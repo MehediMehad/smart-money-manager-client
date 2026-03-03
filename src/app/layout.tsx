@@ -2,6 +2,7 @@ import "./globals.css";
 import { Metadata } from "next";
 import { Toaster } from "sonner";
 import { Noto_Sans_Bengali } from "next/font/google";
+import UserProvider from "@/context/UserContext";
 
 const notoSansBengali = Noto_Sans_Bengali({
   subsets: ["bengali", "latin"],
@@ -21,8 +22,10 @@ export default function RootLayout({
   return (
     <html lang="bn" suppressHydrationWarning>
       <body className={`${notoSansBengali.className} antialiased`}>
-        {children}
-        <Toaster richColors position="top-center" />
+        <UserProvider>
+          {children}
+          <Toaster richColors position="top-center" />
+        </UserProvider>
       </body>
     </html>
   );
