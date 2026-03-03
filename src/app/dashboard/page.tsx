@@ -1,4 +1,5 @@
 import ChartSection from "@/components/modules/dashboard/Home/ChartSection";
+import DebtList from "@/components/modules/dashboard/Home/DebtList";
 import SavingsGoals from "@/components/modules/dashboard/Home/SavingsGoals";
 import SummarySection from "@/components/modules/dashboard/Home/SummarySection";
 
@@ -15,6 +16,7 @@ const DashboardHome = () => {
       <div className="mb-8">
         <SavingsGoals />
       </div>
+      <DebtList />
     </>
   );
 };
