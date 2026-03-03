@@ -1,3 +1,4 @@
+import ChartSection from "@/components/modules/dashboard/Home/ChartSection";
 import SummarySection from "@/components/modules/dashboard/Home/SummarySection";
 
 const DashboardHome = () => {
@@ -7,6 +8,11 @@ const DashboardHome = () => {
         আর্থিক সারসংক্ষেপ
       </h2>
       <SummarySection />
+      <div className="mb-8">
+        <ChartSection />
+      </div>
+      <div className="mb-8">{/* <SavingsGoals /> */}</div>
+      {/* <DebtList /> */}
     </>
   );
 };
