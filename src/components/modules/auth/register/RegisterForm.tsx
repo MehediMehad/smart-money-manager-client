@@ -18,7 +18,6 @@ import { registrationSchema } from "./registerValidation";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { useUser } from "@/context/UserContext";
-import Logo from "@/components/shared/Logo";
 import {
   Select,
   SelectContent,
@@ -28,8 +27,8 @@ import {
 } from "@/components/ui/select";
 import { registerUser } from "@/services/AuthService";
 import { useState } from "react";
-import UserImagePreviewer from "@/components/core/UserImageUploder/UserImagePreviewer";
-import UserImageUploader from "@/components/core/UserImageUploder/UserImageUploader";
+import UserImagePreviewer from "@/components/shared/core/UserImageUploder/UserImagePreviewer";
+import UserImageUploader from "@/components/shared/core/UserImageUploder/UserImageUploader";
 
 export default function RegisterForm() {
   const form = useForm({
@@ -77,7 +76,7 @@ export default function RegisterForm() {
     <Card className="w-full max-w-5xl shadow-lg rounded-xl overflow-hidden">
       <CardHeader className="space-y-4">
         <div className="flex flex-col items-center space-y-2">
-          <Logo />
+          {/* <Logo /> */}
           <div className="text-center">
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
               Register
