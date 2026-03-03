@@ -1,12 +1,13 @@
 import FeaturesSection from "@/components/modules/common/Home/FeaturesSection";
 import HeroSection from "@/components/modules/common/Home/HeroSection";
-import Link from "next/link";
+import HowItWorksSection from "@/components/modules/common/Home/HowItWorksSection";
 
 const HomePage = () => {
   return (
     <div className="min-h-screen bg-background">
       <HeroSection />
       <FeaturesSection />
+      <HowItWorksSection />
     </div>
   );
 };
