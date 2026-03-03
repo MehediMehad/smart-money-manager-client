@@ -1,4 +1,5 @@
 import ChartSection from "@/components/modules/dashboard/Home/ChartSection";
+import SavingsGoals from "@/components/modules/dashboard/Home/SavingsGoals";
 import SummarySection from "@/components/modules/dashboard/Home/SummarySection";
 
 const DashboardHome = () => {
@@ -11,8 +12,9 @@ const DashboardHome = () => {
       <div className="mb-8">
         <ChartSection />
       </div>
-      <div className="mb-8">{/* <SavingsGoals /> */}</div>
-      {/* <DebtList /> */}
+      <div className="mb-8">
+        <SavingsGoals />
+      </div>
     </>
   );
 };
