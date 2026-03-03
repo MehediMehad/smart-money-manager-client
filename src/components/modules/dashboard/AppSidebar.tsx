@@ -20,6 +20,8 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+import clsx from "clsx";
 
 const menuItems = [
   { title: "ড্যাশবোর্ড", url: "/dashboard", icon: LayoutDashboard },
@@ -34,31 +36,42 @@ const menuItems = [
 
 const AppSidebar = () => {
   const { state } = useSidebar();
+  const pathname = usePathname();
   const collapsed = state === "collapsed";
 
   return (
     <Sidebar collapsible="icon">
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel className="text-base font-bold px-4 py-3">
+          <SidebarGroupLabel className="text-base font-bold px-4 py-3 mb-4">
             {!collapsed && "স্মার্ট মানি"}
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {menuItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <Link
-                      href={item.url}
-                      className="hover:bg-accent/60"
-                      // activeClassName="bg-accent text-primary font-semibold"
-                    >
-                      <item.icon className="mr-2 h-5 w-5" />
-                      {!collapsed && <span>{item.title}</span>}
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+              {menuItems.map((item) => {
+                const isActive =
+                  pathname === item.url || pathname.startsWith(item.url + "/");
+
+                return (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton asChild>
+                      <Link
+                        href={item.url}
+                        className={clsx(
+                          "flex items-center rounded-md px-3 py-2 text-base transition-colors",
+                          "hover:bg-accent/60",
+                          isActive && "bg-accent text-primary font-semibold",
+                        )}
+                      >
+                        <item.icon
+                          className={clsx("h-5 w-5", !collapsed && "mr-2")}
+                        />
+                        {!collapsed && <span>{item.title}</span>}
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
