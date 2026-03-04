@@ -19,7 +19,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
@@ -36,13 +36,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Plus, Pencil, Trash2, AlertTriangle } from "lucide-react";
+import { Plus, AlertTriangle, Pencil, Trash2, Info, Eye } from "lucide-react";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 import { format } from "date-fns";
 import { bn } from "date-fns/locale";
 import { cn } from "@/lib/utils";
-
-const COLORS = ["#ef4444", "#3b82f6"]; // red for Taken, blue for Given
 
 const dummyDebts = [
   // GIVEN (তুমি দিয়েছো → receivable)
@@ -135,10 +133,10 @@ function getDebtStatus(dueDate: string, paid = false) {
 
 export default function DebtsPage() {
   const [openAdd, setOpenAdd] = useState(false);
-  const [tab, setTab] = useState<"GIVEN" | "TAKEN" | "all">("all");
+  const [tab, setTab] = useState<"GIVEN" | "TAKEN">("GIVEN");
 
   const filteredDebts = useMemo(() => {
-    if (tab === "all") return dummyDebts;
+    if (tab === "GIVEN") return dummyDebts;
     return dummyDebts.filter((d) => d.type === tab);
   }, [tab]);
 
@@ -253,8 +251,8 @@ export default function DebtsPage() {
             onValueChange={(v) => setTab(v as any)}
             className="w-full"
           >
-            <TabsList className="grid w-full sm:w-auto sm:inline-grid grid-cols-2">
-              <TabsTrigger value="all">সব</TabsTrigger>
+            <TabsList className="grid w-full sm:w-auto sm:inline-grid grid-cols-3">
+              {/* <TabsTrigger value="all">সব</TabsTrigger> */}
               <TabsTrigger value="GIVEN">দেওয়া টাকা</TabsTrigger>
               <TabsTrigger value="TAKEN">নেওয়া টাকা</TabsTrigger>
             </TabsList>
@@ -313,15 +311,15 @@ export default function DebtsPage() {
         {/* Debt Table */}
         <Card className="rounded-2xl shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
-            <Table>
+            <Table className="min-w-full">
               <TableHeader className="bg-muted/60">
                 <TableRow>
                   <TableHead>ব্যক্তি</TableHead>
-                  <TableHead>ধরন</TableHead>
+                  {/* <TableHead>ধরন</TableHead> */}
                   <TableHead>পরিমাণ</TableHead>
                   <TableHead>Due Date</TableHead>
                   <TableHead>অবস্থা</TableHead>
-                  <TableHead className="text-right w-28">অ্যাকশন</TableHead>
+                  <TableHead className="text-right">অ্যাকশন</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -332,7 +330,7 @@ export default function DebtsPage() {
                       <TableCell className="font-medium">
                         {debt.person}
                       </TableCell>
-                      <TableCell>
+                      {/* <TableCell>
                         <Badge
                           variant={
                             debt.type === "GIVEN" ? "default" : "destructive"
@@ -340,7 +338,7 @@ export default function DebtsPage() {
                         >
                           {debt.type === "GIVEN" ? "দেওয়া" : "নেওয়া"}
                         </Badge>
-                      </TableCell>
+                      </TableCell> */}
                       <TableCell
                         className={cn(
                           "font-semibold",
@@ -375,7 +373,7 @@ export default function DebtsPage() {
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-1">
-                          <Button
+                          {/* <Button
                             variant="ghost"
                             size="icon"
                             className="h-8 w-8"
@@ -388,6 +386,13 @@ export default function DebtsPage() {
                             className="h-8 w-8 text-destructive"
                           >
                             <Trash2 className="h-4 w-4" />
+                          </Button> */}
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            className="h-8 w-8 text-destructive"
+                          >
+                            <Eye className="h-4 w-4 text-gray-500" />
                           </Button>
                         </div>
                       </TableCell>
