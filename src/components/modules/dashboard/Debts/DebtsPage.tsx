@@ -264,7 +264,7 @@ export default function DebtsPage() {
                 <Plus className="h-4 w-4" /> নতুন ধার যোগ
               </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-md rounded-2xl">
+            <DialogContent className="w-[95%] sm:max-w-md rounded-2xl">
               <DialogHeader>
                 <DialogTitle>নতুন ধার-দেনা যোগ করুন</DialogTitle>
               </DialogHeader>
@@ -299,7 +299,11 @@ export default function DebtsPage() {
                 </div>
               </div>
               <DialogFooter>
-                <Button variant="outline" onClick={() => setOpenAdd(false)}>
+                <Button
+                  className="mt-2 sm:mt-0"
+                  variant="outline"
+                  onClick={() => setOpenAdd(false)}
+                >
                   বাতিল
                 </Button>
                 <Button>সংরক্ষণ করুন</Button>
@@ -439,8 +443,8 @@ export default function DebtsPage() {
       {/* Mobile floating add */}
       <div className="fixed bottom-6 right-6 z-50 md:hidden">
         <Button
-          size="lg"
-          className="rounded-full h-14 w-14 shadow-2xl bg-gradient-to-r from-red-600 to-rose-600"
+          size="icon"
+          className="h-14 w-14 rounded-full shadow-2xl bg-gradient-to-r from-red-600 to-rose-600"
           onClick={() => setOpenAdd(true)}
         >
           <Plus className="h-7 w-7" />
