@@ -249,9 +249,9 @@ export default function DebtsPage() {
           <Tabs
             value={tab}
             onValueChange={(v) => setTab(v as any)}
-            className="w-full"
+            className="w-full "
           >
-            <TabsList className="grid w-full sm:w-auto sm:inline-grid grid-cols-3">
+            <TabsList className="grid w-full sm:w-auto sm:inline-grid grid-cols-2 gap-5 min-w-[320px]">
               {/* <TabsTrigger value="all">সব</TabsTrigger> */}
               <TabsTrigger value="GIVEN">দেওয়া টাকা</TabsTrigger>
               <TabsTrigger value="TAKEN">নেওয়া টাকা</TabsTrigger>
