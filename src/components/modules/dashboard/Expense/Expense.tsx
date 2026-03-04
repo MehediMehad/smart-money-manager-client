@@ -410,7 +410,7 @@ export default function ExpensePage() {
         </Dialog>
       </div>
 
-      {/* ── Expense Table ── */}
+      {/* Expense Table */}
       <Card className="rounded-2xl shadow-sm overflow-hidden">
         <Table>
           <TableHeader className="bg-muted/40">
