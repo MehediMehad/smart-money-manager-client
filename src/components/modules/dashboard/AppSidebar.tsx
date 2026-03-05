@@ -29,7 +29,11 @@ const menuItems = [
   { title: "ব্যয়", url: "/dashboard/expense", icon: ArrowUpCircle },
   { title: "সঞ্চয়", url: "/dashboard/savings", icon: PiggyBank },
   { title: "ধার-দেনা", url: "/dashboard/debts", icon: HandCoins },
-  { title: "রিপোর্ট", url: "/dashboard/reports", icon: BarChart3 },
+  {
+    title: "মাসিক রিপোর্ট",
+    url: "/dashboard/monthly-reports",
+    icon: BarChart3,
+  },
   { title: "নোটিফিকেশন", url: "/dashboard/notifications", icon: Bell },
   { title: "সেটিংস", url: "/dashboard/settings", icon: Settings },
 ];

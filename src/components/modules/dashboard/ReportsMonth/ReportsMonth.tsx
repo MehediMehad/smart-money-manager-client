@@ -176,8 +176,16 @@ export default function MonthlyReportsPage() {
 
       {/* 2. Monthly Overview Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <OverviewCard title="মোট আয়" value={data.income} variant="emerald" />
-        <OverviewCard title="মোট ব্যয়" value={data.expense} variant="red" />
+        <OverviewCard
+          title="এই মাসের মোট আয়"
+          value={data.income}
+          variant="emerald"
+        />
+        <OverviewCard
+          title="এই মাসের মোট ব্যয়"
+          value={data.expense}
+          variant="red"
+        />
         <OverviewCard
           title="এই মাসের সঞ্চয়"
           value={data.savings}
@@ -191,7 +199,7 @@ export default function MonthlyReportsPage() {
       </div>
 
       {/* 3. Income vs Expense vs Savings Bar Chart */}
-      <Card className="rounded-2xl shadow-sm">
+      {/* <Card className="rounded-2xl shadow-sm">
         <CardHeader>
           <CardTitle>আয় - ব্যয় - সঞ্চয় তুলনা</CardTitle>
         </CardHeader>
@@ -207,7 +215,7 @@ export default function MonthlyReportsPage() {
             </BarChart>
           </ResponsiveContainer>
         </CardContent>
-      </Card>
+      </Card> */}
 
       <div className="grid lg:grid-cols-2 gap-6">
         {/* 4. Income Breakdown */}
