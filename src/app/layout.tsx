@@ -10,7 +10,7 @@ const notoSansBengali = Noto_Sans_Bengali({
 });
 
 export const metadata: Metadata = {
-  title: "আর্থিক ব্যবস্থাপনা",
+  title: "স্মার্ট মানি ম্যানেজার",
   description: "তোমার টাকা-পয়সার হিসাব রাখো সহজে",
 };
 
