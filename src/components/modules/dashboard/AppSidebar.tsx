@@ -22,6 +22,7 @@ import {
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import clsx from "clsx";
+import { PieChart } from "lucide-react";
 
 const menuItems = [
   { title: "ড্যাশবোর্ড", url: "/dashboard", icon: LayoutDashboard },
@@ -34,6 +35,7 @@ const menuItems = [
     url: "/dashboard/monthly-reports",
     icon: BarChart3,
   },
+  { title: "বাজেট", url: "/dashboard/budget", icon: PieChart },
   { title: "নোটিফিকেশন", url: "/dashboard/notifications", icon: Bell },
   { title: "সেটিংস", url: "/dashboard/settings", icon: Settings },
 ];

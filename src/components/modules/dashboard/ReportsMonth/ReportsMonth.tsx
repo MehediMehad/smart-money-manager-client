@@ -9,7 +9,6 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import {
   Select,
@@ -42,9 +41,9 @@ import {
 import { cn } from "@/lib/utils";
 
 const currentYear = 2026;
-const currentMonth = 3; // March
+const currentMonth = "03"; // March
 
-// Dummy data for March 2026
+// Dummy monthly financial data (March 2026)
 const monthlyData = {
   income: 78000,
   expense: 52000,
@@ -52,14 +51,20 @@ const monthlyData = {
   netBalance: 26000,
   topIncomeSource: { name: "বেতন", amount: 50000 },
   highestExpenseCategory: { name: "খাবার", amount: 14000, percent: 27 },
-  savingsRate: 23, // %
+  savingsRate: 23,
   healthScore: 82,
-  previousMonth: {
-    income: 68000,
-    expense: 54000,
-    savings: 12000,
-  },
+  previousMonth: { income: 68000, expense: 54000, savings: 12000 },
 };
+
+// Dummy budget data (integrated with expense)
+const budgetData = [
+  { category: "খাবার", budget: 12000, spent: 14000, status: "over" },
+  { category: "যাতায়াত", budget: 5000, spent: 4800, status: "safe" },
+  { category: "বিল", budget: 6000, spent: 6200, status: "near" },
+  { category: "শপিং", budget: 4000, spent: 3200, status: "safe" },
+  { category: "বিনোদন", budget: 3000, spent: 4200, status: "over" },
+  { category: "শিক্ষা", budget: 8000, spent: 3000, status: "safe" },
+];
 
 const incomeSources = [
   { name: "বেতন", value: 50000 },
@@ -70,16 +75,11 @@ const incomeSources = [
 
 const expenseCategories = [
   { name: "খাবার", value: 14000 },
-  { name: "যাতায়াত", value: 8000 },
-  { name: "বিল", value: 12000 },
-  { name: "শপিং", value: 9000 },
-  { name: "অন্যান্য", value: 9000 },
-];
-
-const ieComparison = [
-  { name: "Income", amount: monthlyData.income, fill: "#10b981" },
-  { name: "Expense", amount: monthlyData.expense, fill: "#ef4444" },
-  { name: "Savings", amount: monthlyData.savings, fill: "#3b82f6" },
+  { name: "যাতায়াত", value: 4800 },
+  { name: "বিল", value: 6200 },
+  { name: "শপিং", value: 3200 },
+  { name: "বিনোদন", value: 4200 },
+  { name: "শিক্ষা", value: 3000 },
 ];
 
 const dailyTrend = [
@@ -103,7 +103,14 @@ const goalStatus = [
   { name: "মোবাইল", target: 65000, addedThisMonth: 0, status: "সম্পন্ন" },
 ];
 
-const COLORS = ["#10b981", "#3b82f6", "#f59e0b", "#8b5cf6", "#ec4899"];
+const COLORS = [
+  "#10b981",
+  "#3b82f6",
+  "#f59e0b",
+  "#8b5cf6",
+  "#ec4899",
+  "#f97316",
+];
 
 function formatBDT(amount: number) {
   return "৳" + amount.toLocaleString("bn-BD");
@@ -111,12 +118,21 @@ function formatBDT(amount: number) {
 
 export default function MonthlyReportsPage() {
   const [selectedYear, setSelectedYear] = useState(currentYear.toString());
-  const [selectedMonth, setSelectedMonth] = useState(
-    currentMonth.toString().padStart(2, "0"),
-  );
+  const [selectedMonth, setSelectedMonth] = useState(currentMonth);
 
-  // In real app → fetch data based on selectedYear + selectedMonth
-  const data = monthlyData; // dummy
+  // In real app → fetch based on month/year
+  const data = monthlyData;
+  const budgets = budgetData;
+
+  const totalBudget = useMemo(
+    () => budgets.reduce((sum, b) => sum + b.budget, 0),
+    [budgets],
+  );
+  const totalSpent = useMemo(
+    () => budgets.reduce((sum, b) => sum + b.spent, 0),
+    [budgets],
+  );
+  const totalRemaining = totalBudget - totalSpent;
 
   const incomeChange =
     ((data.income - data.previousMonth.income) / data.previousMonth.income) *
@@ -128,41 +144,50 @@ export default function MonthlyReportsPage() {
     ((data.savings - data.previousMonth.savings) / data.previousMonth.savings) *
     100;
 
+  const chartData = budgets.map((b) => ({
+    category: b.category,
+    budget: b.budget,
+    spent: b.spent,
+  }));
   return (
     <div className="space-y-6 pb-12">
-      {/* 1. Month Selector */}
+      {/* Month Selector */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-card rounded-2xl p-4 shadow-sm border">
-        <h2 className="text-2xl font-bold">মাসিক রিপোর্ট</h2>
+        <h2 className="text-2xl font-bold">
+          মাসিক রিপোর্ট (
+          {new Date(2000, Number(selectedMonth) - 1).toLocaleString("bn-BD", {
+            month: "long",
+          })}{" "}
+          {selectedYear})
+        </h2>
         <div className="flex flex-wrap gap-3 items-center">
-          <div className="flex gap-2">
-            <Select value={selectedMonth} onValueChange={setSelectedMonth}>
-              <SelectTrigger className="w-36">
-                <SelectValue placeholder="মাস" />
-              </SelectTrigger>
-              <SelectContent>
-                {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
-                  <SelectItem key={m} value={m.toString().padStart(2, "0")}>
-                    {new Date(2000, m - 1).toLocaleString("bn-BD", {
-                      month: "long",
-                    })}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+          <Select value={selectedMonth} onValueChange={setSelectedMonth}>
+            <SelectTrigger className="w-36">
+              <SelectValue placeholder="মাস" />
+            </SelectTrigger>
+            <SelectContent>
+              {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
+                <SelectItem key={m} value={m.toString().padStart(2, "0")}>
+                  {new Date(2000, m - 1).toLocaleString("bn-BD", {
+                    month: "long",
+                  })}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
 
-            <Select value={selectedYear} onValueChange={setSelectedYear}>
-              <SelectTrigger className="w-28">
-                <SelectValue placeholder="বছর" />
-              </SelectTrigger>
-              <SelectContent>
-                {[2024, 2025, 2026, 2027].map((y) => (
-                  <SelectItem key={y} value={y.toString()}>
-                    {y}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+          <Select value={selectedYear} onValueChange={setSelectedYear}>
+            <SelectTrigger className="w-28">
+              <SelectValue placeholder="বছর" />
+            </SelectTrigger>
+            <SelectContent>
+              {[2025, 2026, 2027].map((y) => (
+                <SelectItem key={y} value={y.toString()}>
+                  {y}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
 
           <Button className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700">
             দেখান
@@ -174,57 +199,120 @@ export default function MonthlyReportsPage() {
         </div>
       </div>
 
-      {/* 2. Monthly Overview Cards */}
+      {/* 4 Main Summary Cards (আয়, খরচ, সঞ্চয়, বাকি বাজেট) */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <OverviewCard
-          title="এই মাসের মোট আয়"
+          title="মোট আয়"
           value={data.income}
+          subtitle="এই মাসে"
           variant="emerald"
         />
         <OverviewCard
-          title="এই মাসের মোট ব্যয়"
-          value={data.expense}
+          title="খরচ হয়েছে"
+          value={totalSpent}
+          subtitle={`বাজেটের ${((totalSpent / totalBudget) * 100).toFixed(0)}%`}
           variant="red"
         />
         <OverviewCard
-          title="এই মাসের সঞ্চয়"
+          title="সঞ্চয়"
           value={data.savings}
+          subtitle="এই মাসে"
           variant="blue"
         />
         <OverviewCard
-          title="নেট ব্যালেন্স"
-          value={data.netBalance}
-          variant="purple"
+          title="বাকি বাজেট"
+          value={totalRemaining}
+          subtitle={totalRemaining >= 0 ? "অবশিষ্ট" : "অতিরিক্ত খরচ"}
+          variant={totalRemaining >= 0 ? "purple" : "destructive"}
         />
       </div>
 
-      {/* 3. Income vs Expense vs Savings Bar Chart */}
+      {/* Budget vs Actual Bar Chart */}
       {/* <Card className="rounded-2xl shadow-sm">
         <CardHeader>
-          <CardTitle>আয় - ব্যয় - সঞ্চয় তুলনা</CardTitle>
+          <CardTitle>বাজেট বনাম প্রকৃত খরচ</CardTitle>
+          <CardDescription>
+            ক্যাটাগরি অনুযায়ী তুলনা (Over budget লাল রঙে)
+          </CardDescription>
         </CardHeader>
-        <CardContent className="h-64 sm:h-80">
+        <CardContent className="h-72">
           <ResponsiveContainer>
-            <BarChart data={ieComparison}>
+            <BarChart
+              data={budgetVsActual}
+              margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
+            >
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" />
+              <XAxis
+                dataKey="category"
+                angle={-45}
+                textAnchor="end"
+                height={70}
+                interval={0}
+              />
               <YAxis />
               <Tooltip formatter={(v: number) => formatBDT(v)} />
               <Legend />
-              <Bar dataKey="amount" radius={[6, 6, 0, 0]} />
+              <Bar
+                dataKey="budget"
+                name="বাজেট"
+                fill="#3b82f6"
+                radius={[4, 4, 0, 0]}
+              />
+              <Bar
+                dataKey="spent"
+                name="খরচ"
+                fill="#ef4444"
+                radius={[4, 4, 0, 0]}
+              />
             </BarChart>
           </ResponsiveContainer>
         </CardContent>
       </Card> */}
 
+      <Card className="rounded-2xl shadow-sm">
+        <CardHeader>
+          <CardTitle>বাজেট বনাম খরচ তুলনা</CardTitle>
+          <CardDescription>ক্যাটাগরি অনুযায়ী</CardDescription>
+        </CardHeader>
+        <CardContent className="h-64 sm:h-80">
+          <ResponsiveContainer>
+            <BarChart
+              data={chartData}
+              margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis
+                dataKey="category"
+                angle={-45}
+                textAnchor="end"
+                height={70}
+                interval={0}
+              />
+              <YAxis />
+              <Tooltip formatter={(v: number) => formatBDT(v)} />
+              <Legend />
+              <Bar
+                dataKey="budget"
+                name="বাজেট"
+                fill="#3b82f6"
+                radius={[4, 4, 0, 0]}
+              />
+              <Bar
+                dataKey="spent"
+                name="খরচ"
+                fill="#ef4444"
+                radius={[4, 4, 0, 0]}
+              />
+            </BarChart>
+          </ResponsiveContainer>
+        </CardContent>
+      </Card>
+
+      {/* Income & Expense Breakdown */}
       <div className="grid lg:grid-cols-2 gap-6">
-        {/* 4. Income Breakdown */}
         <Card className="rounded-2xl shadow-sm">
           <CardHeader>
             <CardTitle>আয়ের উৎস বণ্টন</CardTitle>
-            <CardDescription>
-              সবচেয়ে বেশি আয় এসেছে {data.topIncomeSource.name} থেকে
-            </CardDescription>
           </CardHeader>
           <CardContent className="h-64">
             <ResponsiveContainer>
@@ -251,13 +339,9 @@ export default function MonthlyReportsPage() {
           </CardContent>
         </Card>
 
-        {/* 5. Expense Breakdown */}
         <Card className="rounded-2xl shadow-sm">
           <CardHeader>
             <CardTitle>ব্যয়ের ক্যাটাগরি বণ্টন</CardTitle>
-            <CardDescription>
-              সবচেয়ে বেশি খরচ {data.highestExpenseCategory.name}-এ
-            </CardDescription>
           </CardHeader>
           <CardContent className="h-64">
             <ResponsiveContainer>
@@ -285,77 +369,7 @@ export default function MonthlyReportsPage() {
         </Card>
       </div>
 
-      {/* 7. Monthly Comparison Table */}
-      <Card className="rounded-2xl shadow-sm">
-        <CardHeader>
-          <CardTitle>গত মাসের তুলনায় পরিবর্তন</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <div className="flex justify-between items-center border-b pb-3">
-              <span>আয়</span>
-              <div className="flex items-center gap-2">
-                <span className="font-bold">{formatBDT(data.income)}</span>
-                <div
-                  className={cn(
-                    "flex items-center text-sm",
-                    incomeChange >= 0 ? "text-emerald-600" : "text-red-600",
-                  )}
-                >
-                  {incomeChange >= 0 ? (
-                    <ArrowUpRight className="h-4 w-4" />
-                  ) : (
-                    <ArrowDownRight className="h-4 w-4" />
-                  )}
-                  {Math.abs(incomeChange).toFixed(1)}%
-                </div>
-              </div>
-            </div>
-
-            <div className="flex justify-between items-center border-b pb-3">
-              <span>ব্যয়</span>
-              <div className="flex items-center gap-2">
-                <span className="font-bold">{formatBDT(data.expense)}</span>
-                <div
-                  className={cn(
-                    "flex items-center text-sm",
-                    expenseChange <= 0 ? "text-emerald-600" : "text-red-600",
-                  )}
-                >
-                  {expenseChange <= 0 ? (
-                    <ArrowDownRight className="h-4 w-4" />
-                  ) : (
-                    <ArrowUpRight className="h-4 w-4" />
-                  )}
-                  {Math.abs(expenseChange).toFixed(1)}%
-                </div>
-              </div>
-            </div>
-
-            <div className="flex justify-between items-center">
-              <span>সঞ্চয়</span>
-              <div className="flex items-center gap-2">
-                <span className="font-bold">{formatBDT(data.savings)}</span>
-                <div
-                  className={cn(
-                    "flex items-center text-sm",
-                    savingsChange >= 0 ? "text-emerald-600" : "text-red-600",
-                  )}
-                >
-                  {savingsChange >= 0 ? (
-                    <ArrowUpRight className="h-4 w-4" />
-                  ) : (
-                    <ArrowDownRight className="h-4 w-4" />
-                  )}
-                  {Math.abs(savingsChange).toFixed(1)}%
-                </div>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* 8. Smart Insights */}
+      {/* Smart Insights */}
       <Card className="rounded-2xl shadow-sm border-emerald-400/40 bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-950/30 dark:to-teal-950/20">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -368,95 +382,99 @@ export default function MonthlyReportsPage() {
             positive={incomeChange >= 0}
           />
           <InsightItem
-            text={`সবচেয়ে বেশি খরচ হয়েছে ${data.highestExpenseCategory.name}-এ (${data.highestExpenseCategory.percent}%)`}
+            text={`খরচ গত মাসের তুলনায় ${Math.abs(expenseChange).toFixed(1)}% ${expenseChange <= 0 ? "কমেছে" : "বেড়েছে"}`}
+            positive={expenseChange <= 0}
+          />
+          <InsightItem
+            text={`বাজেটের ${((totalSpent / totalBudget) * 100).toFixed(0)}% খরচ হয়েছে — ${totalRemaining >= 0 ? "নিয়ন্ত্রণে" : "সতর্কতা দরকার"}`}
+            positive={totalRemaining >= 0}
+          />
+          <InsightItem
+            text={`${budgetData.filter((b) => b.status === "over").length} টি ক্যাটাগরি বাজেট অতিক্রম করেছে`}
             positive={false}
           />
-          <InsightItem
-            text={`আয়ের ${data.savingsRate}% সঞ্চয় করেছেন — ${data.savingsRate >= 20 ? "ভালো" : "উন্নতি দরকার"}`}
-            positive={data.savingsRate >= 20}
-          />
-          <InsightItem
-            text={`ফাইন্যান্সিয়াল হেলথ স্কোর: ${data.healthScore}/100 (${data.healthScore >= 70 ? "শক্তিশালী" : "মাঝারি"})`}
-            positive={data.healthScore >= 70}
-          />
         </CardContent>
       </Card>
 
-      {/* 9. Daily Trend (Optional) */}
-      <Card className="rounded-2xl shadow-sm">
-        <CardHeader>
-          <CardTitle>দৈনিক আয়-ব্যয়ের ধারা</CardTitle>
-        </CardHeader>
-        <CardContent className="h-64">
-          <ResponsiveContainer>
-            <LineChart data={dailyTrend}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="day" />
-              <YAxis />
-              <Tooltip formatter={(v: number) => formatBDT(v)} />
-              <Legend />
-              <Line
-                type="monotone"
-                dataKey="income"
-                stroke="#10b981"
-                name="আয়"
-              />
-              <Line
-                type="monotone"
-                dataKey="expense"
-                stroke="#ef4444"
-                name="ব্যয়"
-              />
-            </LineChart>
-          </ResponsiveContainer>
-        </CardContent>
-      </Card>
+      {/* Daily Trend + Goal Status */}
+      <div className="grid lg:grid-cols-2 gap-6">
+        <Card className="rounded-2xl shadow-sm">
+          <CardHeader>
+            <CardTitle>দৈনিক আয়-ব্যয়</CardTitle>
+          </CardHeader>
+          <CardContent className="h-64">
+            <ResponsiveContainer>
+              <LineChart data={dailyTrend}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="day" />
+                <YAxis />
+                <Tooltip formatter={(v: number) => formatBDT(v)} />
+                <Legend />
+                <Line
+                  type="monotone"
+                  dataKey="income"
+                  stroke="#10b981"
+                  name="আয়"
+                />
+                <Line
+                  type="monotone"
+                  dataKey="expense"
+                  stroke="#ef4444"
+                  name="ব্যয়"
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
 
-      {/* 6. Goal Status This Month */}
-      <Card className="rounded-2xl shadow-sm">
-        <CardHeader>
-          <CardTitle>এই মাসের সঞ্চয় লক্ষ্য অগ্রগতি</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {goalStatus.map((g, i) => (
-              <div
-                key={i}
-                className="flex justify-between items-center border-b pb-3 last:border-0"
-              >
-                <div>
-                  <p className="font-medium">{g.name}</p>
-                  <p className="text-sm text-muted-foreground">
-                    লক্ষ্য: {formatBDT(g.target)}
-                  </p>
+        <Card className="rounded-2xl shadow-sm">
+          <CardHeader>
+            <CardTitle>এই মাসের লক্ষ্য অগ্রগতি</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {goalStatus.map((g, i) => (
+                <div
+                  key={i}
+                  className="flex justify-between items-center border-b pb-3 last:border-0"
+                >
+                  <div>
+                    <p className="font-medium">{g.name}</p>
+                    <p className="text-sm text-muted-foreground">
+                      লক্ষ্য: {formatBDT(g.target)}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-bold text-emerald-600">
+                      +{formatBDT(g.addedThisMonth)}
+                    </p>
+                    <Badge
+                      variant={g.status === "সম্পন্ন" ? "default" : "secondary"}
+                    >
+                      {g.status}
+                    </Badge>
+                  </div>
                 </div>
-                <div className="text-right">
-                  <p className="font-bold text-emerald-600">
-                    +{formatBDT(g.addedThisMonth)}
-                  </p>
-                  <Badge
-                    variant={g.status === "সম্পন্ন" ? "default" : "secondary"}
-                  >
-                    {g.status}
-                  </Badge>
-                </div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }
 
+// Reusable components
 function OverviewCard({
   title,
   value,
+  subtitle,
   variant = "default",
 }: {
   title: string;
   value: number;
-  variant?: "emerald" | "red" | "blue" | "purple" | "default";
+  subtitle: string;
+  variant?: "emerald" | "red" | "blue" | "purple" | "destructive" | "default";
 }) {
   const colors = {
     default: "text-foreground",
@@ -464,6 +482,7 @@ function OverviewCard({
     red: "text-red-600 dark:text-red-400",
     blue: "text-blue-600 dark:text-blue-400",
     purple: "text-purple-600 dark:text-purple-400",
+    destructive: "text-destructive",
   };
 
   return (
@@ -474,9 +493,12 @@ function OverviewCard({
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className={`text-2xl font-bold ${colors[variant]}`}>
+        <div
+          className={`text-2xl font-bold ${colors[variant] || "text-foreground"}`}
+        >
           {formatBDT(value)}
         </div>
+        <p className="text-xs text-muted-foreground mt-1">{subtitle}</p>
       </CardContent>
     </Card>
   );

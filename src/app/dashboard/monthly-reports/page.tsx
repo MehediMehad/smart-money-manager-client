@@ -3,6 +3,7 @@ import MonthlyReportsPage from "@/components/modules/dashboard/ReportsMonth/Repo
 const Page = () => {
   return (
     <>
+      {/* <MonthlyReportsPage2 /> */}
       <MonthlyReportsPage />
     </>
   );
