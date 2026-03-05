@@ -38,7 +38,8 @@ import {
   LineChart,
   Line,
 } from "recharts";
-import { cn } from "@/lib/utils";
+import IncomeTable from "./IncomeTable";
+import ExpenseTable from "./ExpenseTable";
 
 const currentYear = 2026;
 const currentMonth = "03"; // March
@@ -460,6 +461,10 @@ export default function MonthlyReportsPage() {
           </CardContent>
         </Card>
       </div>
+      {/* <div className="flex gap-6">
+        <IncomeTable />
+        <ExpenseTable />
+      </div> */}
     </div>
   );
 }

@@ -54,7 +54,6 @@ import {
 } from "recharts";
 import { format } from "date-fns";
 import { bn } from "date-fns/locale";
-import { cn } from "@/lib/utils";
 
 const COLORS = [
   "#10b981",
