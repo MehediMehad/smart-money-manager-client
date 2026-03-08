@@ -143,22 +143,22 @@ export default function MonthlyBudget() {
           variant="emerald"
         />
         <BudgetSummaryCard
-          title="বাকি বাজেট"
-          value={totalRemaining}
-          subtitle={totalRemaining >= 0 ? "অবশিষ্ট" : "অতিরিক্ত খরচ"}
-          variant={totalRemaining >= 0 ? "blue" : "destructive"}
-        />
-        <BudgetSummaryCard
           title="মোট বাজেট"
           value={totalBudget}
           subtitle="এই মাসে"
           variant="blue"
         />
         <BudgetSummaryCard
-          title="মোট খরচ"
+          title="খরচ"
           value={totalSpent}
-          subtitle="এ পর্যন্ত"
+          subtitle="এই মাসে"
           variant="red"
+        />
+        <BudgetSummaryCard
+          title="বাকি বাজেট"
+          value={totalRemaining}
+          subtitle={totalRemaining >= 0 ? "অবশিষ্ট" : "অতিরিক্ত খরচ"}
+          variant={totalRemaining >= 0 ? "purple" : "destructive"}
         />
       </div>
 

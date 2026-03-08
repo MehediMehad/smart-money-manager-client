@@ -7,6 +7,9 @@ import {
   BarChart3,
   Settings,
   Bell,
+  Clock,
+  PieChart,
+  Receipt,
 } from "lucide-react";
 import {
   Sidebar,
@@ -22,12 +25,20 @@ import {
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import clsx from "clsx";
-import { PieChart } from "lucide-react";
 
 const menuItems = [
   { title: "ড্যাশবোর্ড", url: "/dashboard", icon: LayoutDashboard },
+  {
+    title: "আজকের আপডেট",
+    url: "/dashboard/today-update",
+    icon: Clock,
+  },
   { title: "আয়", url: "/dashboard/income", icon: ArrowDownCircle },
   { title: "ব্যয়", url: "/dashboard/expense", icon: ArrowUpCircle },
+
+  { title: "দৈনিক বাজেট", url: "/dashboard/daily-budget", icon: Receipt },
+  { title: "মাসিক বাজেট", url: "/dashboard/monthly-budget", icon: PieChart },
+
   { title: "সঞ্চয়", url: "/dashboard/savings", icon: PiggyBank },
   { title: "ধার-দেনা", url: "/dashboard/debts", icon: HandCoins },
   {
@@ -35,8 +46,6 @@ const menuItems = [
     url: "/dashboard/monthly-reports",
     icon: BarChart3,
   },
-  { title: "মাসিক বাজেট", url: "/dashboard/monthly-budget", icon: PieChart },
-  { title: "দৈনিক বাজেট", url: "/dashboard/daily-budget", icon: PieChart },
   { title: "নোটিফিকেশন", url: "/dashboard/notifications", icon: Bell },
   { title: "সেটিংস", url: "/dashboard/settings", icon: Settings },
 ];
