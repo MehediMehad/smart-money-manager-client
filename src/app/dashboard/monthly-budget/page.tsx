@@ -1,11 +1,11 @@
-import BudgetPage from "@/components/modules/dashboard/Budget/BudgetPage";
+import MonthlyBudget from "@/components/modules/dashboard/MonthlyBudget/MonthlyBudgetPage";
 
-const Page = () => {
+const MonthlyPage = () => {
   return (
     <>
-      <BudgetPage />
+      <MonthlyBudget />
     </>
   );
 };
 
-export default Page;
+export default MonthlyPage;

@@ -198,25 +198,6 @@ export default function MonthlyReportsPage2() {
         />
       </div>
 
-      {/* 3. Income vs Expense vs Savings Bar Chart */}
-      {/* <Card className="rounded-2xl shadow-sm">
-        <CardHeader>
-          <CardTitle>আয় - ব্যয় - সঞ্চয় তুলনা</CardTitle>
-        </CardHeader>
-        <CardContent className="h-64 sm:h-80">
-          <ResponsiveContainer>
-            <BarChart data={ieComparison}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" />
-              <YAxis />
-              <Tooltip formatter={(v: number) => formatBDT(v)} />
-              <Legend />
-              <Bar dataKey="amount" radius={[6, 6, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
-        </CardContent>
-      </Card> */}
-
       <div className="grid lg:grid-cols-2 gap-6">
         {/* 4. Income Breakdown */}
         <Card className="rounded-2xl shadow-sm">
