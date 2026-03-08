@@ -35,7 +35,8 @@ const menuItems = [
     url: "/dashboard/monthly-reports",
     icon: BarChart3,
   },
-  { title: "বাজেট", url: "/dashboard/budget", icon: PieChart },
+  { title: "মাসিক বাজেট", url: "/dashboard/monthly-budget", icon: PieChart },
+  { title: "দৈনিক বাজেট", url: "/dashboard/daily-budget", icon: PieChart },
   { title: "নোটিফিকেশন", url: "/dashboard/notifications", icon: Bell },
   { title: "সেটিংস", url: "/dashboard/settings", icon: Settings },
 ];

@@ -1,15 +1,8 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import {
   Select,
   SelectContent,
@@ -17,15 +10,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { TrendingUp, AlertTriangle } from "lucide-react";
 import {
-  ArrowUpRight,
-  ArrowDownRight,
-  TrendingUp,
-  AlertTriangle,
-} from "lucide-react";
-import {
-  BarChart,
-  Bar,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -38,8 +24,6 @@ import {
   LineChart,
   Line,
 } from "recharts";
-import IncomeTable from "./IncomeTable";
-import ExpenseTable from "./ExpenseTable";
 
 const currentYear = 2026;
 const currentMonth = "03"; // March
@@ -93,17 +77,6 @@ const dailyTrend = [
   { day: "৩০", income: 0, expense: 3500 },
 ];
 
-const goalStatus = [
-  { name: "ল্যাপটপ", target: 80000, addedThisMonth: 12000, status: "চলমান" },
-  {
-    name: "জরুরি তহবিল",
-    target: 150000,
-    addedThisMonth: 6000,
-    status: "চলমান",
-  },
-  { name: "মোবাইল", target: 65000, addedThisMonth: 0, status: "সম্পন্ন" },
-];
-
 const COLORS = [
   "#10b981",
   "#3b82f6",
@@ -141,15 +114,7 @@ export default function MonthlyReportsPage() {
   const expenseChange =
     ((data.expense - data.previousMonth.expense) / data.previousMonth.expense) *
     100;
-  const savingsChange =
-    ((data.savings - data.previousMonth.savings) / data.previousMonth.savings) *
-    100;
 
-  const chartData = budgets.map((b) => ({
-    category: b.category,
-    budget: b.budget,
-    spent: b.spent,
-  }));
   return (
     <div className="space-y-6 pb-12">
       {/* Month Selector */}
@@ -227,87 +192,6 @@ export default function MonthlyReportsPage() {
           variant={totalRemaining >= 0 ? "purple" : "destructive"}
         />
       </div>
-
-      {/* Budget vs Actual Bar Chart */}
-      {/* <Card className="rounded-2xl shadow-sm">
-        <CardHeader>
-          <CardTitle>বাজেট বনাম প্রকৃত খরচ</CardTitle>
-          <CardDescription>
-            ক্যাটাগরি অনুযায়ী তুলনা (Over budget লাল রঙে)
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="h-72">
-          <ResponsiveContainer>
-            <BarChart
-              data={budgetVsActual}
-              margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
-            >
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis
-                dataKey="category"
-                angle={-45}
-                textAnchor="end"
-                height={70}
-                interval={0}
-              />
-              <YAxis />
-              <Tooltip formatter={(v: number) => formatBDT(v)} />
-              <Legend />
-              <Bar
-                dataKey="budget"
-                name="বাজেট"
-                fill="#3b82f6"
-                radius={[4, 4, 0, 0]}
-              />
-              <Bar
-                dataKey="spent"
-                name="খরচ"
-                fill="#ef4444"
-                radius={[4, 4, 0, 0]}
-              />
-            </BarChart>
-          </ResponsiveContainer>
-        </CardContent>
-      </Card> */}
-
-      <Card className="rounded-2xl shadow-sm">
-        <CardHeader>
-          <CardTitle>বাজেট বনাম খরচ তুলনা</CardTitle>
-          <CardDescription>ক্যাটাগরি অনুযায়ী</CardDescription>
-        </CardHeader>
-        <CardContent className="h-64 sm:h-80">
-          <ResponsiveContainer>
-            <BarChart
-              data={chartData}
-              margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-            >
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis
-                dataKey="category"
-                angle={-45}
-                textAnchor="end"
-                height={70}
-                interval={0}
-              />
-              <YAxis />
-              <Tooltip formatter={(v: number) => formatBDT(v)} />
-              <Legend />
-              <Bar
-                dataKey="budget"
-                name="বাজেট"
-                fill="#3b82f6"
-                radius={[4, 4, 0, 0]}
-              />
-              <Bar
-                dataKey="spent"
-                name="খরচ"
-                fill="#ef4444"
-                radius={[4, 4, 0, 0]}
-              />
-            </BarChart>
-          </ResponsiveContainer>
-        </CardContent>
-      </Card>
 
       {/* Income & Expense Breakdown */}
       <div className="grid lg:grid-cols-2 gap-6">
@@ -398,73 +282,117 @@ export default function MonthlyReportsPage() {
       </Card>
 
       {/* Daily Trend + Goal Status */}
-      <div className="grid lg:grid-cols-2 gap-6">
-        <Card className="rounded-2xl shadow-sm">
-          <CardHeader>
-            <CardTitle>দৈনিক আয়-ব্যয়</CardTitle>
-          </CardHeader>
-          <CardContent className="h-64">
-            <ResponsiveContainer>
-              <LineChart data={dailyTrend}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="day" />
-                <YAxis />
-                <Tooltip formatter={(v: number) => formatBDT(v)} />
-                <Legend />
-                <Line
-                  type="monotone"
-                  dataKey="income"
-                  stroke="#10b981"
-                  name="আয়"
-                />
-                <Line
-                  type="monotone"
-                  dataKey="expense"
-                  stroke="#ef4444"
-                  name="ব্যয়"
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
+      <Card className="rounded-2xl shadow-sm">
+        <CardHeader>
+          <CardTitle>দৈনিক আয়-ব্যয়</CardTitle>
+        </CardHeader>
+        <CardContent className="h-64">
+          <ResponsiveContainer>
+            <LineChart data={dailyTrend}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="day" />
+              <YAxis />
+              <Tooltip formatter={(v: number) => formatBDT(v)} />
+              <Legend />
+              <Line
+                type="monotone"
+                dataKey="income"
+                stroke="#10b981"
+                name="আয়"
+              />
+              <Line
+                type="monotone"
+                dataKey="expense"
+                stroke="#ef4444"
+                name="ব্যয়"
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </CardContent>
+      </Card>
+      {/* Table */}
+      {/* Budget Table */}
+      <Card className="rounded-2xl shadow-sm">
+        <CardHeader>
+          <CardTitle>বাজেটের বিস্তারিত অবস্থা</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b bg-muted/40">
+                  <th className="text-left py-3  font-medium">ক্যাটাগরি</th>
+                  <th className="text-right py-3  font-medium">বাজেট</th>
+                  <th className="text-right py-3  font-medium">খরচ</th>
+                  <th className="text-right py-3  font-medium">বাকি</th>
+                  <th className="text-center py-3  font-medium">অবস্থা</th>
+                </tr>
+              </thead>
+              <tbody>
+                {budgets.map((item) => {
+                  const remaining = item.budget - item.spent;
+                  let statusColor = "";
+                  let statusText = "";
 
-        <Card className="rounded-2xl shadow-sm">
-          <CardHeader>
-            <CardTitle>এই মাসের লক্ষ্য অগ্রগতি</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {goalStatus.map((g, i) => (
-                <div
-                  key={i}
-                  className="flex justify-between items-center border-b pb-3 last:border-0"
-                >
-                  <div>
-                    <p className="font-medium">{g.name}</p>
-                    <p className="text-sm text-muted-foreground">
-                      লক্ষ্য: {formatBDT(g.target)}
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-bold text-emerald-600">
-                      +{formatBDT(g.addedThisMonth)}
-                    </p>
-                    <Badge
-                      variant={g.status === "সম্পন্ন" ? "default" : "secondary"}
+                  if (item.status === "over") {
+                    statusColor =
+                      "bg-red-100 text-red-800 dark:bg-red-950/40 dark:text-red-400";
+                    statusText = "অতিক্রম";
+                  } else if (item.status === "near") {
+                    statusColor =
+                      "bg-amber-100 text-amber-800 dark:bg-amber-950/40 dark:text-amber-400";
+                    statusText = "প্রায় শেষ";
+                  } else {
+                    statusColor =
+                      "bg-emerald-100 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-400";
+                    statusText = "নিরাপদ";
+                  }
+
+                  return (
+                    <tr
+                      key={item.category}
+                      className="border-b last:border-0 hover:bg-muted/20 transition-colors"
                     >
-                      {g.status}
-                    </Badge>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-      {/* <div className="flex gap-6">
-        <IncomeTable />
-        <ExpenseTable />
-      </div> */}
+                      <td className="py-3 font-medium">{item.category}</td>
+                      <td className="text-right py-3">
+                        {formatBDT(item.budget)}
+                      </td>
+                      <td className="text-right py-3">
+                        {formatBDT(item.spent)}
+                      </td>
+                      <td className="py-3 font-medium">
+                        {remaining >= 0
+                          ? formatBDT(remaining)
+                          : `(${formatBDT(Math.abs(remaining))})`}
+                      </td>
+                      <td className="py-3 text-center">
+                        <span
+                          className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${statusColor}`}
+                        >
+                          {statusText}
+                        </span>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+              <tfoot className="font-medium border-t bg-muted/30">
+                <tr>
+                  <td className="py-3">মোট</td>
+                  <td className="py-3">{formatBDT(totalBudget)}</td>
+                  <td className="py-3">{formatBDT(totalSpent)}</td>
+                  <td className="py-3">
+                    {totalRemaining >= 0
+                      ? formatBDT(totalRemaining)
+                      : `(${formatBDT(Math.abs(totalRemaining))})`}
+                  </td>
+                  <td className="py-3"></td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
