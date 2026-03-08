@@ -19,6 +19,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
+  DialogTrigger,
 } from "@/components/ui/dialog";
 import {
   Select,
@@ -28,8 +29,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Pencil } from "lucide-react";
+import { Pencil, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { DialogDescription } from "@radix-ui/react-dialog";
 
 const currentYear = 2026;
 const currentMonth = "03"; // March
@@ -48,6 +50,7 @@ const dummyBudgets = [
   { category: "বিনোদন", budget: 3000, spent: 4200, remaining: -1200 },
   { category: "শিক্ষা", budget: 8000, spent: 3000, remaining: 5000 },
 ];
+const currentBalance = 50000;
 
 function formatBDT(amount: number) {
   return "৳" + Math.abs(amount).toLocaleString("bn-BD");
@@ -73,6 +76,7 @@ function getStatusBadge(status: string) {
 }
 
 export default function MonthlyBudget() {
+  const [openAdd, setOpenAdd] = useState(false);
   const [selectedMonth, setSelectedMonth] = useState(currentMonth);
   const [selectedYear, setSelectedYear] = useState(currentYear.toString());
   const [openEdit, setOpenEdit] = useState<string | null>(null);
@@ -131,18 +135,12 @@ export default function MonthlyBudget() {
       </div>
 
       {/* 2. Summary Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
         <BudgetSummaryCard
-          title="মোট বাজেট"
-          value={totalBudget}
-          subtitle="এই মাসে"
+          title="বর্তমান ব্যালেন্স"
+          value={currentBalance}
+          subtitle="সর্বশেষ ব্যালেন্স"
           variant="emerald"
-        />
-        <BudgetSummaryCard
-          title="মোট খরচ"
-          value={totalSpent}
-          subtitle="এ পর্যন্ত"
-          variant="red"
         />
         <BudgetSummaryCard
           title="বাকি বাজেট"
@@ -150,12 +148,68 @@ export default function MonthlyBudget() {
           subtitle={totalRemaining >= 0 ? "অবশিষ্ট" : "অতিরিক্ত খরচ"}
           variant={totalRemaining >= 0 ? "blue" : "destructive"}
         />
+        <BudgetSummaryCard
+          title="মোট বাজেট"
+          value={totalBudget}
+          subtitle="এই মাসে"
+          variant="blue"
+        />
+        <BudgetSummaryCard
+          title="মোট খরচ"
+          value={totalSpent}
+          subtitle="এ পর্যন্ত"
+          variant="red"
+        />
       </div>
 
       {/* 4. Budget List Table */}
       <Card className="rounded-2xl shadow-sm overflow-hidden">
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>ক্যাটাগরি বাজেট</CardTitle>
+          <Dialog open={openAdd} onOpenChange={setOpenAdd}>
+            <DialogTrigger asChild>
+              <Button className="gap-2 bg-emerald-600 hover:bg-emerald-700">
+                <Plus className="h-4 w-4" /> নতুন বাজেট যোগ করুন
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-md rounded-2xl">
+              <DialogHeader>
+                <DialogTitle>নতুন ক্যাটাগরি বাজেট</DialogTitle>
+                <DialogDescription>
+                  এই মাসের জন্য বাজেট সেট করুন
+                </DialogDescription>
+              </DialogHeader>
+              <div className="grid gap-4 py-4">
+                <div className="grid gap-2">
+                  <Label>ক্যাটাগরি</Label>
+                  <Select>
+                    <SelectTrigger>
+                      <SelectValue placeholder="বেছে নিন" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="খাবার">খাবার</SelectItem>
+                      <SelectItem value="যাতায়াত">যাতায়াত</SelectItem>
+                      <SelectItem value="বিল">বিল</SelectItem>
+                      <SelectItem value="শপিং">শপিং</SelectItem>
+                      <SelectItem value="বিনোদন">বিনোদন</SelectItem>
+                      <SelectItem value="শিক্ষা">শিক্ষা</SelectItem>
+                      <SelectItem value="অন্যান্য">অন্যান্য</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="grid gap-2">
+                  <Label>বাজেট পরিমাণ (৳)</Label>
+                  <Input type="number" placeholder="8000" />
+                </div>
+              </div>
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setOpenAdd(false)}>
+                  বাতিল
+                </Button>
+                <Button>সেভ করুন</Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </CardHeader>
 
         <div className="overflow-x-auto">
