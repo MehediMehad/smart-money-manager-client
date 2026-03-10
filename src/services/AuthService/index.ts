@@ -1,12 +1,13 @@
 "use server";
 
+import config from "@/configs";
 import { jwtDecode } from "jwt-decode";
 import { cookies } from "next/headers";
 import { FieldValues } from "react-hook-form";
 
 export const registerUser = async (userData: FormData) => {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/user/registration`, {
+    const res = await fetch(`${config.base_api}/user/registration`, {
       method: "POST",
       body: userData
     });
@@ -25,7 +26,7 @@ export const registerUser = async (userData: FormData) => {
 
 export const loginUser = async (userData: FieldValues) => {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/auth/login`, {
+    const res = await fetch(`${config.base_api}/auth/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -66,7 +67,7 @@ export const logout = async () => {
 export const getNewToken = async () => {
   try {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_BASE_API}/auth/refresh-token`,
+      `${config.base_api}/auth/refresh-token`,
       {
         method: "POST",
         headers: {

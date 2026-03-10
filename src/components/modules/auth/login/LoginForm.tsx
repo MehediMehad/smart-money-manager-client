@@ -41,6 +41,8 @@ export default function LoginForm() {
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
     try {
       const res = await loginUser(data);
+      console.log("✅", data, res);
+
       setIsLoading(true);
       if (res?.success) {
         toast.success(res?.message);
@@ -129,7 +131,7 @@ export default function LoginForm() {
             <Button
               disabled={isSubmitting ? true : false}
               type="submit"
-              className="mt-4 w-full"
+              className="mt-4 w-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-pink-300 dark:focus:ring-pink-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
             >
               {isSubmitting ? "Logging...." : "Login"}
             </Button>
@@ -137,7 +139,8 @@ export default function LoginForm() {
         </Form>
         <p className="text-sm text-gray-600 text-center my-3">
           Do not have any account ?
-          <Link href="/register" className="text-primary">
+          {/* <Link href="/register" className="text-primary"> */}
+          <Link href="/register" className="text-gray-600">
             Register
           </Link>
         </p>
