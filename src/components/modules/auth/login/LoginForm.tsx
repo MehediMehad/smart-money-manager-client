@@ -61,7 +61,7 @@ export default function LoginForm() {
   };
 
   return (
-    <Card className="w-full max-w-md shadow-lg rounded-xl overflow-hidden">
+    <Card className="w-full max-w-lg shadow-lg rounded-xl overflow-hidden">
       <CardHeader className="flex flex-col items-center space-y-2 p-6 rounded-t-xl">
         {/* Logo */}
         <Image

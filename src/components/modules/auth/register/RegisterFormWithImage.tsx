@@ -18,17 +18,44 @@ import { registrationSchema } from "./registerValidation";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { useUser } from "@/context/UserContext";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { registerUser } from "@/services/AuthService";
 import { useState } from "react";
+import UserImagePreviewer from "@/components/shared/core/UserImageUploder/UserImagePreviewer";
+import UserImageUploader from "@/components/shared/core/UserImageUploder/UserImageUploader";
 
-import { Eye, EyeOff } from "lucide-react";
+// services/authService/index.ts
+// export const registerUser = async (userData: FormData) => {
+//   try {
+//     const res = await fetch(`${config.base_api}/user/registration`, {
+//       method: "POST",
+//       body: userData,
+//     });
+
+//     const result = await res.json();
+//     if (result.success) {
+//       (await cookies()).set("accessToken", result.data.accessToken);
+//       (await cookies()).set("refreshToken", result?.data?.refreshToken);
+//     }
+
+//     return result;
+//   } catch (error: any) {
+//     return Error(error);
+//   }
+// };
 
 export default function RegisterForm() {
-  const [showPassword, setShowPassword] = useState(false);
-
   const form = useForm({
     resolver: zodResolver(registrationSchema),
   });
+  const [imageFiles, setImageFiles] = useState<File[] | []>([]);
+  const [imagePreview, setImagePreview] = useState<string[] | []>([]);
 
   const {
     formState: { isSubmitting },
@@ -42,20 +69,15 @@ export default function RegisterForm() {
 
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
     try {
-      const formData = {
-        name: data.name,
-        email: data.email,
-        password: data.password,
-      };
-
+      const formData = new FormData();
+      formData.append("data", JSON.stringify(data));
+      formData.append("file", imageFiles[0]);
       const res = await registerUser(formData);
 
       setIsLoading(true);
       if (res?.success) {
-        console.log("🐼🐼🐼🐼🐼🐼");
         toast.success(res?.message);
-        router.push(`/verify-otp?email=${data.email}`);
-        // verify otp page এ redirect
+        router.push("/");
       } else {
         toast.error(res?.message);
       }
@@ -64,8 +86,14 @@ export default function RegisterForm() {
     }
   };
 
+  const genderOptions = [
+    { value: "MALE", label: "Male" },
+    { value: "FEMALE", label: "Female" },
+    { value: "OTHER", label: "Other" },
+  ];
+
   return (
-    <Card className="w-full max-w-lg shadow-lg rounded-xl overflow-hidden">
+    <Card className="w-full max-w-5xl shadow-lg rounded-xl overflow-hidden">
       <CardHeader className="space-y-4">
         <div className="flex flex-col items-center space-y-2">
           {/* <Logo /> */}
@@ -83,7 +111,10 @@ export default function RegisterForm() {
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <div className="flex gap-x-4">
-              {/* <div className="w-full">
+              <div className="w-full">
+                {/* <div className="flex justify-between items-center border-t border-b py-3">
+                <FormLabel>Image</FormLabel>
+              </div> */}
                 <div className="flex gap-4 ">
                   {imageFiles.length !== 1 && (
                     <UserImageUploader
@@ -100,13 +131,13 @@ export default function RegisterForm() {
                     setImagePreview={setImagePreview}
                   />
                 </div>
-              </div> */}
+              </div>
               <div className="w-full flex flex-col gap-2">
                 <FormField
                   control={form.control}
                   name="name"
                   render={({ field }) => (
-                    <FormItem className="mb-2">
+                    <FormItem>
                       <FormLabel>Name</FormLabel>
                       <FormControl>
                         <Input {...field} value={field.value || ""} />
@@ -119,7 +150,7 @@ export default function RegisterForm() {
                   control={form.control}
                   name="email"
                   render={({ field }) => (
-                    <FormItem className="mb-2">
+                    <FormItem>
                       <FormLabel>Email</FormLabel>
                       <FormControl>
                         <Input
@@ -135,28 +166,67 @@ export default function RegisterForm() {
 
                 <FormField
                   control={form.control}
-                  name="password"
+                  name="contactNumber"
                   render={({ field }) => (
-                    <FormItem className="relative mb-2">
-                      <FormLabel>Password</FormLabel>
+                    <FormItem>
+                      <FormLabel>Contact Number</FormLabel>
                       <FormControl>
                         <Input
-                          type={showPassword ? "text" : "password"}
+                          type="text"
                           {...field}
                           value={field.value || ""}
                         />
                       </FormControl>
-                      <button
-                        type="button"
-                        className="absolute right-3 top-11 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                        onClick={() => setShowPassword(!showPassword)}
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="gender"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>gender</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
                       >
-                        {showPassword ? (
-                          <EyeOff className="h-5 w-5" />
-                        ) : (
-                          <Eye className="h-5 w-5" />
-                        )}
-                      </button>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select Gender" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {genderOptions.map((gender) => (
+                            <SelectItem
+                              key={gender?.value}
+                              value={gender?.value}
+                            >
+                              {gender?.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Password</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="password"
+                          {...field}
+                          value={field.value || ""}
+                        />
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -165,26 +235,15 @@ export default function RegisterForm() {
                   control={form.control}
                   name="passwordConfirm"
                   render={({ field }) => (
-                    <FormItem className="relative">
+                    <FormItem>
                       <FormLabel>Confirm Password</FormLabel>
                       <FormControl>
                         <Input
-                          type={showPassword ? "text" : "password"}
+                          type="password"
                           {...field}
                           value={field.value || ""}
                         />
                       </FormControl>
-                      <button
-                        type="button"
-                        className="absolute right-3 top-11 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                        onClick={() => setShowPassword(!showPassword)}
-                      >
-                        {showPassword ? (
-                          <EyeOff className="h-5 w-5" />
-                        ) : (
-                          <Eye className="h-5 w-5" />
-                        )}
-                      </button>
 
                       {passwordConfirm && password !== passwordConfirm ? (
                         <FormMessage> Password does not match </FormMessage>
@@ -209,7 +268,6 @@ export default function RegisterForm() {
         <p className="text-sm text-gray-600 text-center my-3">
           Already have an account ?
           <Link href="/login" className="text-primary">
-            {" "}
             Login
           </Link>
         </p>

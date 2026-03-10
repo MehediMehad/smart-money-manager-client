@@ -5,18 +5,22 @@ import { jwtDecode } from "jwt-decode";
 import { cookies } from "next/headers";
 import { FieldValues } from "react-hook-form";
 
-export const registerUser = async (userData: FormData) => {
+export const registerUser = async (userData: FieldValues) => {
+  console.log("userData", userData);
   try {
-    const res = await fetch(`${config.base_api}/user/registration`, {
+    const res = await fetch(`${config.base_api}/auth/register`, {
       method: "POST",
-      body: userData
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(userData),
     });
 
     const result = await res.json();
-    if (result.success) {
-      (await cookies()).set("accessToken", result.data.accessToken);
-      (await cookies()).set("refreshToken", result?.data?.refreshToken);
-    }
+
+    console.log("result ✅🥴🥴🥴", result);
+
+
 
     return result;
   } catch (error: any) {
