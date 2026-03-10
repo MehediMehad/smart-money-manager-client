@@ -20,6 +20,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useUser } from "@/context/UserContext";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Eye, EyeOff } from "lucide-react";
+import Image from "next/image";
 
 export default function LoginForm() {
   const form = useForm({
@@ -61,18 +62,25 @@ export default function LoginForm() {
 
   return (
     <Card className="w-full max-w-md shadow-lg rounded-xl overflow-hidden">
-      <CardHeader className="space-y-4">
-        <div className="flex flex-col items-center space-y-2">
-          {/* <Logo /> */}
-          <div className="text-center">
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-              Welcome back
-            </h1>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-              Enter your credentials to access your account
-            </p>
-          </div>
-        </div>
+      <CardHeader className="flex flex-col items-center space-y-2 p-6 rounded-t-xl">
+        {/* Logo */}
+        <Image
+          src="/logo.png"
+          width={68}
+          height={68}
+          alt="Smart Money Manager Logo"
+          className="object-contain"
+          quality={100}
+        />
+        {/* Title */}
+        <h2 className="text-2xl font-bold text-gray-800 text-center">
+          Welcome to Smart Money Manager
+        </h2>
+
+        {/* Subtitle */}
+        <p className="text-gray-500 text-sm text-center">
+          Manage your money smarter and easier
+        </p>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -81,7 +89,7 @@ export default function LoginForm() {
               control={form.control}
               name="email"
               render={({ field }) => (
-                <FormItem>
+                <FormItem className="mb-2">
                   <FormLabel>Email</FormLabel>
                   <FormControl>
                     <Input type="email" {...field} value={field.value || ""} />
@@ -94,7 +102,7 @@ export default function LoginForm() {
               control={form.control}
               name="password"
               render={({ field }) => (
-                <FormItem className="relative">
+                <FormItem className="relative mb-2">
                   <FormLabel>Password</FormLabel>
                   <FormControl>
                     <Input
@@ -131,7 +139,7 @@ export default function LoginForm() {
             <Button
               disabled={isSubmitting ? true : false}
               type="submit"
-              className="mt-4 w-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-pink-300 dark:focus:ring-pink-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
+              className="mt-4 w-full"
             >
               {isSubmitting ? "Logging...." : "Login"}
             </Button>
@@ -139,8 +147,8 @@ export default function LoginForm() {
         </Form>
         <p className="text-sm text-gray-600 text-center my-3">
           Do not have any account ?
-          {/* <Link href="/register" className="text-primary"> */}
-          <Link href="/register" className="text-gray-600">
+          <Link href="/register" className="text-primary">
+            {" "}
             Register
           </Link>
         </p>
