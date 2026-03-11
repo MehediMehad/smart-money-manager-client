@@ -75,6 +75,28 @@ export const verifyOtp = async (data: FieldValues) => {
   }
 };
 
+export const resendOtp = async (data: FieldValues) => {
+  try {
+    const res = await fetch(`${config.base_api}/auth/resend-otp`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    const request = await res.json();
+
+    if (!res.ok) {
+      throw new Error(request?.message || "Failed to resend OTP");
+    }
+
+    return request;
+  } catch (error: any) {
+    throw new Error(error?.message || "Something went wrong");
+  }
+};
+
 export const getCurrentUser = async () => {
   const accessToken = (await cookies()).get("accessToken")?.value;
   let decodedData = null;

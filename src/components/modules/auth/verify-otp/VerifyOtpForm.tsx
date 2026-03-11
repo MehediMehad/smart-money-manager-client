@@ -1,30 +1,59 @@
 "use client";
 
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { verifyOtp } from "@/services/AuthService";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import OtpInput from "./OtpInput";
 
-const OTP_LENGTH = 6;
+import { resendOtp, verifyOtp } from "@/services/AuthService";
+
+import { useForm, FieldValues, SubmitHandler } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from "@/components/ui/form";
+
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSlot,
+} from "@/components/ui/input-otp";
+
+import { Button } from "@/components/ui/button";
+import { verifyOtpSchema } from "./verifyOtpSchema";
+
 const RESEND_TIME = 60;
 
 export default function VerifyOtpForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
+
   const email = searchParams.get("email");
 
-  const [otp, setOtp] = useState<string[]>(Array(OTP_LENGTH).fill(""));
   const [timer, setTimer] = useState(RESEND_TIME);
-
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isResending, setIsResending] = useState(false);
 
   const isExpired = timer === 0;
-  const isComplete = otp.every((d) => d !== "");
 
+  const form = useForm({
+    resolver: zodResolver(verifyOtpSchema),
+    defaultValues: {
+      otp: "",
+    },
+  });
+
+  const {
+    formState: { isSubmitting },
+    reset,
+  } = form;
+
+  // email check
   useEffect(() => {
     if (!email) {
       toast.error("Invalid verification request");
@@ -32,6 +61,7 @@ export default function VerifyOtpForm() {
     }
   }, [email, router]);
 
+  // timer
   useEffect(() => {
     if (timer <= 0) return;
 
@@ -42,54 +72,55 @@ export default function VerifyOtpForm() {
     return () => clearInterval(interval);
   }, [timer]);
 
-  useEffect(() => {
-    if (isComplete && !isSubmitting) {
-      handleSubmit();
-    }
-  }, [isComplete]);
-
-  const handleSubmit = async () => {
-    const otpValue = otp.join("");
-
-    if (otpValue.length !== OTP_LENGTH || !email) return;
+  const onSubmit: SubmitHandler<FieldValues> = async (data) => {
+    if (!email) return;
 
     try {
-      setIsSubmitting(true);
-
       const res = await verifyOtp({
         email,
-        code: otpValue,
+        code: data.otp,
         type: "VERIFY_EMAIL",
       });
 
       if (res?.success) {
         toast.success(res?.message || "OTP verified successfully");
+        reset();
         router.push("/");
       } else {
-        throw new Error(res?.message);
+        toast.error(res?.message);
       }
-    } catch (error: any) {
-      toast.error(error?.message || "Invalid OTP");
-      setOtp(Array(OTP_LENGTH).fill(""));
-    } finally {
-      setIsSubmitting(false);
+    } catch (err: any) {
+      toast.error(err?.message || "OTP verification failed");
     }
   };
 
-  const resendOtp = async () => {
-    if (!email) return;
+  useEffect(() => {
+    const otp = form.watch("otp");
 
+    if (otp?.length === 6) {
+      form.handleSubmit(onSubmit)();
+    }
+  }, [form.watch("otp")]);
+
+  const handleResendOtp = async () => {
+    if (!email) return;
+    const type = "VERIFY_EMAIL";
+    const data = { email, type };
     try {
       setIsResending(true);
 
-      // call resend api
+      const res = await resendOtp(data);
 
-      setOtp(Array(OTP_LENGTH).fill(""));
-      setTimer(RESEND_TIME);
+      if (res?.success) {
+        toast.success(res?.message || "OTP resent successfully");
 
-      toast.success("OTP resent to your email");
-    } catch {
-      toast.error("Failed to resend OTP");
+        reset(); // react-hook-form reset
+        setTimer(RESEND_TIME);
+      } else {
+        toast.error(res?.message);
+      }
+    } catch (error: any) {
+      toast.error(error?.message || "Failed to resend OTP");
     } finally {
       setIsResending(false);
     }
@@ -116,12 +147,61 @@ export default function VerifyOtpForm() {
         </CardHeader>
 
         <CardContent className="space-y-6">
-          <OtpInput
-            value={otp}
-            onChange={setOtp}
-            length={OTP_LENGTH}
-            disabled={isSubmitting || isExpired}
-          />
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)}>
+              <FormField
+                control={form.control}
+                name="otp"
+                render={({ field }) => (
+                  <FormItem className="flex justify-center">
+                    <FormControl>
+                      <InputOTP
+                        maxLength={6}
+                        {...field}
+                        disabled={isSubmitting || isExpired}
+                      >
+                        <InputOTPGroup>
+                          <InputOTPSlot
+                            index={0}
+                            className="w-12 h-12 text-xl"
+                          />
+                          <InputOTPSlot
+                            index={1}
+                            className="w-12 h-12 text-xl"
+                          />
+                          <InputOTPSlot
+                            index={2}
+                            className="w-12 h-12 text-xl"
+                          />
+                          <InputOTPSlot
+                            index={3}
+                            className="w-12 h-12 text-xl"
+                          />
+                          <InputOTPSlot
+                            index={4}
+                            className="w-12 h-12 text-xl"
+                          />
+                          <InputOTPSlot
+                            index={5}
+                            className="w-12 h-12 text-xl"
+                          />
+                        </InputOTPGroup>
+                      </InputOTP>
+                    </FormControl>
+                    {/* <FormMessage /> */}
+                  </FormItem>
+                )}
+              />
+
+              {/* <Button
+                type="submit"
+                className="w-full mt-5"
+                disabled={isSubmitting || isExpired}
+              >
+                {isSubmitting ? "Verifying..." : "Verify OTP"}
+              </Button> */}
+            </form>
+          </Form>
 
           {isExpired && (
             <p className="text-red-500 text-sm text-center">
@@ -136,7 +216,7 @@ export default function VerifyOtpForm() {
               </p>
             ) : (
               <button
-                onClick={resendOtp}
+                onClick={handleResendOtp}
                 disabled={isResending}
                 className="text-primary font-medium hover:underline disabled:opacity-50"
               >
