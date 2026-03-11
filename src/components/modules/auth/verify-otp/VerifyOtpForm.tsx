@@ -4,112 +4,94 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { verifyOtp } from "@/services/AuthService";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import OtpInput from "./OtpInput";
 
-const VerifyOtpForm = () => {
+const OTP_LENGTH = 6;
+const RESEND_TIME = 60;
+
+export default function VerifyOtpForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const email = searchParams.get("email");
 
-  const [otp, setOtp] = useState(["", "", "", "", "", ""]);
-  const inputsRef = useRef<(HTMLInputElement | null)[]>([]);
+  const [otp, setOtp] = useState<string[]>(Array(OTP_LENGTH).fill(""));
+  const [timer, setTimer] = useState(RESEND_TIME);
 
-  const [timer, setTimer] = useState(57);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isResending, setIsResending] = useState(false);
 
-  // Timer countdown
+  const isExpired = timer === 0;
+  const isComplete = otp.every((d) => d !== "");
+
   useEffect(() => {
-    if (timer === 0) return;
-    const interval = setInterval(() => setTimer((prev) => prev - 1), 1000);
+    if (!email) {
+      toast.error("Invalid verification request");
+      router.push("/login");
+    }
+  }, [email, router]);
+
+  useEffect(() => {
+    if (timer <= 0) return;
+
+    const interval = setInterval(() => {
+      setTimer((prev) => prev - 1);
+    }, 1000);
+
     return () => clearInterval(interval);
   }, [timer]);
 
-  // Auto submit if all boxes filled
   useEffect(() => {
-    if (otp.join("").length === 6) {
+    if (isComplete && !isSubmitting) {
       handleSubmit();
     }
-  }, [otp]);
+  }, [isComplete]);
 
-  // Handle OTP change
-  const handleChange = (value: string, index: number) => {
-    if (!/^[0-9]*$/.test(value)) return;
-
-    const newOtp = [...otp];
-    newOtp[index] = value.slice(-1); // only last digit
-    setOtp(newOtp);
-
-    // move to next input
-    if (value && index < 5) {
-      inputsRef.current[index + 1]?.focus();
-    }
-  };
-
-  // Handle paste
-  const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
-    e.preventDefault();
-    const pasteData = e.clipboardData.getData("Text").slice(0, 6);
-    const newOtp = pasteData.split("");
-    while (newOtp.length < 6) newOtp.push("");
-    setOtp(newOtp);
-
-    // focus last filled box
-    const lastIndex = newOtp.findIndex((v) => v === "");
-    if (lastIndex !== -1) {
-      inputsRef.current[lastIndex]?.focus();
-    } else {
-      inputsRef.current[5]?.focus();
-    }
-  };
-
-  // Handle backspace
-  const handleKeyDown = (
-    e: React.KeyboardEvent<HTMLInputElement>,
-    index: number,
-  ) => {
-    if (e.key === "Backspace" && !otp[index] && index > 0) {
-      inputsRef.current[index - 1]?.focus();
-    }
-  };
-
-  // Submit OTP
   const handleSubmit = async () => {
     const otpValue = otp.join("");
-    if (otpValue.length !== 6 || isSubmitting) return;
 
-    setIsSubmitting(true);
+    if (otpValue.length !== OTP_LENGTH || !email) return;
 
     try {
-      const payload = { email, code: otpValue, type: "VERIFY_EMAIL" };
+      setIsSubmitting(true);
 
-      const res = await verifyOtp(payload);
+      const res = await verifyOtp({
+        email,
+        code: otpValue,
+        type: "VERIFY_EMAIL",
+      });
+
       if (res?.success) {
         toast.success(res?.message || "OTP verified successfully");
         router.push("/");
+      } else {
+        throw new Error(res?.message);
       }
-    } catch (error) {
-      toast.error("Invalid OTP");
-      setOtp(["", "", "", "", "", ""]);
-      inputsRef.current[0]?.focus();
+    } catch (error: any) {
+      toast.error(error?.message || "Invalid OTP");
+      setOtp(Array(OTP_LENGTH).fill(""));
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  // Resend OTP
   const resendOtp = async () => {
-    try {
-      console.log("RESEND OTP", email);
+    if (!email) return;
 
-      /**
-       * Resend OTP API call
-       */
+    try {
+      setIsResending(true);
+
+      // call resend api
+
+      setOtp(Array(OTP_LENGTH).fill(""));
+      setTimer(RESEND_TIME);
 
       toast.success("OTP resent to your email");
-      setTimer(60);
     } catch {
       toast.error("Failed to resend OTP");
+    } finally {
+      setIsResending(false);
     }
   };
 
@@ -134,35 +116,19 @@ const VerifyOtpForm = () => {
         </CardHeader>
 
         <CardContent className="space-y-6">
-          {/* OTP BOX */}
-          <div className="flex justify-center gap-3">
-            {otp.map((digit, index) => (
-              <input
-                key={index}
-                type="text"
-                maxLength={1}
-                value={digit}
-                ref={(el) => {
-                  if (el) inputsRef.current[index] = el;
-                }}
-                onChange={(e) => handleChange(e.target.value, index)}
-                onKeyDown={(e) => handleKeyDown(e, index)}
-                onPaste={handlePaste}
-                className="w-12 h-12 text-center border rounded-lg text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-primary"
-              />
-            ))}
-          </div>
+          <OtpInput
+            value={otp}
+            onChange={setOtp}
+            length={OTP_LENGTH}
+            disabled={isSubmitting || isExpired}
+          />
 
-          {/* VERIFY BUTTON */}
-          {/* <Button
-            onClick={handleSubmit}
-            className="w-full"
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? "Verifying..." : "Verify OTP"}
-          </Button> */}
+          {isExpired && (
+            <p className="text-red-500 text-sm text-center">
+              OTP expired. Please request a new one.
+            </p>
+          )}
 
-          {/* RESEND */}
           <div className="text-center text-sm">
             {timer > 0 ? (
               <p className="text-gray-500">
@@ -171,9 +137,10 @@ const VerifyOtpForm = () => {
             ) : (
               <button
                 onClick={resendOtp}
-                className="text-primary font-medium hover:underline"
+                disabled={isResending}
+                className="text-primary font-medium hover:underline disabled:opacity-50"
               >
-                Resend OTP
+                {isResending ? "Resending..." : "Resend OTP"}
               </button>
             )}
           </div>
@@ -181,6 +148,4 @@ const VerifyOtpForm = () => {
       </Card>
     </div>
   );
-};
-
-export default VerifyOtpForm;
+}
