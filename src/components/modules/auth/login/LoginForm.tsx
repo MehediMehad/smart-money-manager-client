@@ -37,6 +37,7 @@ export default function LoginForm() {
 
   const {
     formState: { isSubmitting },
+    reset,
   } = form;
 
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
@@ -46,6 +47,7 @@ export default function LoginForm() {
 
       setIsLoading(true);
       if (res?.success) {
+        reset();
         toast.success(res?.message);
         if (redirect) {
           router.push(redirect);

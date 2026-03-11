@@ -32,6 +32,7 @@ export default function RegisterForm() {
 
   const {
     formState: { isSubmitting },
+    reset,
   } = form;
 
   const password = form.watch("password");
@@ -52,10 +53,13 @@ export default function RegisterForm() {
 
       setIsLoading(true);
       if (res?.success) {
-        console.log("🐼🐼🐼🐼🐼🐼");
         toast.success(res?.message);
-        router.push(`/verify-otp?email=${data.email}`);
-        // verify otp page এ redirect
+
+        reset();
+
+        setTimeout(() => {
+          router.replace(`/verify-otp?email=${data?.email}`);
+        }, 300);
       } else {
         toast.error(res?.message);
       }

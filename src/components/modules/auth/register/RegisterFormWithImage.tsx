@@ -59,6 +59,7 @@ export default function RegisterForm() {
 
   const {
     formState: { isSubmitting },
+    reset,
   } = form;
 
   const password = form.watch("password");
@@ -76,6 +77,7 @@ export default function RegisterForm() {
 
       setIsLoading(true);
       if (res?.success) {
+        reset();
         toast.success(res?.message);
         router.push("/");
       } else {

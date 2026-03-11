@@ -51,6 +51,30 @@ export const loginUser = async (userData: FieldValues) => {
   }
 };
 
+export const verifyOtp = async (data: FieldValues) => {
+  console.log("userData🤢🤢", data);
+  try {
+    const res = await fetch(`${config.base_api}/auth/verify`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    const result = await res.json();
+
+    if (result?.success) {
+      (await cookies()).set("accessToken", result?.data?.accessToken);
+      (await cookies()).set("refreshToken", result?.data?.refreshToken);
+    }
+
+    return result;
+  } catch (error: any) {
+    return Error(error);
+  }
+};
+
 export const getCurrentUser = async () => {
   const accessToken = (await cookies()).get("accessToken")?.value;
   let decodedData = null;

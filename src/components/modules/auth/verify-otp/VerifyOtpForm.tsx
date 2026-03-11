@@ -1,6 +1,7 @@
 "use client";
 
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { verifyOtp } from "@/services/AuthService";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -14,7 +15,7 @@ const VerifyOtpForm = () => {
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const inputsRef = useRef<(HTMLInputElement | null)[]>([]);
 
-  const [timer, setTimer] = useState(60);
+  const [timer, setTimer] = useState(57);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Timer countdown
@@ -80,16 +81,13 @@ const VerifyOtpForm = () => {
     setIsSubmitting(true);
 
     try {
-      const payload = { email, otp: otpValue };
-      console.log("VERIFY OTP DATA", payload);
+      const payload = { email, code: otpValue, type: "VERIFY_EMAIL" };
 
-      /**
-       * API call example:
-       * await fetch("/api/verify-otp", { method: "POST", body: JSON.stringify(payload) })
-       */
-
-      toast.success("Email verified successfully");
-      router.push("/login");
+      const res = await verifyOtp(payload);
+      if (res?.success) {
+        toast.success(res?.message || "OTP verified successfully");
+        router.push("/");
+      }
     } catch (error) {
       toast.error("Invalid OTP");
       setOtp(["", "", "", "", "", ""]);
