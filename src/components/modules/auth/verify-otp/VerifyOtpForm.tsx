@@ -35,6 +35,9 @@ export default function VerifyOtpForm() {
   const searchParams = useSearchParams();
 
   const email = searchParams.get("email");
+  const type = searchParams.get("type");
+
+  console.log(email, "😈😈", type, "🐼🐼");
 
   const [timer, setTimer] = useState(RESEND_TIME);
   const [isResending, setIsResending] = useState(false);
@@ -74,12 +77,13 @@ export default function VerifyOtpForm() {
 
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
     if (!email) return;
+    if (!type) return;
 
     try {
       const res = await verifyOtp({
         email,
         code: data.otp,
-        type: "VERIFY_EMAIL",
+        type,
       });
 
       if (res?.success) {
@@ -104,8 +108,7 @@ export default function VerifyOtpForm() {
 
   const handleResendOtp = async () => {
     if (!email) return;
-    const type = "VERIFY_EMAIL";
-    const data = { email, type };
+    const data = { email };
     try {
       setIsResending(true);
 

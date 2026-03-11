@@ -58,7 +58,7 @@ export default function RegisterForm() {
         reset();
 
         setTimeout(() => {
-          router.replace(`/verify-otp?email=${data?.email}`);
+          router.replace(`/verify-otp?email=${data?.email}&type=VERIFY_EMAIL`);
         }, 300);
       } else {
         toast.error(res?.message);

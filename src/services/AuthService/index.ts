@@ -52,7 +52,6 @@ export const loginUser = async (userData: FieldValues) => {
 };
 
 export const verifyOtp = async (data: FieldValues) => {
-  console.log("userData🤢🤢", data);
   try {
     const res = await fetch(`${config.base_api}/auth/verify`, {
       method: "POST",
@@ -72,6 +71,28 @@ export const verifyOtp = async (data: FieldValues) => {
     return result;
   } catch (error: any) {
     return Error(error);
+  }
+};
+
+export const forgotPassword = async (data: FieldValues) => {
+  try {
+    const res = await fetch(`${config.base_api}/auth/forgot-password`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    const result = await res.json();
+
+    if (!res.ok) {
+      throw new Error(result?.message || "Failed to send OTP");
+    }
+
+    return result;
+  } catch (error: any) {
+    throw new Error(error?.message || "Something went wrong");
   }
 };
 

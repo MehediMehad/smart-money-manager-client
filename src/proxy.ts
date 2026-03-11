@@ -3,7 +3,7 @@ import { getCurrentUser } from "./services/AuthService";
 
 type Role = keyof typeof roleBasedPrivateRoutes;
 
-const authRoutes = ["/login", "/register", "/verify-otp"];
+const authRoutes = ["/login", "/register", "/verify-otp", '/forgot-password'];
 
 const roleBasedPrivateRoutes = {
   user: [/^\/user/, /^\/create-shop/],

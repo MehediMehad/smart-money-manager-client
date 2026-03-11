@@ -129,14 +129,14 @@ export default function LoginForm() {
               )}
             />
 
-            {/* <div className="flex justify-end mt-1">
+            <div className="flex justify-end mt-1">
               <Link
                 href="/forgot-password"
                 className="text-sm font-medium text-primary hover:underline"
               >
                 Forgot password?
               </Link>
-            </div> */}
+            </div>
 
             <Button
               disabled={isSubmitting ? true : false}
