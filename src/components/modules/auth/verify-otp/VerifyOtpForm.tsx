@@ -87,9 +87,12 @@ export default function VerifyOtpForm() {
       });
 
       if (res?.success) {
+        const token = res?.data?.accessToken;
         toast.success(res?.message || "OTP verified successfully");
         reset();
-        router.push("/");
+        router.push(
+          `${type === "RESET_PASSWORD" ? `/reset-password?token=${token}` : "/"}`,
+        );
       } else {
         toast.error(res?.message);
       }
