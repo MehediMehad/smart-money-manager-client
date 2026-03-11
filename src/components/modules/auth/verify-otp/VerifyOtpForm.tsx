@@ -133,105 +133,83 @@ export default function VerifyOtpForm() {
   };
 
   return (
-    <div className="flex justify-center items-center h-screen w-screen">
-      <Card className="w-full max-w-lg shadow-lg rounded-xl overflow-hidden">
-        <CardHeader className="flex flex-col items-center space-y-2 p-6">
-          <Image
-            src="/logo.png"
-            width={68}
-            height={68}
-            alt="Smart Money Manager Logo"
-          />
+    <Card className="w-full max-w-lg shadow-lg rounded-xl overflow-hidden">
+      <CardHeader className="flex flex-col items-center space-y-2 p-6">
+        <Image
+          src="/logo.png"
+          width={68}
+          height={68}
+          alt="Smart Money Manager Logo"
+        />
 
-          <h2 className="text-2xl font-bold text-gray-800">
-            Verify Your Email
-          </h2>
+        <h2 className="text-2xl font-bold text-gray-800">Verify Your Email</h2>
 
-          <p className="text-gray-500 text-sm text-center">
-            Enter the OTP sent to {email}
-          </p>
-        </CardHeader>
+        <p className="text-gray-500 text-sm text-center">
+          Enter the OTP sent to {email}
+        </p>
+      </CardHeader>
 
-        <CardContent className="space-y-6">
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)}>
-              <FormField
-                control={form.control}
-                name="otp"
-                render={({ field }) => (
-                  <FormItem className="flex justify-center">
-                    <FormControl>
-                      <InputOTP
-                        maxLength={6}
-                        {...field}
-                        disabled={isSubmitting || isExpired}
-                      >
-                        <InputOTPGroup>
-                          <InputOTPSlot
-                            index={0}
-                            className="w-12 h-12 text-xl"
-                          />
-                          <InputOTPSlot
-                            index={1}
-                            className="w-12 h-12 text-xl"
-                          />
-                          <InputOTPSlot
-                            index={2}
-                            className="w-12 h-12 text-xl"
-                          />
-                          <InputOTPSlot
-                            index={3}
-                            className="w-12 h-12 text-xl"
-                          />
-                          <InputOTPSlot
-                            index={4}
-                            className="w-12 h-12 text-xl"
-                          />
-                          <InputOTPSlot
-                            index={5}
-                            className="w-12 h-12 text-xl"
-                          />
-                        </InputOTPGroup>
-                      </InputOTP>
-                    </FormControl>
-                    {/* <FormMessage /> */}
-                  </FormItem>
-                )}
-              />
+      <CardContent className="space-y-6">
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)}>
+            <FormField
+              control={form.control}
+              name="otp"
+              render={({ field }) => (
+                <FormItem className="flex justify-center">
+                  <FormControl>
+                    <InputOTP
+                      maxLength={6}
+                      {...field}
+                      disabled={isSubmitting || isExpired}
+                    >
+                      <InputOTPGroup>
+                        <InputOTPSlot index={0} className="w-12 h-12 text-xl" />
+                        <InputOTPSlot index={1} className="w-12 h-12 text-xl" />
+                        <InputOTPSlot index={2} className="w-12 h-12 text-xl" />
+                        <InputOTPSlot index={3} className="w-12 h-12 text-xl" />
+                        <InputOTPSlot index={4} className="w-12 h-12 text-xl" />
+                        <InputOTPSlot index={5} className="w-12 h-12 text-xl" />
+                      </InputOTPGroup>
+                    </InputOTP>
+                  </FormControl>
+                  {/* <FormMessage /> */}
+                </FormItem>
+              )}
+            />
 
-              {/* <Button
+            {/* <Button
                 type="submit"
                 className="w-full mt-5"
                 disabled={isSubmitting || isExpired}
               >
                 {isSubmitting ? "Verifying..." : "Verify OTP"}
               </Button> */}
-            </form>
-          </Form>
+          </form>
+        </Form>
 
-          {isExpired && (
-            <p className="text-red-500 text-sm text-center">
-              OTP expired. Please request a new one.
+        {isExpired && (
+          <p className="text-red-500 text-sm text-center">
+            OTP expired. Please request a new one.
+          </p>
+        )}
+
+        <div className="text-center text-sm">
+          {timer > 0 ? (
+            <p className="text-gray-500">
+              Resend OTP in <span className="font-semibold">{timer}s</span>
             </p>
+          ) : (
+            <button
+              onClick={handleResendOtp}
+              disabled={isResending}
+              className="text-primary font-medium hover:underline disabled:opacity-50"
+            >
+              {isResending ? "Resending..." : "Resend OTP"}
+            </button>
           )}
-
-          <div className="text-center text-sm">
-            {timer > 0 ? (
-              <p className="text-gray-500">
-                Resend OTP in <span className="font-semibold">{timer}s</span>
-              </p>
-            ) : (
-              <button
-                onClick={handleResendOtp}
-                disabled={isResending}
-                className="text-primary font-medium hover:underline disabled:opacity-50"
-              >
-                {isResending ? "Resending..." : "Resend OTP"}
-              </button>
-            )}
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+        </div>
+      </CardContent>
+    </Card>
   );
 }
