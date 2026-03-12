@@ -25,6 +25,10 @@ import Image from "next/image";
 export default function LoginForm() {
   const form = useForm({
     resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: "mehedi@lnovic.com",
+      password: "Mehedi1!",
+    },
   });
 
   const { setIsLoading } = useUser();
@@ -43,7 +47,6 @@ export default function LoginForm() {
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
     try {
       const res = await loginUser(data);
-      console.log("✅", data, res);
 
       setIsLoading(true);
       if (res?.success) {
@@ -94,7 +97,7 @@ export default function LoginForm() {
                 <FormItem className="mb-2">
                   <FormLabel>Email</FormLabel>
                   <FormControl>
-                    <Input type="email" {...field} value={field.value || ""} />
+                    <Input type="email" {...field} value={field.value} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -110,7 +113,7 @@ export default function LoginForm() {
                     <Input
                       type={showPassword ? "text" : "password"}
                       {...field}
-                      value={field.value || ""}
+                      value={field.value}
                     />
                   </FormControl>
                   <button

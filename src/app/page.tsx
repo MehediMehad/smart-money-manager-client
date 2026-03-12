@@ -8,14 +8,11 @@ import Link from "next/link";
 const HomePage = () => {
   return (
     <div className="min-h-screen bg-background">
-      {/* <HeroSection />
+      <HeroSection />
       <FeaturesSection />
       <HowItWorksSection />
       <CTASection />
-      <Footer /> */}
-      <Link href={"/login"} className="text-3xl font-bold underline">
-        Login!
-      </Link>
+      <Footer />
     </div>
   );
 };
