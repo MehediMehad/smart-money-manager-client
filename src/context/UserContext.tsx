@@ -1,5 +1,5 @@
-"use client"
-import { getCurrentUser } from "@/services/AuthService";
+"use client";
+import { getCurrentUser } from "@/services/Auth";
 import { IUser } from "@/types";
 import {
   createContext,

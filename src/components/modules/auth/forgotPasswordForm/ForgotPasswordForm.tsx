@@ -16,7 +16,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { useForm, FieldValues, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import { forgotPassword } from "@/services/AuthService";
+import { forgotPassword } from "@/services/Auth";
 import { forgotPasswordSchema } from "./forgotPasswordValidation";
 
 import { toast } from "sonner";

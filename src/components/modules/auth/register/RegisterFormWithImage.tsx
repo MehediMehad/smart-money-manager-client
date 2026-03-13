@@ -25,7 +25,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { registerUser } from "@/services/AuthService";
+import { registerUser } from "@/services/Auth";
 import { useState } from "react";
 import UserImagePreviewer from "@/components/shared/core/UserImageUploder/UserImagePreviewer";
 import UserImageUploader from "@/components/shared/core/UserImageUploder/UserImageUploader";

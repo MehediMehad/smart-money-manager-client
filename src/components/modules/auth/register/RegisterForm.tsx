@@ -18,7 +18,7 @@ import { registrationSchema } from "./registerValidation";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { useUser } from "@/context/UserContext";
-import { registerUser } from "@/services/AuthService";
+import { registerUser } from "@/services/Auth";
 import { useState } from "react";
 
 import { Eye, EyeOff } from "lucide-react";

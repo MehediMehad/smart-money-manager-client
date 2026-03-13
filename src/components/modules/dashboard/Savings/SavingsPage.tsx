@@ -174,7 +174,7 @@ export default function SavingsDashboard() {
           <h3 className="text-xl font-semibold">চলমান লক্ষ্যসমূহ</h3>
           <Dialog open={openAddGoal} onOpenChange={setOpenAddGoal}>
             <DialogTrigger asChild>
-              <Button className="gap-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700">
+              <Button className="gap-2 bg-gradient-to-r from-emerald-700 to-teal-600">
                 <Plus className="h-4 w-4" /> নতুন লক্ষ্য
               </Button>
             </DialogTrigger>
