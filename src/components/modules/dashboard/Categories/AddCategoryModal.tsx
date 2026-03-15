@@ -22,10 +22,11 @@ import {
 import { Plus } from "lucide-react";
 import { toast } from "sonner";
 import { createCategory } from "@/services/Category";
+import EmojiPicker, { EmojiClickData } from "emoji-picker-react";
 
 interface AddCategoryModalProps {
   onSuccess?: () => void; // optional callback to refresh list
-  isIcon?: boolean; // Mobile FAB জন্য
+  isIcon?: boolean; // Mobile FAB
 }
 
 export default function AddCategoryModal({
@@ -33,6 +34,7 @@ export default function AddCategoryModal({
   isIcon,
 }: AddCategoryModalProps) {
   const [open, setOpen] = useState(false);
+  const [showPicker, setShowPicker] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     type: "EXPENSE" as "INCOME" | "EXPENSE",
@@ -42,6 +44,10 @@ export default function AddCategoryModal({
   const handleSubmit = async () => {
     if (!formData.name.trim()) {
       toast.error("Category name is required");
+      return;
+    }
+    if (!formData.emoji) {
+      toast.error("Emoji is required");
       return;
     }
 
@@ -59,6 +65,11 @@ export default function AddCategoryModal({
       toast.error("Something went wrong");
       console.error(err);
     }
+  };
+
+  const onEmojiClick = (emojiData: EmojiClickData) => {
+    setFormData({ ...formData, emoji: emojiData.emoji });
+    setShowPicker(false); // picker auto close
   };
 
   return (
@@ -82,12 +93,13 @@ export default function AddCategoryModal({
         )}
       </DialogTrigger>
 
-      <DialogContent className="w-[85%] mx-auto sm:max-w-sm md:max-w-lg rounded-2xl">
+      <DialogContent className="w-[85%] top-[40%] mx-auto sm:max-w-sm md:max-w-lg rounded-2xl">
         <DialogHeader>
           <DialogTitle>Add New Category</DialogTitle>
         </DialogHeader>
 
-        <div className="grid gap-4 py-4">
+        <div className="grid gap-4 py-4 relative">
+          {/* Name */}
           <div className="grid gap-2">
             <Label>Name</Label>
             <Input
@@ -99,6 +111,7 @@ export default function AddCategoryModal({
             />
           </div>
 
+          {/* Type */}
           <div className="grid gap-2">
             <Label>Type</Label>
             <Select
@@ -120,17 +133,26 @@ export default function AddCategoryModal({
             </Select>
           </div>
 
-          <div className="grid gap-2">
+          {/* Emoji Picker */}
+          <div className="grid gap-2 relative">
             <Label>Emoji</Label>
             <Input
               value={formData.emoji}
-              onChange={(e) =>
-                setFormData({ ...formData, emoji: e.target.value })
-              }
-              placeholder="e.g. 🍔"
-              maxLength={2}
-              className="text-center"
+              placeholder="Select an emoji"
+              readOnly
+              className="text-center cursor-pointer"
+              onClick={() => setShowPicker((prev) => !prev)}
             />
+            {showPicker && (
+              <div className="absolute z-50 mt-2">
+                <EmojiPicker
+                  onEmojiClick={onEmojiClick}
+                  searchDisabled={false}
+                  skinTonesDisabled={false}
+                  autoFocusSearch={false}
+                />
+              </div>
+            )}
           </div>
         </div>
 
