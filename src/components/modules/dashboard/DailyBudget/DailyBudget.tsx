@@ -3,7 +3,7 @@
 import { useState, useMemo } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { ICategory } from "@/types";
+import { TCategory } from "@/types";
 import BudgetSummaryCards from "./BudgetSummaryCards";
 import DailyBudgetTable from "./DailyBudgetTable";
 
@@ -18,7 +18,7 @@ const dummyDailyBudgets = [
 const currentBalance = 12000;
 
 type Props = {
-  categories: ICategory[];
+  categories: TCategory[];
 };
 
 const DailyBudgetPage = ({ categories }: Props) => {

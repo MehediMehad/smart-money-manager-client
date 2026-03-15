@@ -440,7 +440,7 @@ export default function IncomePage() {
       {/* Mobile floating add button */}
       <div className="fixed bottom-6 right-6 z-50 md:hidden">
         <Button
-          size="lg"
+          size="icon"
           className="rounded-full h-14 w-14 shadow-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700"
           onClick={() => setOpenAdd(true)}
         >

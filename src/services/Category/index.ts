@@ -158,3 +158,34 @@ export const getCategories = async () => {
     }
 };
 
+
+// Delete Category
+export const deleteCategory = async (id: string) => {
+    try {
+        const accessToken = (await cookies()).get("accessToken")?.value;
+
+        if (!accessToken) {
+            throw new Error("No access token found");
+        }
+
+        const res = await fetch(`${config.base_api}/categories/hide/${id}`, {
+            method: "POST",
+            headers: {
+                Authorization: `Bearer ${accessToken}`,
+                "Content-Type": "application/json",
+            },
+        });
+
+        if (!res.ok) {
+            const errorData = await res.json().catch(() => ({}));
+            throw new Error(errorData.message || `HTTP ${res.status}`);
+        }
+
+        const result = await res.json();
+        return result.data;
+    } catch (error: any) {
+        console.error("deleteCategory error:", error);
+        throw new Error(error?.message || "Failed to delete category");
+    }
+};
+
