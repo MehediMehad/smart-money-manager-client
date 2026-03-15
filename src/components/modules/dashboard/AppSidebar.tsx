@@ -25,6 +25,7 @@ import {
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import clsx from "clsx";
+import { MdOutlineCategory } from "react-icons/md";
 
 const menuItems = [
   { title: "ড্যাশবোর্ড", url: "/dashboard", icon: LayoutDashboard },
@@ -45,6 +46,11 @@ const menuItems = [
     title: "মাসিক রিপোর্ট",
     url: "/dashboard/monthly-reports",
     icon: BarChart3,
+  },
+  {
+    title: "ক্যাটাগরি",
+    url: "/dashboard/categories",
+    icon: MdOutlineCategory,
   },
   { title: "নোটিফিকেশন", url: "/dashboard/notifications", icon: Bell },
   { title: "সেটিংস", url: "/dashboard/settings", icon: Settings },
