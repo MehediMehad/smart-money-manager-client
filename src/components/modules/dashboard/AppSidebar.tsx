@@ -48,7 +48,7 @@ const menuItems = [
     icon: BarChart3,
   },
   {
-    title: "ক্যাটাগরি",
+    title: "Categories",
     url: "/dashboard/categories",
     icon: MdOutlineCategory,
   },

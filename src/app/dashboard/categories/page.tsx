@@ -1,9 +1,12 @@
 import CategoriesPage from "@/components/modules/dashboard/Categories/Categories";
+import { getCategories } from "@/services/Category";
 
-const Page = () => {
+const Page = async () => {
+  const categories = await getCategories();
+
   return (
     <>
-      <CategoriesPage />
+      <CategoriesPage categories={categories || []} />
     </>
   );
 };

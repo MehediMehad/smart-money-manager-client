@@ -182,6 +182,8 @@ export const deleteCategory = async (id: string) => {
         }
 
         const result = await res.json();
+        revalidateTag("categories", { expire: 0 });
+
         return result.data;
     } catch (error: any) {
         console.error("deleteCategory error:", error);
