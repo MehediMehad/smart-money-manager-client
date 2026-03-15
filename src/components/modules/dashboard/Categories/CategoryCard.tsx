@@ -1,16 +1,23 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { deleteCategory } from "@/services/Category";
 import { TCategory } from "@/types";
 import { Trash2 } from "lucide-react";
+import { toast } from "sonner";
+import DeleteCategoryModal from "./DeleteCategoryModal";
 
-const CategoryCard = ({
-  category,
-  onDelete,
-}: {
-  category: TCategory;
-  onDelete: () => void;
-}) => {
+const CategoryCard = ({ category }: { category: TCategory }) => {
+  const handleDelete = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this category?")) return;
+
+    try {
+      await deleteCategory(id);
+      toast.success("Category deleted successfully");
+    } catch (err: any) {
+      toast.error(err.message || "Failed to delete category");
+    }
+  };
   return (
     <Card className="flex items-center justify-between p-3 rounded-xl shadow-sm hover:shadow-md transition-all">
       {/* Left Side */}
@@ -34,14 +41,9 @@ const CategoryCard = ({
       </div>
 
       {/* Delete Button */}
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={onDelete}
-        className="text-destructive hover:bg-red-500/10"
-      >
-        <Trash2 className="h-4 w-4 text-red-500 " size={18} />
-      </Button>
+      <div className="flex items-center gap-1">
+        <DeleteCategoryModal category={category} />
+      </div>
     </Card>
   );
 };

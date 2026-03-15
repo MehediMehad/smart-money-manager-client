@@ -27,7 +27,7 @@ import { Label } from "@/components/ui/label";
 import { formatBDT, getStatus, getStatusBadge } from "@/lib/budget-utils";
 import { createDailyBudget } from "@/services/DailyBudget";
 import { toast } from "sonner";
-import { ICategory } from "@/types";
+import { TCategory } from "@/types";
 
 type DailyBudgetItem = {
   category: string;
@@ -37,7 +37,7 @@ type DailyBudgetItem = {
 };
 
 type Props = {
-  categories: ICategory[];
+  categories: TCategory[];
   dailyBudgets: DailyBudgetItem[];
 };
 
@@ -45,7 +45,7 @@ const DailyBudgetTable = ({ dailyBudgets, categories }: Props) => {
   const [openAdd, setOpenAdd] = useState(false);
   const [openEdit, setOpenEdit] = useState<string | null>(null);
 
-  const [selectedCategory, setSelectedCategory] = useState<ICategory | null>(
+  const [selectedCategory, setSelectedCategory] = useState<TCategory | null>(
     null,
   );
   const [budgetAmount, setBudgetAmount] = useState<string>("");
@@ -54,7 +54,7 @@ const DailyBudgetTable = ({ dailyBudgets, categories }: Props) => {
 
   const amountInputRef = useRef<HTMLInputElement>(null);
 
-  const handleCategorySelect = (cat: ICategory) => {
+  const handleCategorySelect = (cat: TCategory) => {
     setSelectedCategory(cat);
 
     setTimeout(() => {

@@ -2,8 +2,6 @@
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ArrowDownCircle, ArrowUpCircle } from "lucide-react";
-import { toast } from "sonner";
-import { deleteCategory } from "@/services/Category";
 import { TCategory } from "@/types";
 import CategoryCard from "./CategoryCard";
 import AddCategoryModal from "./AddCategoryModal";
@@ -13,20 +11,9 @@ interface Props {
 }
 
 export default function CategoriesPage({ categories }: Props) {
-  const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this category?")) return;
-
-    try {
-      await deleteCategory(id);
-      toast.success("Category deleted successfully");
-    } catch (err: any) {
-      toast.error(err.message || "Failed to delete category");
-    }
-  };
-
+  // Filter
   const incomeCats = categories?.filter((c) => c.type === "INCOME");
   const expenseCats = categories?.filter((c) => c.type === "EXPENSE");
-
   return (
     <div className="space-y-6">
       {/* Header + Add Button */}
@@ -66,11 +53,7 @@ export default function CategoriesPage({ categories }: Props) {
         <TabsContent value="EXPENSE">
           <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4">
             {expenseCats?.map((cat) => (
-              <CategoryCard
-                key={cat.id}
-                category={cat}
-                onDelete={() => handleDelete(cat.id)}
-              />
+              <CategoryCard key={cat.id} category={cat} />
             ))}
           </div>
         </TabsContent>
@@ -78,11 +61,7 @@ export default function CategoriesPage({ categories }: Props) {
         <TabsContent value="INCOME">
           <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4">
             {incomeCats?.map((cat) => (
-              <CategoryCard
-                key={cat.id}
-                category={cat}
-                onDelete={() => handleDelete(cat.id)}
-              />
+              <CategoryCard key={cat.id} category={cat} />
             ))}
           </div>
         </TabsContent>
