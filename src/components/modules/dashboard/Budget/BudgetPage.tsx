@@ -12,10 +12,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
-import { Plus, AlertTriangle, Pencil } from "lucide-react";
+import { AlertTriangle, Pencil } from "lucide-react";
 import BudgetFormModal from "./BudgetFormModal";
 import { TBudget } from "@/constants";
-import Link from "next/link";
 import { cn } from "@/lib/utils";
 
 interface Props {
@@ -84,45 +83,6 @@ export default function BudgetPage({ budgets }: Props) {
           <BudgetFormModal mode="create" />
         </div>
       </div>
-
-      {/* Alerts */}
-      {alertBudgets.length > 0 && (
-        <div className="space-y-3">
-          <h2 className="text-lg font-semibold flex items-center gap-2 text-amber-700 dark:text-amber-500">
-            <AlertTriangle className="h-5 w-5" />
-            Budget Alerts
-          </h2>
-          <div className="space-y-2">
-            {alertBudgets.map((b) => {
-              const status = getBudgetStatus(b);
-              const percent = Math.round((b.spent / b.amount) * 100);
-              const isOver = status === "OVER";
-              const exceeded = Math.round(b.spent - b.amount);
-
-              return (
-                <div
-                  key={b.id}
-                  className={`p-3 rounded-lg border ${
-                    isOver
-                      ? "bg-red-50 border-red-200 text-red-800 dark:bg-red-950/40 dark:border-red-800/50 dark:text-red-200"
-                      : "bg-amber-50 border-amber-200 text-amber-800 dark:bg-amber-950/40 dark:border-amber-800/50 dark:text-amber-200"
-                  }`}
-                >
-                  <div className="font-medium flex items-center gap-2">
-                    {isOver ? "🔴 Over budget" : "🟡 Warning"} —{" "}
-                    {b.category?.name || "Unknown"} ({b.type.toLowerCase()})
-                  </div>
-                  <div className="text-sm mt-1 opacity-90">
-                    {isOver
-                      ? `Exceeded by ${exceeded.toLocaleString()} BDT`
-                      : `Used ${percent}% (${b.spent.toLocaleString()} / ${b.amount.toLocaleString()} BDT)`}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
 
       {/* Filter Section */}
       <div className="bg-card border rounded-xl p-4 space-y-4 shadow-sm">
@@ -224,6 +184,7 @@ export default function BudgetPage({ budgets }: Props) {
 
             const isOver = percent > 100;
             const isWarning = percent > 80 && percent <= 100;
+            const isSafe = percent <= 80;
 
             const statusColor = isOver
               ? "bg-red-600"
@@ -251,6 +212,7 @@ export default function BudgetPage({ budgets }: Props) {
                     statusBg,
                     isOver && "border-red-500/50 animate-pulse-subtle", // subtle pulse for over
                     isWarning && "border-amber-500/50",
+                    isSafe && "border-emerald-500/50",
                   )}
                 >
                   <CardContent className="p-5 space-y-4">
@@ -363,6 +325,45 @@ export default function BudgetPage({ budgets }: Props) {
           )}
         </div>
       )}
+
+      {/* Alerts */}
+      {/* {alertBudgets.length > 0 && (
+        <div className="space-y-3">
+          <h2 className="text-lg font-semibold flex items-center gap-2 text-amber-700 dark:text-amber-500">
+            <AlertTriangle className="h-5 w-5" />
+            Budget Alerts
+          </h2>
+          <div className="space-y-2">
+            {alertBudgets.map((b) => {
+              const status = getBudgetStatus(b);
+              const percent = Math.round((b.spent / b.amount) * 100);
+              const isOver = status === "OVER";
+              const exceeded = Math.round(b.spent - b.amount);
+
+              return (
+                <div
+                  key={b.id}
+                  className={`p-3 rounded-lg border ${
+                    isOver
+                      ? "bg-red-50 border-red-200 text-red-800 dark:bg-red-950/40 dark:border-red-800/50 dark:text-red-200"
+                      : "bg-amber-50 border-amber-200 text-amber-800 dark:bg-amber-950/40 dark:border-amber-800/50 dark:text-amber-200"
+                  }`}
+                >
+                  <div className="font-medium flex items-center gap-2">
+                    {isOver ? "🔴 Over budget" : "🟡 Warning"} —{" "}
+                    {b.category?.name || "Unknown"} ({b.type.toLowerCase()})
+                  </div>
+                  <div className="text-sm mt-1 opacity-90">
+                    {isOver
+                      ? `Exceeded by ${exceeded.toLocaleString()} BDT`
+                      : `Used ${percent}% (${b.spent.toLocaleString()} / ${b.amount.toLocaleString()} BDT)`}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )} */}
 
       {/* Mobile FAB */}
       <div className="fixed bottom-10 right-6 z-50 md:hidden">
