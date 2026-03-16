@@ -1,9 +1,7 @@
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { deleteCategory } from "@/services/Category";
 import { TCategory } from "@/types";
-import { Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import DeleteCategoryModal from "./DeleteCategoryModal";
 

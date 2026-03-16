@@ -1,33 +1,9 @@
 "use client";
 
-import { useState, useMemo } from "react";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  DialogFooter,
-  DialogDescription,
-} from "@/components/ui/dialog";
 import {
   Select,
   SelectContent,
@@ -35,386 +11,363 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import { Plus, Pencil, Trash2, AlertTriangle } from "lucide-react";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-} from "recharts";
+import { Card, CardContent } from "@/components/ui/card";
+import { Plus, AlertTriangle, Pencil } from "lucide-react";
+import BudgetFormModal from "./BudgetFormModal";
+import { TBudget } from "@/constants";
+import Link from "next/link";
 import { cn } from "@/lib/utils";
 
-const currentYear = 2026;
-const currentMonth = "03"; // March
-
-// Dummy budget data for March 2026
-const dummyBudgets = [
-  { category: "খাবার", budget: 12000, spent: 9500, remaining: 2500 },
-  { category: "যাতায়াত", budget: 5000, spent: 6200, remaining: -1200 },
-  {
-    category: "বিল (ইন্টারনেট+বিদ্যুৎ)",
-    budget: 6000,
-    spent: 4800,
-    remaining: 1200,
-  },
-  { category: "শপিং", budget: 4000, spent: 1800, remaining: 2200 },
-  { category: "বিনোদন", budget: 3000, spent: 4200, remaining: -1200 },
-  { category: "শিক্ষা", budget: 8000, spent: 3000, remaining: 5000 },
-];
-
-function formatBDT(amount: number) {
-  return "৳" + Math.abs(amount).toLocaleString("bn-BD");
+interface Props {
+  budgets: TBudget[];
 }
 
-function getStatus(spent: number, budget: number) {
-  const percent = (spent / budget) * 100;
-  if (percent > 100) return "over";
-  if (percent > 80) return "near";
-  return "safe";
-}
+export default function BudgetPage({ budgets }: Props) {
+  const [budgetType, setBudgetType] = useState<"DAILY" | "MONTHLY">("DAILY");
+  const [selectedDate, setSelectedDate] = useState<string>("");
+  const [selectedMonth, setSelectedMonth] = useState<string>("");
+  const [statusFilter, setStatusFilter] = useState<
+    "ALL" | "SAFE" | "WARNING" | "OVER"
+  >("ALL");
 
-function getStatusBadge(status: string) {
-  if (status === "over")
-    return <Badge variant="destructive">Over Budget</Badge>;
-  if (status === "near")
-    return (
-      <Badge variant="outline" className="border-amber-500 text-amber-700">
-        Near Limit
-      </Badge>
-    );
-  return <Badge variant="secondary">Safe</Badge>;
-}
-
-function getStatusColor(status: string) {
-  if (status === "over") return "bg-red-500";
-  if (status === "near") return "bg-amber-500";
-  return "bg-emerald-500";
-}
-
-export default function BudgetPage() {
-  const [selectedMonth, setSelectedMonth] = useState(currentMonth);
-  const [selectedYear, setSelectedYear] = useState(currentYear.toString());
-  const [openAdd, setOpenAdd] = useState(false);
-  const [openEdit, setOpenEdit] = useState<string | null>(null);
-
-  // In real app → fetch based on month/year
-  const budgets = dummyBudgets;
-
-  const totalBudget = useMemo(
-    () => budgets.reduce((sum, b) => sum + b.budget, 0),
-    [budgets],
-  );
-  const totalSpent = useMemo(
-    () => budgets.reduce((sum, b) => sum + b.spent, 0),
-    [budgets],
-  );
-  const totalRemaining = totalBudget - totalSpent;
-
-  const chartData = budgets.map((b) => ({
-    category: b.category,
-    budget: b.budget,
-    spent: b.spent,
-  }));
-
-  return (
-    <div className="space-y-6 pb-20 md:pb-12">
-      {/* 1. Month Selector */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-card rounded-2xl p-4 border shadow-sm">
-        <h2 className="text-2xl font-bold">মাসিক বাজেট</h2>
-        <div className="flex flex-wrap gap-3 items-center">
-          <Select value={selectedMonth} onValueChange={setSelectedMonth}>
-            <SelectTrigger className="w-40">
-              <SelectValue placeholder="মাস" />
-            </SelectTrigger>
-            <SelectContent>
-              {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
-                <SelectItem key={m} value={m.toString().padStart(2, "0")}>
-                  {new Date(2000, m - 1).toLocaleString("bn-BD", {
-                    month: "long",
-                  })}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
-          <Select value={selectedYear} onValueChange={setSelectedYear}>
-            <SelectTrigger className="w-32">
-              <SelectValue placeholder="বছর" />
-            </SelectTrigger>
-            <SelectContent>
-              {[2025, 2026, 2027].map((y) => (
-                <SelectItem key={y} value={y.toString()}>
-                  {y}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
-          <Button className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700">
-            আপডেট করুন
-          </Button>
-        </div>
-      </div>
-
-      {/* 2. Summary Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <BudgetSummaryCard
-          title="মোট বাজেট"
-          value={totalBudget}
-          subtitle="এই মাসে"
-          variant="emerald"
-        />
-        <BudgetSummaryCard
-          title="মোট খরচ"
-          value={totalSpent}
-          subtitle="এ পর্যন্ত"
-          variant="red"
-        />
-        <BudgetSummaryCard
-          title="বাকি বাজেট"
-          value={totalRemaining}
-          subtitle={totalRemaining >= 0 ? "অবশিষ্ট" : "অতিরিক্ত খরচ"}
-          variant={totalRemaining >= 0 ? "blue" : "destructive"}
-        />
-      </div>
-
-      {/* 3. Budget vs Spent Bar Chart */}
-      <Card className="rounded-2xl shadow-sm">
-        <CardHeader>
-          <CardTitle>বাজেট বনাম খরচ তুলনা</CardTitle>
-          <CardDescription>ক্যাটাগরি অনুযায়ী</CardDescription>
-        </CardHeader>
-        <CardContent className="h-64 sm:h-80">
-          <ResponsiveContainer>
-            <BarChart
-              data={chartData}
-              margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-            >
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis
-                dataKey="category"
-                angle={-45}
-                textAnchor="end"
-                height={70}
-                interval={0}
-              />
-              <YAxis />
-              <Tooltip formatter={(v: number) => formatBDT(v)} />
-              <Legend />
-              <Bar
-                dataKey="budget"
-                name="বাজেট"
-                fill="#3b82f6"
-                radius={[4, 4, 0, 0]}
-              />
-              <Bar
-                dataKey="spent"
-                name="খরচ"
-                fill="#ef4444"
-                radius={[4, 4, 0, 0]}
-              />
-            </BarChart>
-          </ResponsiveContainer>
-        </CardContent>
-      </Card>
-
-      {/* 4. Budget List Table */}
-      <Card className="rounded-2xl shadow-sm overflow-hidden">
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle>ক্যাটাগরি বাজেট</CardTitle>
-          <Dialog open={openAdd} onOpenChange={setOpenAdd}>
-            <DialogTrigger asChild>
-              <Button className="gap-2 bg-emerald-600 hover:bg-emerald-700">
-                <Plus className="h-4 w-4" /> নতুন বাজেট যোগ করুন
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-md rounded-2xl">
-              <DialogHeader>
-                <DialogTitle>নতুন ক্যাটাগরি বাজেট</DialogTitle>
-                <DialogDescription>
-                  এই মাসের জন্য বাজেট সেট করুন
-                </DialogDescription>
-              </DialogHeader>
-              <div className="grid gap-4 py-4">
-                <div className="grid gap-2">
-                  <Label>ক্যাটাগরি</Label>
-                  <Select>
-                    <SelectTrigger>
-                      <SelectValue placeholder="বেছে নিন" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="খাবার">খাবার</SelectItem>
-                      <SelectItem value="যাতায়াত">যাতায়াত</SelectItem>
-                      <SelectItem value="বিল">বিল</SelectItem>
-                      <SelectItem value="শপিং">শপিং</SelectItem>
-                      <SelectItem value="বিনোদন">বিনোদন</SelectItem>
-                      <SelectItem value="শিক্ষা">শিক্ষা</SelectItem>
-                      <SelectItem value="অন্যান্য">অন্যান্য</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="grid gap-2">
-                  <Label>বাজেট পরিমাণ (৳)</Label>
-                  <Input type="number" placeholder="8000" />
-                </div>
-              </div>
-              <DialogFooter>
-                <Button variant="outline" onClick={() => setOpenAdd(false)}>
-                  বাতিল
-                </Button>
-                <Button>সেভ করুন</Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
-        </CardHeader>
-
-        <div className="overflow-x-auto">
-          <Table>
-            <TableHeader className="bg-muted/60">
-              <TableRow>
-                <TableHead>ক্যাটাগরি</TableHead>
-                <TableHead>বাজেট</TableHead>
-                <TableHead>খরচ</TableHead>
-                <TableHead>বাকি</TableHead>
-                <TableHead>অবস্থা</TableHead>
-                <TableHead className="text-right">অ্যাকশন</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {budgets.map((item, index) => {
-                const status = getStatus(item.spent, item.budget);
-                const percent = Math.min(
-                  Math.round((item.spent / item.budget) * 100),
-                  100,
-                );
-                const isOver = status === "over";
-
-                return (
-                  <TableRow key={index} className="hover:bg-muted/50">
-                    <TableCell className="font-medium">
-                      {item.category}
-                    </TableCell>
-                    <TableCell>{formatBDT(item.budget)}</TableCell>
-                    <TableCell
-                      className={cn(
-                        "font-semibold",
-                        isOver ? "text-red-600" : "text-foreground",
-                      )}
-                    >
-                      {formatBDT(item.spent)}
-                    </TableCell>
-                    <TableCell
-                      className={cn(
-                        "font-semibold",
-                        isOver ? "text-red-600" : "",
-                      )}
-                    >
-                      {item.remaining >= 0
-                        ? formatBDT(item.remaining)
-                        : `-${formatBDT(Math.abs(item.remaining))}`}
-                    </TableCell>
-                    <TableCell>{getStatusBadge(status)}</TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end gap-1">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8"
-                          onClick={() => setOpenEdit(item.category)}
-                        >
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 text-destructive"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
-        </div>
-      </Card>
-
-      {/* Mobile floating add button */}
-      <div className="fixed bottom-6 right-6 z-50 md:hidden">
-        <Button
-          size="lg"
-          className="rounded-full h-14 w-14 shadow-2xl bg-emerald-600 hover:bg-emerald-700"
-          onClick={() => setOpenAdd(true)}
-        >
-          <Plus className="h-7 w-7" />
-        </Button>
-      </div>
-
-      {/* Edit Modal (placeholder - same form as add) */}
-      <Dialog open={!!openEdit} onOpenChange={() => setOpenEdit(null)}>
-        <DialogContent className="sm:max-w-md rounded-2xl">
-          <DialogHeader>
-            <DialogTitle>{openEdit} বাজেট আপডেট করুন</DialogTitle>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid gap-2">
-              <Label>বাজেট পরিমাণ (৳)</Label>
-              <Input type="number" defaultValue="12000" />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setOpenEdit(null)}>
-              বাতিল
-            </Button>
-            <Button>আপডেট করুন</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </div>
-  );
-}
-
-function BudgetSummaryCard({
-  title,
-  value,
-  subtitle,
-  variant = "default",
-}: {
-  title: string;
-  value: number;
-  subtitle: string;
-  variant?: "emerald" | "red" | "blue" | "purple" | "destructive" | "default";
-}) {
-  const colors = {
-    default: "text-foreground",
-    emerald: "text-emerald-600 dark:text-emerald-400",
-    red: "text-red-600 dark:text-red-400",
-    blue: "text-blue-600 dark:text-blue-400",
-    purple: "text-purple-600 dark:text-purple-400",
-    destructive: "text-destructive",
+  const getBudgetStatus = (budget: TBudget): "SAFE" | "WARNING" | "OVER" => {
+    const spent = budget.spent ?? 0;
+    const percent = budget.amount > 0 ? (spent / budget.amount) * 100 : 0;
+    if (percent > 100) return "OVER";
+    if (percent > 80) return "WARNING";
+    return "SAFE";
   };
 
+  const filteredBudgets = budgets.filter((b) => {
+    if (b.type !== budgetType) return false;
+
+    if (budgetType === "DAILY" && selectedDate) {
+      if (!("date" in b) || b.date !== selectedDate) return false;
+    }
+    if (budgetType === "MONTHLY" && selectedMonth) {
+      if (!("monthYear" in b) || b.monthYear !== selectedMonth) return false;
+    }
+
+    if (statusFilter === "ALL") return true;
+    return getBudgetStatus(b) === statusFilter;
+  });
+
+  const alertBudgets = budgets
+    .filter((b) => {
+      const status = getBudgetStatus(b);
+      return status === "WARNING" || status === "OVER";
+    })
+    .sort((a, b) => {
+      const sa = getBudgetStatus(a);
+      const sb = getBudgetStatus(b);
+      if (sa === "OVER" && sb !== "OVER") return -1;
+      if (sb === "OVER" && sa !== "OVER") return 1;
+      return 0;
+    });
+
+  const hasActiveFilters =
+    selectedDate || selectedMonth || statusFilter !== "ALL";
+
   return (
-    <Card className="rounded-2xl shadow-sm">
-      <CardHeader className="pb-2">
-        <CardTitle className="text-sm font-medium text-muted-foreground">
-          {title}
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className={`text-2xl font-bold ${colors[variant]}`}>
-          {formatBDT(value)}
+    <div className="space-y-6 pb-24 md:pb-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h1 className="text-2xl font-bold flex items-center gap-2">
+            📊 Budget Management
+          </h1>
+          <p className="text-sm text-muted-foreground mt-1 hidden sm:block">
+            Set daily and monthly spending limits and track your progress
+          </p>
         </div>
-        <p className="text-xs text-muted-foreground mt-1">{subtitle}</p>
-      </CardContent>
-    </Card>
+        <div className="hidden sm:block">
+          <BudgetFormModal mode="create" />
+        </div>
+      </div>
+
+      {/* Alerts */}
+      {alertBudgets.length > 0 && (
+        <div className="space-y-3">
+          <h2 className="text-lg font-semibold flex items-center gap-2 text-amber-700 dark:text-amber-500">
+            <AlertTriangle className="h-5 w-5" />
+            Budget Alerts
+          </h2>
+          <div className="space-y-2">
+            {alertBudgets.map((b) => {
+              const status = getBudgetStatus(b);
+              const percent = Math.round((b.spent / b.amount) * 100);
+              const isOver = status === "OVER";
+              const exceeded = Math.round(b.spent - b.amount);
+
+              return (
+                <div
+                  key={b.id}
+                  className={`p-3 rounded-lg border ${
+                    isOver
+                      ? "bg-red-50 border-red-200 text-red-800 dark:bg-red-950/40 dark:border-red-800/50 dark:text-red-200"
+                      : "bg-amber-50 border-amber-200 text-amber-800 dark:bg-amber-950/40 dark:border-amber-800/50 dark:text-amber-200"
+                  }`}
+                >
+                  <div className="font-medium flex items-center gap-2">
+                    {isOver ? "🔴 Over budget" : "🟡 Warning"} —{" "}
+                    {b.category?.name || "Unknown"} ({b.type.toLowerCase()})
+                  </div>
+                  <div className="text-sm mt-1 opacity-90">
+                    {isOver
+                      ? `Exceeded by ${exceeded.toLocaleString()} BDT`
+                      : `Used ${percent}% (${b.spent.toLocaleString()} / ${b.amount.toLocaleString()} BDT)`}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Filter Section */}
+      <div className="bg-card border rounded-xl p-4 space-y-4 shadow-sm">
+        <h3 className="font-medium text-base">Filter & Sort</h3>
+        <div className="flex flex-wrap gap-x-6 gap-y-4 items-end">
+          <div className="space-y-1.5">
+            <Label className="text-sm">Budget Type</Label>
+            <div className="flex gap-2">
+              <Button
+                variant={budgetType === "DAILY" ? "default" : "outline"}
+                size="sm"
+                onClick={() => {
+                  setBudgetType("DAILY");
+                  setSelectedMonth("");
+                }}
+              >
+                Daily
+              </Button>
+              <Button
+                variant={budgetType === "MONTHLY" ? "default" : "outline"}
+                size="sm"
+                onClick={() => {
+                  setBudgetType("MONTHLY");
+                  setSelectedDate("");
+                }}
+              >
+                Monthly
+              </Button>
+            </div>
+          </div>
+
+          {budgetType === "DAILY" && (
+            <div className="space-y-1.5 min-w-[160px]">
+              <Label className="text-sm">Select Date</Label>
+              <Input
+                type="date"
+                value={selectedDate}
+                onChange={(e) => setSelectedDate(e.target.value)}
+                className="h-9"
+              />
+            </div>
+          )}
+
+          {budgetType === "MONTHLY" && (
+            <div className="space-y-1.5 min-w-[160px]">
+              <Label className="text-sm">Select Month</Label>
+              <Input
+                type="month"
+                value={selectedMonth}
+                onChange={(e) => setSelectedMonth(e.target.value)}
+                className="h-9"
+              />
+            </div>
+          )}
+
+          <div className="space-y-1.5">
+            <Label className="text-sm">Status</Label>
+            <Select
+              value={statusFilter}
+              onValueChange={(v) => setStatusFilter(v as any)}
+            >
+              <SelectTrigger className="w-[150px] h-9">
+                <SelectValue placeholder="All Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ALL">All Status</SelectItem>
+                <SelectItem value="SAFE">🟢 Safe</SelectItem>
+                <SelectItem value="WARNING">🟡 Warning</SelectItem>
+                <SelectItem value="OVER">🔴 Over Budget</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {hasActiveFilters && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                setSelectedDate("");
+                setSelectedMonth("");
+                setStatusFilter("ALL");
+              }}
+            >
+              Clear all
+            </Button>
+          )}
+        </div>
+      </div>
+
+      {/* Budget Cards Grid */}
+      {filteredBudgets.length > 0 ? (
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+          {filteredBudgets.map((budget) => {
+            const spent = budget.spent ?? 0;
+            const percent =
+              budget.amount > 0 ? (spent / budget.amount) * 100 : 0;
+            const percentRounded = Math.round(percent); // for display
+            const remaining = budget.amount - spent;
+
+            const isOver = percent > 100;
+            const isWarning = percent > 80 && percent <= 100;
+
+            const statusColor = isOver
+              ? "bg-red-600"
+              : isWarning
+                ? "bg-amber-500"
+                : "bg-emerald-600";
+
+            const statusBg = isOver
+              ? "bg-red-50 dark:bg-red-950/30 border-red-200 dark:border-red-800/40"
+              : isWarning
+                ? "bg-amber-50 dark:bg-amber-950/30 border-amber-200 dark:border-amber-800/40"
+                : "bg-emerald-50/40 dark:bg-emerald-950/20 border-emerald-200/50 dark:border-emerald-800/30";
+
+            const statusText = isOver
+              ? `Over Budget (${percentRounded}%)`
+              : isWarning
+                ? `Warning (${percentRounded}%)`
+                : `On Track (${percentRounded}%)`;
+
+            return (
+              <div key={budget.id} className="block">
+                <Card
+                  className={cn(
+                    "rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 cursor-pointer overflow-hidden border",
+                    statusBg,
+                    isOver && "border-red-500/50 animate-pulse-subtle", // subtle pulse for over
+                    isWarning && "border-amber-500/50",
+                  )}
+                >
+                  <CardContent className="p-5 space-y-4">
+                    {/* Header */}
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <h4 className="font-semibold text-lg">
+                          {budget.category?.name || "Unnamed Budget"}
+                        </h4>
+                        <p className="text-xs text-muted-foreground mt-0.5">
+                          {budget.type} Budget
+                        </p>
+                      </div>
+
+                      {isOver && (
+                        <AlertTriangle className="h-6 w-6 text-red-500" />
+                      )}
+                      {isWarning && (
+                        <AlertTriangle className="h-6 w-6 text-amber-500" />
+                      )}
+                    </div>
+
+                    {/* Progress Bar – allow going beyond 100% visually */}
+                    <div className="space-y-1.5">
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">Progress</span>
+                        <span
+                          className={`font-medium ${isOver ? "text-red-600" : ""}`}
+                        >
+                          {percentRounded}%
+                        </span>
+                      </div>
+                      <div className="h-2.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                        <div
+                          className={`h-full transition-all duration-500 ${statusColor}`}
+                          style={{ width: `${Math.min(percentRounded, 100)}%` }} // cap width at 100% for bar
+                        />
+                      </div>
+                    </div>
+
+                    {/* Amounts */}
+                    <div className="grid grid-cols-2 gap-3 text-sm">
+                      <div>
+                        <p className="text-muted-foreground">Budget</p>
+                        <p className="font-bold text-emerald-600">
+                          {budget.amount.toLocaleString()} BDT
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-muted-foreground">Spent</p>
+                        <p
+                          className={`font-bold ${isOver ? "text-red-600" : ""}`}
+                        >
+                          {spent.toLocaleString()} BDT
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Remaining + Status */}
+                    <div className="text-xs space-y-1.5 pt-2 border-t">
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Remaining</span>
+                        <span
+                          className={`font-medium ${remaining < 0 ? "text-red-600" : ""}`}
+                        >
+                          {remaining.toLocaleString()} BDT
+                        </span>
+                      </div>
+
+                      <p
+                        className={`font-medium ${isOver ? "text-red-600" : isWarning ? "text-amber-600" : "text-emerald-600"}`}
+                      >
+                        {statusText}
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            );
+          })}
+        </div>
+      ) : (
+        <div className="text-center py-16 text-muted-foreground border rounded-xl bg-card/50">
+          <p className="text-lg font-medium">
+            {hasActiveFilters
+              ? "No budgets match your filters"
+              : "No budgets found yet"}
+          </p>
+          <p className="mt-2">
+            {hasActiveFilters
+              ? "Try adjusting date/month or status"
+              : "Start by adding a daily or monthly budget"}
+          </p>
+          <div className="mt-6">
+            <BudgetFormModal mode="create" />
+          </div>
+          {hasActiveFilters && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="mt-4"
+              onClick={() => {
+                setSelectedDate("");
+                setSelectedMonth("");
+                setStatusFilter("ALL");
+              }}
+            >
+              Reset Filters
+            </Button>
+          )}
+        </div>
+      )}
+
+      {/* Mobile FAB */}
+      <div className="fixed bottom-10 right-6 z-50 md:hidden">
+        <BudgetFormModal mode="create" isIcon />
+      </div>
+    </div>
   );
 }

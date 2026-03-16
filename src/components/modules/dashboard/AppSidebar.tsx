@@ -37,6 +37,7 @@ const menuItems = [
   { title: "আয়", url: "/dashboard/income", icon: ArrowDownCircle },
   { title: "ব্যয়", url: "/dashboard/expense", icon: ArrowUpCircle },
 
+  { title: "Budget", url: "/dashboard/budget", icon: Receipt },
   { title: "দৈনিক বাজেট", url: "/dashboard/daily-budget", icon: Receipt },
   { title: "মাসিক বাজেট", url: "/dashboard/monthly-budget", icon: PieChart },
 
