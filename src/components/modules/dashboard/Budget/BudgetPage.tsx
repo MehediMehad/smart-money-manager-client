@@ -16,12 +16,14 @@ import { AlertTriangle, Pencil } from "lucide-react";
 import BudgetFormModal from "./BudgetFormModal";
 import { TBudget } from "@/constants";
 import { cn } from "@/lib/utils";
+import { TCategory } from "@/types";
 
 interface Props {
   budgets: TBudget[];
+  categories: TCategory[];
 }
 
-export default function BudgetPage({ budgets }: Props) {
+export default function BudgetPage({ budgets, categories }: Props) {
   const [budgetType, setBudgetType] = useState<"DAILY" | "MONTHLY">("DAILY");
   const [selectedDate, setSelectedDate] = useState<string>("");
   const [selectedMonth, setSelectedMonth] = useState<string>("");
@@ -80,7 +82,7 @@ export default function BudgetPage({ budgets }: Props) {
           </p>
         </div>
         <div className="hidden sm:block">
-          <BudgetFormModal mode="create" />
+          <BudgetFormModal mode="create" categories={categories} />
         </div>
       </div>
 
@@ -307,7 +309,7 @@ export default function BudgetPage({ budgets }: Props) {
               : "Start by adding a daily or monthly budget"}
           </p>
           <div className="mt-6">
-            <BudgetFormModal mode="create" />
+            <BudgetFormModal mode="create" categories={categories} />
           </div>
           {hasActiveFilters && (
             <Button
@@ -367,7 +369,7 @@ export default function BudgetPage({ budgets }: Props) {
 
       {/* Mobile FAB */}
       <div className="fixed bottom-10 right-6 z-50 md:hidden">
-        <BudgetFormModal mode="create" isIcon />
+        <BudgetFormModal mode="create" isIcon categories={categories} />
       </div>
     </div>
   );
