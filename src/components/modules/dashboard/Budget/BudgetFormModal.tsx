@@ -1,6 +1,11 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "sonner";
+import { format } from "date-fns";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,128 +18,113 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
-import { Plus, Pencil, CalendarIcon } from "lucide-react";
-import { toast } from "sonner";
-import { TCategory } from "@/types";
+import { CalendarIcon, Pencil, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { format } from "date-fns";
-import { DatePickerDemo } from "./date-piker";
-// import { createBudget } from "@/services/Budget";
+
+import { MonthPicker } from "@/components/shared/core/MonthPicker";
+import { budgetSchema, BudgetFormValues } from "@/validations/budgetValidation";
+import { TCategory } from "@/types";
+import { createBudgetLimit, updateBudgetLimit } from "@/services/Budget";
 
 type Props = {
   mode: "create" | "edit";
-  budget?: any; // TBudget
+  budget?: any; // improve type later if possible
   isIcon?: boolean;
   onSuccess?: () => void;
   categories: TCategory[];
 };
 
-const BudgetFormModal = ({
+export default function BudgetFormModal({
   mode,
   budget,
   isIcon,
   onSuccess,
   categories,
-}: Props) => {
-  console.log("categories", categories);
-  const amountInputRef = useRef<HTMLInputElement>(null);
-  const expenseCategories = categories.filter((cat) => cat.type === "EXPENSE");
-  const [selectedCategory, setSelectedCategory] = useState<TCategory | null>(
-    null,
-  );
-
-  const [open, setOpen] = useState(false);
+}: Props) {
   const isEdit = mode === "edit";
+  const expenseCategories = categories.filter((cat) => cat.type === "EXPENSE");
 
-  // Date states
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(
-    isEdit && budget?.date ? new Date(budget.date) : undefined,
-  );
-  const [selectedMonth, setSelectedMonth] = useState<Date | undefined>(
-    isEdit && budget?.month ? new Date(budget.month + "-01") : undefined,
-  );
-
-  const [form, setForm] = useState({
-    categoryId: isEdit ? budget?.categoryId : "",
-    amount: isEdit ? budget?.amount : "",
-    type: isEdit ? budget?.type : "DAILY",
-    date: isEdit ? budget?.date : "",
-    month: isEdit ? budget?.month : "",
+  const form = useForm<BudgetFormValues>({
+    resolver: zodResolver(budgetSchema),
+    defaultValues: {
+      type: isEdit ? (budget?.type ?? "DAILY") : "DAILY",
+      date: isEdit && budget?.date ? budget.date : "",
+      month: isEdit && budget?.month ? budget.month : "",
+      amount: isEdit && budget?.amount ? String(budget.amount) : "",
+      categoryId: isEdit && budget?.categoryId ? budget.categoryId : "",
+    },
   });
 
-  const handleCategorySelect = (cat: TCategory) => {
-    setSelectedCategory(cat);
-    setForm((prev) => ({
-      ...prev,
-      categoryId: cat.id,
-    }));
+  const {
+    watch,
+    setValue,
+    handleSubmit,
+    formState: { isSubmitting },
+  } = form;
 
-    setTimeout(() => {
-      amountInputRef.current?.focus();
-    }, 100);
-  };
+  const selectedType = watch("type");
+  const selectedCategoryId = watch("categoryId");
 
-  const handleDateSelect = (date: Date | undefined) => {
-    setSelectedDate(date);
-    setSelectedMonth(undefined);
-    setForm((prev) => ({
-      ...prev,
-      date: date ? format(date, "yyyy-MM-dd") : "",
-      month: "",
-    }));
-  };
+  const selectedCategory = expenseCategories.find(
+    (cat) => cat.id === selectedCategoryId,
+  );
 
-  const handleMonthSelect = (date: Date | undefined) => {
-    setSelectedMonth(date);
-    setSelectedDate(undefined);
-    setForm((prev) => ({
-      ...prev,
-      month: date ? format(date, "yyyy-MM") : "",
-      date: "",
-    }));
-  };
+  const amountInputRef = useRef<HTMLInputElement>(null);
 
-  const handleSubmit = async () => {
-    if (!form.categoryId) {
-      toast.error("Please select a category");
-      return;
+  // Reset dependent fields when type changes
+  useEffect(() => {
+    if (selectedType === "DAILY") {
+      setValue("month", "", { shouldValidate: true });
+    } else {
+      setValue("date", "", { shouldValidate: true });
     }
-    if (!form.amount || Number(form.amount) <= 0) {
-      toast.error("Enter a valid amount");
-      return;
-    }
-    if (form.type === "DAILY" && !form.date) {
-      toast.error("Please select a date");
-      return;
-    }
-    if (form.type === "MONTHLY" && !form.month) {
-      toast.error("Please select a month");
-      return;
-    }
+  }, [selectedType, setValue]);
 
+  const onSubmit = async (values: BudgetFormValues) => {
     try {
+      let result;
+
       if (isEdit) {
-        // await updateBudget(budget.id, form);
-        toast.success("Budget updated");
+        // Only amount is updatable
+        result = await updateBudgetLimit({
+          id: budget.id,
+          amount: Number(values.amount),
+        });
       } else {
-        // await createBudget(form);
-        toast.success("Budget created");
+        result = await createBudgetLimit({
+          categoryId: values.categoryId,
+          amount: Number(values.amount),
+          type: values.type,
+          date: values.date || undefined,
+          month: values.month || undefined,
+        });
       }
-      setOpen(false);
+
+      if (!result.success) {
+        throw new Error(result.message);
+      }
+
+      toast.success(
+        isEdit ? "Budget updated successfully" : "Budget created successfully",
+      );
+
+      form.reset();
       onSuccess?.();
     } catch (err: any) {
+      console.error(err);
       toast.error(
         err.message || `Failed to ${isEdit ? "update" : "create"} budget`,
       );
@@ -142,7 +132,7 @@ const BudgetFormModal = ({
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog>
       <DialogTrigger asChild>
         {isIcon ? (
           <Button
@@ -174,146 +164,198 @@ const BudgetFormModal = ({
           </DialogTitle>
         </DialogHeader>
 
-        <div className="grid gap-4 py-4">
-          {/* Type Select */}
-          <div className="grid gap-2">
-            <Label>Type</Label>
-            <DatePickerDemo />
-            <Select
-              value={form.type}
-              onValueChange={(v) => setForm({ ...form, type: v })}
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="DAILY">Daily</SelectItem>
-                <SelectItem value="MONTHLY">Monthly</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Date / Month Picker with shadcn Calendar */}
-          <div className="grid gap-2">
-            <Label>{form.type === "DAILY" ? "Date" : "Month"}</Label>
-
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  className={cn(
-                    "w-full justify-start text-left font-normal",
-                    !(
-                      (form.type === "DAILY" && selectedDate) ||
-                      (form.type === "MONTHLY" && selectedMonth)
-                    ) && "text-muted-foreground",
-                  )}
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {form.type === "DAILY"
-                    ? selectedDate
-                      ? format(selectedDate, "dd MMMM yyyy")
-                      : "Select a date"
-                    : selectedMonth
-                      ? format(selectedMonth, "MMMM yyyy")
-                      : "Select a month"}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                {form.type === "DAILY" ? (
-                  <Calendar
-                    mode="single"
-                    selected={selectedDate}
-                    onSelect={handleDateSelect}
-                    initialFocus
-                    fromDate={new Date("2020-01-01")}
-                  />
-                ) : (
-                  <Calendar
-                    mode="single"
-                    selected={selectedMonth}
-                    onSelect={handleMonthSelect}
-                    initialFocus
-                    fromDate={new Date("2020-01-01")}
-                    footer={
-                      <p className="px-3 pb-3 text-center text-xs text-muted-foreground">
-                        Click any date to select the month
-                      </p>
-                    }
-                  />
-                )}
-              </PopoverContent>
-            </Popover>
-          </div>
-
-          {/* Amount Input */}
-          <div className="grid gap-2">
-            <Label>Amount</Label>
-            <Input
-              type="number"
-              value={form.amount}
-              onChange={(e) => setForm({ ...form, amount: e.target.value })}
-              placeholder="e.g. 1500"
-            />
-          </div>
-
-          {/* Category List */}
-          <div className="grid gap-1">
-            <Label>Category</Label>
-            <div className="max-h-80 overflow-y-auto -mx-1 px-1">
-              {expenseCategories.length === 0 ? (
-                <p className="text-center text-[10px] text-muted-foreground py-1">
-                  No categories available
-                </p>
-              ) : (
-                <div className="flex flex-wrap gap-1.5">
-                  {expenseCategories.map((cat) => (
-                    <button
-                      key={cat.id}
-                      type="button"
-                      onClick={() => handleCategorySelect(cat)}
+        <Form {...form}>
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 py-4">
+            {/* Type */}
+            <FormField
+              control={form.control}
+              name="type"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Type</FormLabel>
+                  <FormControl>
+                    <select
+                      {...field}
                       className={cn(
-                        "inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] transition-colors",
-                        "hover:bg-primary/10 hover:text-primary",
-                        selectedCategory?.id === cat.id
-                          ? "bg-primary/15 text-primary font-medium"
-                          : "text-muted-foreground/90",
+                        "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background",
+                        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+                        "disabled:cursor-not-allowed disabled:opacity-50",
                       )}
                     >
-                      <span className="text-[12px]">{cat.emoji}</span>
-                      <span className="max-w-[80px] truncate">
-                        {cat.name.length > 10
-                          ? cat.name.slice(0, 8) + ".."
-                          : cat.name}
-                      </span>
-                    </button>
-                  ))}
-                </div>
+                      <option value="DAILY">Daily</option>
+                      <option value="MONTHLY">Monthly</option>
+                    </select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
               )}
-            </div>
-          </div>
+            />
 
-          {selectedCategory && (
-            <p className="text-[10px] text-muted-foreground/80 text-center">
-              {selectedCategory.emoji} {selectedCategory.name}
-            </p>
-          )}
-        </div>
+            {/* Date or Month */}
+            <FormField
+              control={form.control}
+              name={selectedType === "DAILY" ? "date" : "month"}
+              render={({ field }) => (
+                <FormItem className="flex flex-col">
+                  <FormLabel>
+                    {selectedType === "DAILY" ? "Select Date" : "Select Month"}
+                  </FormLabel>
+                  <Popover modal>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant="outline"
+                          className={cn(
+                            "w-full justify-start text-left font-normal",
+                            !field.value && "text-muted-foreground",
+                          )}
+                        >
+                          <CalendarIcon className="mr-2 h-4 w-4" />
+                          {field.value
+                            ? selectedType === "DAILY"
+                              ? format(new Date(field.value), "dd MMMM yyyy")
+                              : format(
+                                  new Date(field.value + "-01"),
+                                  "MMMM yyyy",
+                                )
+                            : selectedType === "DAILY"
+                              ? "Pick a date"
+                              : "Pick a month"}
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      {selectedType === "DAILY" ? (
+                        <Calendar
+                          mode="single"
+                          selected={
+                            field.value ? new Date(field.value) : undefined
+                          }
+                          onSelect={(date) =>
+                            field.onChange(
+                              date ? format(date, "yyyy-MM-dd") : "",
+                            )
+                          }
+                          initialFocus
+                        />
+                      ) : (
+                        <MonthPicker
+                          selectedMonth={
+                            field.value
+                              ? new Date(field.value + "-01")
+                              : undefined
+                          }
+                          onMonthChange={(date) =>
+                            field.onChange(date ? format(date, "yyyy-MM") : "")
+                          }
+                        />
+                      )}
+                    </PopoverContent>
+                  </Popover>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-        <DialogFooter className="flex-col sm:flex-row gap-3">
-          <Button variant="outline" onClick={() => setOpen(false)}>
-            Cancel
-          </Button>
-          <Button
-            onClick={handleSubmit}
-            className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700"
-          >
-            {isEdit ? "Update" : "Save"}
-          </Button>
-        </DialogFooter>
+            {/* Amount */}
+            <FormField
+              control={form.control}
+              name="amount"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Amount</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      placeholder="e.g. 1500"
+                      {...field}
+                      ref={(e) => {
+                        field.ref(e);
+                        amountInputRef.current = e;
+                      }}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Category */}
+            <FormField
+              control={form.control}
+              name="categoryId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Category</FormLabel>
+                  <div className="max-h-72 overflow-y-auto -mx-1 px-1">
+                    {expenseCategories.length === 0 ? (
+                      <p className="text-center text-sm text-muted-foreground py-4">
+                        No expense categories available
+                      </p>
+                    ) : (
+                      <div className="flex flex-wrap gap-2">
+                        {expenseCategories.map((cat) => (
+                          <button
+                            key={cat.id}
+                            type="button"
+                            onClick={() => {
+                              field.onChange(cat.id);
+                              // optional: auto focus amount
+                              setTimeout(
+                                () => amountInputRef.current?.focus(),
+                                80,
+                              );
+                            }}
+                            className={cn(
+                              "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-colors",
+                              "border hover:bg-primary/10 hover:text-primary hover:border-primary/40",
+                              field.value === cat.id
+                                ? "bg-primary/15 text-primary border-primary/40 shadow-sm"
+                                : "text-muted-foreground border-transparent",
+                            )}
+                          >
+                            <span className="text-base">{cat.emoji}</span>
+                            {cat.name}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  <FormMessage />
+                  {selectedCategory && (
+                    <p className="text-xs text-muted-foreground mt-1.5 text-center">
+                      Selected: {selectedCategory.emoji} {selectedCategory.name}
+                    </p>
+                  )}
+                </FormItem>
+              )}
+            />
+
+            <DialogFooter className="flex-col sm:flex-row gap-3 pt-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => form.reset()}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                disabled={isSubmitting}
+                className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700"
+              >
+                {isSubmitting
+                  ? isEdit
+                    ? "Updating..."
+                    : "Creating..."
+                  : isEdit
+                    ? "Update Budget"
+                    : "Create Budget"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );
-};
-
-export default BudgetFormModal;
+}
