@@ -1,7 +1,10 @@
 "use client";
 
+import { useState } from "react";
+import { format } from "date-fns";
+import { CalendarIcon } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -10,6 +13,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { MonthPicker } from "@/components/shared/core/MonthPicker";
+import { cn } from "@/lib/utils";
 
 interface Props {
   budgetType: "DAILY" | "MONTHLY";
@@ -28,11 +39,12 @@ export default function BudgetFilters({
   isPending,
   onUpdateQuery,
 }: Props) {
+  const [datePickerOpen, setDatePickerOpen] = useState(false);
+  const [monthPickerOpen, setMonthPickerOpen] = useState(false);
+
   const today = new Date();
-  const defaultDate = today.toISOString().split("T")[0];
-  const defaultMonth = `${today.getFullYear()}-${String(
-    today.getMonth() + 1,
-  ).padStart(2, "0")}`;
+  const defaultDate = format(today, "yyyy-MM-dd");
+  const defaultMonth = format(today, "yyyy-MM");
 
   const hasActiveFilters = statusFilter !== "ALL";
 
@@ -72,6 +84,7 @@ export default function BudgetFilters({
               onClick={() => {
                 const value = selectedMonth || defaultMonth;
                 const [year, month] = value.split("-");
+
                 onUpdateQuery({
                   type: "MONTHLY",
                   month,
@@ -86,38 +99,83 @@ export default function BudgetFilters({
         </div>
 
         {budgetType === "DAILY" && (
-          <div className="space-y-1.5 min-w-[160px]">
+          <div className="space-y-1.5 min-w-[220px]">
             <Label className="text-sm">Select Date</Label>
-            <Input
-              type="date"
-              value={selectedDate}
-              onChange={(e) =>
-                onUpdateQuery({
-                  type: "DAILY",
-                  date: e.target.value,
-                })
-              }
-              className="h-9"
-            />
+
+            <Popover open={datePickerOpen} onOpenChange={setDatePickerOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className={cn(
+                    "w-full h-9 justify-start text-left font-normal",
+                    !selectedDate && "text-muted-foreground",
+                  )}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {selectedDate
+                    ? format(new Date(selectedDate), "dd MMMM yyyy")
+                    : "Pick a date"}
+                </Button>
+              </PopoverTrigger>
+
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={selectedDate ? new Date(selectedDate) : undefined}
+                  onSelect={(date) => {
+                    onUpdateQuery({
+                      type: "DAILY",
+                      date: date ? format(date, "yyyy-MM-dd") : defaultDate,
+                    });
+                    setDatePickerOpen(false);
+                  }}
+                  initialFocus
+                />
+              </PopoverContent>
+            </Popover>
           </div>
         )}
 
         {budgetType === "MONTHLY" && (
-          <div className="space-y-1.5 min-w-[160px]">
+          <div className="space-y-1.5 min-w-[220px]">
             <Label className="text-sm">Select Month</Label>
-            <Input
-              type="month"
-              value={selectedMonth}
-              onChange={(e) => {
-                const [year, month] = e.target.value.split("-");
-                onUpdateQuery({
-                  type: "MONTHLY",
-                  month,
-                  year,
-                });
-              }}
-              className="h-9"
-            />
+
+            <Popover open={monthPickerOpen} onOpenChange={setMonthPickerOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className={cn(
+                    "w-full h-9 justify-start text-left font-normal",
+                    !selectedMonth && "text-muted-foreground",
+                  )}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {selectedMonth
+                    ? format(new Date(`${selectedMonth}-01`), "MMMM yyyy")
+                    : "Pick a month"}
+                </Button>
+              </PopoverTrigger>
+
+              <PopoverContent className="w-auto p-0" align="start">
+                <MonthPicker
+                  selectedMonth={
+                    selectedMonth ? new Date(`${selectedMonth}-01`) : undefined
+                  }
+                  onMonthChange={(date) => {
+                    const value = date ? format(date, "yyyy-MM") : defaultMonth;
+                    const [year, month] = value.split("-");
+
+                    onUpdateQuery({
+                      type: "MONTHLY",
+                      month,
+                      year,
+                    });
+
+                    setMonthPickerOpen(false);
+                  }}
+                />
+              </PopoverContent>
+            </Popover>
           </div>
         )}
 
