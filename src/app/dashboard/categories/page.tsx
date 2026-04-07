@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import CategoriesPage from "@/components/modules/dashboard/Categories/Categories";
 import { getCategories } from "@/services/Category";
 

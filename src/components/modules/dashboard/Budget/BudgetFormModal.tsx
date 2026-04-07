@@ -207,7 +207,7 @@ export default function BudgetFormModal({
         )}
       </DialogTrigger>
 
-      <DialogContent className="max-w-xl rounded-2xl">
+      <DialogContent className="max-w-[90%] md:max-w-xl rounded-2xl">
         <DialogHeader>
           <DialogTitle>
             {isEdit ? "Edit Budget" : "Create New Budget"}

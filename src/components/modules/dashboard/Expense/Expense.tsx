@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -121,7 +121,7 @@ function formatDateBD(dateStr: string) {
   return format(d, "dd MMM yyyy", { locale: bn });
 }
 
-export default function ExpensePage() {
+export default function Expense() {
   const searchParams = useSearchParams();
 
   // Read initial values from URL query params
@@ -200,7 +200,7 @@ export default function ExpensePage() {
                 </Button>
               </div>
             </DialogTrigger>
-            <DialogContent className="w-[90%] sm:max-w-md rounded-2xl">
+            <DialogContent className="max-w-xl rounded-2xl">
               <DialogHeader>
                 <DialogTitle>নতুন খরচ যোগ করুন</DialogTitle>
                 <DialogDescription>সঠিক তথ্য দিয়ে সেভ করুন</DialogDescription>
@@ -307,44 +307,6 @@ export default function ExpensePage() {
           </div>
         </div>
 
-        {/* Category Filter */}
-        {/* <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2 border rounded-md px-3 py-1.5 text-sm bg-muted/40">
-            <Filter className="h-4 w-4" />
-            <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-              <SelectTrigger className="border-0 shadow-none p-0 h-auto w-40">
-                <SelectValue placeholder="ক্যাটাগরি" />
-              </SelectTrigger>
-              <SelectContent>
-                {categories.map((cat) => (
-                  <SelectItem key={cat} value={cat}>
-                    {cat}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          {(year !== "2026" ||
-            month !== "03" ||
-            specificDate ||
-            searchTerm ||
-            categoryFilter !== "সব ক্যাটাগরি") && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => {
-                setYear("2026");
-                setMonth("03");
-                setSpecificDate("");
-                setSearchTerm("");
-                setCategoryFilter("সব ক্যাটাগরি");
-              }}
-            >
-              ফিল্টার রিসেট করুন
-            </Button>
-          )}
-        </div> */}
         <div className="w-[200px] flex items-center gap-2 border rounded-md px-3 py-1.5 text-sm">
           <Filter className="h-4 w-4" />
           <Select value={categoryFilter} onValueChange={setCategoryFilter}>
