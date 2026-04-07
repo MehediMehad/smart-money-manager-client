@@ -4,6 +4,15 @@ import config from "@/configs";
 import { cookies } from "next/headers";
 import { revalidateTag } from "next/cache";
 
+type BudgetType = "DAILY" | "MONTHLY";
+type GetBudgetsParams = {
+    type?: BudgetType;
+    date?: string;
+    month?: string;
+    year?: string;
+};
+
+
 type ServerActionResponse<T = any> = {
     success: boolean;
     message: string;
@@ -43,9 +52,6 @@ export const createBudgetLimit = async (data: {
             payload.month = Number(month);
             payload.year = Number(year);
         }
-
-        console.log("dsdsd++++++++++++++++++", payload, "================");
-
 
         const res = await fetch(`${config.base_api}/budgets`, {
             method: "POST",
@@ -141,9 +147,9 @@ export const updateBudgetLimit = async (data: {
         };
     }
 };
-// const accessToken = (await cookies()).get("accessToken")?.value;
-// Get all budgets //  revalidateTag("budgets", { expire: 0 });
-export const getBudgets = async () => {
+
+
+export const getBudgets = async (params?: GetBudgetsParams) => {
     try {
         const accessToken = (await cookies()).get("accessToken")?.value;
 
@@ -151,7 +157,17 @@ export const getBudgets = async () => {
             throw new Error("No access token found");
         }
 
-        const res = await fetch(`${config.base_api}/budgets`, {
+        const searchParams = new URLSearchParams();
+
+        if (params?.type) searchParams.set("type", params.type);
+        if (params?.date) searchParams.set("date", params.date);
+        if (params?.month) searchParams.set("month", params.month);
+        if (params?.year) searchParams.set("year", params.year);
+
+        const url = `${config.base_api}/budgets${searchParams.toString() ? `?${searchParams.toString()}` : ""
+            }`;
+
+        const res = await fetch(url, {
             method: "GET",
             headers: {
                 Authorization: `Bearer ${accessToken}`,
@@ -160,6 +176,7 @@ export const getBudgets = async () => {
             next: {
                 tags: ["budgets"],
             },
+            cache: "no-store",
         });
 
         if (!res.ok) {
