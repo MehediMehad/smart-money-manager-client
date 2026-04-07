@@ -3,18 +3,19 @@
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { toast } from "sonner";
 import { format } from "date-fns";
+import { toast } from "sonner";
+import { CalendarIcon, Pencil, Plus } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   Dialog,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-  DialogFooter,
 } from "@/components/ui/dialog";
 import {
   Form,
@@ -37,9 +38,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { CalendarIcon, Pencil, Plus } from "lucide-react";
-import { cn } from "@/lib/utils";
 
+import { cn } from "@/lib/utils";
 import { MonthPicker } from "@/components/shared/core/MonthPicker";
 import { budgetSchema, BudgetFormValues } from "@/validations/budgetValidation";
 import { TCategory } from "@/types";
@@ -63,32 +63,39 @@ export default function BudgetFormModal({
   const isEdit = mode === "edit";
   const expenseCategories = categories.filter((cat) => cat.type === "EXPENSE");
 
+  const [open, setOpen] = useState(false);
   const [datePickerOpen, setDatePickerOpen] = useState(false);
   const [monthPickerOpen, setMonthPickerOpen] = useState(false);
+
+  const amountInputRef = useRef<HTMLInputElement>(null);
 
   const today = new Date();
   const todayDate = format(today, "yyyy-MM-dd");
   const currentMonth = format(today, "yyyy-MM");
 
-  const defaultType = isEdit ? (budget?.type ?? "DAILY") : "DAILY";
+  const getDefaultValues = (): BudgetFormValues => {
+    if (isEdit) {
+      return {
+        type: budget?.type ?? "DAILY",
+        date: budget?.date ?? "",
+        month: budget?.month ?? "",
+        amount: budget?.amount ? String(budget.amount) : "",
+        categoryId: budget?.categoryId ?? "",
+      };
+    }
+
+    return {
+      type: "DAILY",
+      date: todayDate,
+      month: "",
+      amount: "",
+      categoryId: "",
+    };
+  };
 
   const form = useForm<BudgetFormValues>({
     resolver: zodResolver(budgetSchema),
-    defaultValues: {
-      type: defaultType,
-      date: isEdit
-        ? (budget?.date ?? "")
-        : defaultType === "DAILY"
-          ? todayDate
-          : "",
-      month: isEdit
-        ? (budget?.month ?? "")
-        : defaultType === "MONTHLY"
-          ? currentMonth
-          : "",
-      amount: isEdit && budget?.amount ? String(budget.amount) : "",
-      categoryId: isEdit && budget?.categoryId ? budget.categoryId : "",
-    },
+    defaultValues: getDefaultValues(),
   });
 
   const {
@@ -101,45 +108,36 @@ export default function BudgetFormModal({
 
   const selectedType = watch("type");
   const selectedCategoryId = watch("categoryId");
-
   const selectedCategory = expenseCategories.find(
     (cat) => cat.id === selectedCategoryId,
   );
 
-  const amountInputRef = useRef<HTMLInputElement>(null);
-  const didMountRef = useRef(false);
-
   useEffect(() => {
-    if (!didMountRef.current) {
-      didMountRef.current = true;
+    if (!open) return;
+    reset(getDefaultValues());
+  }, [open]); // eslint-disable-line react-hooks/exhaustive-deps
 
-      if (!isEdit) {
-        setValue("date", todayDate, { shouldValidate: true });
-        setValue("month", "", { shouldValidate: false });
-      }
+  const handleTypeChange = (value: "DAILY" | "MONTHLY") => {
+    setValue("type", value, { shouldValidate: true });
 
-      return;
-    }
-
-    if (selectedType === "DAILY") {
+    if (value === "DAILY") {
       setValue("date", watch("date") || todayDate, { shouldValidate: true });
       setValue("month", "", { shouldValidate: true });
+      setMonthPickerOpen(false);
     } else {
       setValue("month", watch("month") || currentMonth, {
         shouldValidate: true,
       });
       setValue("date", "", { shouldValidate: true });
+      setDatePickerOpen(false);
     }
-  }, [selectedType, setValue, watch, todayDate, currentMonth, isEdit]);
+  };
 
   const handleCancel = () => {
-    reset({
-      type: isEdit ? (budget?.type ?? "DAILY") : "DAILY",
-      date: isEdit ? (budget?.date ?? "") : todayDate,
-      month: isEdit ? (budget?.month ?? "") : "",
-      amount: isEdit && budget?.amount ? String(budget.amount) : "",
-      categoryId: isEdit && budget?.categoryId ? budget.categoryId : "",
-    });
+    reset(getDefaultValues());
+    setDatePickerOpen(false);
+    setMonthPickerOpen(false);
+    setOpen(false);
   };
 
   const onSubmit = async (values: BudgetFormValues) => {
@@ -169,27 +167,22 @@ export default function BudgetFormModal({
         isEdit ? "Budget updated successfully" : "Budget created successfully",
       );
 
-      reset({
-        type: "DAILY",
-        date: todayDate,
-        month: "",
-        amount: "",
-        categoryId: "",
-      });
-      // close modal
-      handleCancel();
+      reset(getDefaultValues());
+      setDatePickerOpen(false);
+      setMonthPickerOpen(false);
+      setOpen(false);
 
       onSuccess?.();
     } catch (err: any) {
       console.error(err);
       toast.error(
-        err.message || `Failed to ${isEdit ? "update" : "create"} budget`,
+        err?.message || `Failed to ${isEdit ? "update" : "create"} budget`,
       );
     }
   };
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         {isIcon ? (
           <Button
@@ -207,7 +200,7 @@ export default function BudgetFormModal({
             <Pencil className="h-4 w-4" />
           </Button>
         ) : (
-          <Button className="gap-1.5 shadow-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700">
+          <Button className="gap-2 py-5 bg-gradient-to-r from-emerald-700 to-teal-600 hover:from-emerald-800 hover:to-teal-700">
             <Plus className="h-4 w-4" />
             Add Budget
           </Button>
@@ -223,53 +216,42 @@ export default function BudgetFormModal({
 
         <Form {...form}>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 py-4">
-            {/* Type */}
             <FormField
               control={form.control}
               name="type"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Type</FormLabel>
+
                   <Select
                     value={field.value}
-                    onValueChange={(value: "DAILY" | "MONTHLY") => {
-                      field.onChange(value);
-
-                      if (value === "DAILY") {
-                        setValue("date", watch("date") || todayDate, {
-                          shouldValidate: true,
-                        });
-                        setValue("month", "", { shouldValidate: true });
-                      } else {
-                        setValue("month", watch("month") || currentMonth, {
-                          shouldValidate: true,
-                        });
-                        setValue("date", "", { shouldValidate: true });
-                      }
-                    }}
+                    onValueChange={(value: "DAILY" | "MONTHLY") =>
+                      handleTypeChange(value)
+                    }
                   >
                     <FormControl>
-                      <SelectTrigger>
+                      <SelectTrigger className="py-5">
                         <SelectValue placeholder="Select budget type" />
                       </SelectTrigger>
                     </FormControl>
+
                     <SelectContent>
                       <SelectItem value="DAILY">Daily</SelectItem>
                       <SelectItem value="MONTHLY">Monthly</SelectItem>
                     </SelectContent>
                   </Select>
+
                   <FormMessage />
                 </FormItem>
               )}
             />
 
-            {/* Date or Month */}
             <FormField
               control={form.control}
               name={selectedType === "DAILY" ? "date" : "month"}
               render={({ field }) => (
                 <FormItem className="flex flex-col">
-                  <FormLabel>
+                  <FormLabel className="mb-1">
                     {selectedType === "DAILY" ? "Select Date" : "Select Month"}
                   </FormLabel>
 
@@ -282,9 +264,10 @@ export default function BudgetFormModal({
                       <PopoverTrigger asChild>
                         <FormControl>
                           <Button
+                            type="button"
                             variant="outline"
                             className={cn(
-                              "w-full justify-start text-left font-normal",
+                              "w-full justify-start py-5 text-left font-normal",
                               !field.value && "text-muted-foreground",
                             )}
                           >
@@ -303,9 +286,8 @@ export default function BudgetFormModal({
                             field.value ? new Date(field.value) : undefined
                           }
                           onSelect={(date) => {
-                            field.onChange(
-                              date ? format(date, "yyyy-MM-dd") : "",
-                            );
+                            if (!date) return;
+                            field.onChange(format(date, "yyyy-MM-dd"));
                             setDatePickerOpen(false);
                           }}
                           initialFocus
@@ -321,9 +303,10 @@ export default function BudgetFormModal({
                       <PopoverTrigger asChild>
                         <FormControl>
                           <Button
+                            type="button"
                             variant="outline"
                             className={cn(
-                              "w-full justify-start text-left font-normal",
+                              "w-full justify-start py-5 text-left font-normal",
                               !field.value && "text-muted-foreground",
                             )}
                           >
@@ -338,7 +321,7 @@ export default function BudgetFormModal({
                         </FormControl>
                       </PopoverTrigger>
 
-                      <PopoverContent className="w-auto p-0" align="start">
+                      <PopoverContent className="w-auto py-5" align="start">
                         <MonthPicker
                           selectedMonth={
                             field.value
@@ -346,7 +329,8 @@ export default function BudgetFormModal({
                               : undefined
                           }
                           onMonthChange={(date) => {
-                            field.onChange(date ? format(date, "yyyy-MM") : "");
+                            if (!date) return;
+                            field.onChange(format(date, "yyyy-MM"));
                             setMonthPickerOpen(false);
                           }}
                         />
@@ -359,15 +343,15 @@ export default function BudgetFormModal({
               )}
             />
 
-            {/* Amount */}
             <FormField
               control={form.control}
               name="amount"
               render={({ field }) => (
-                <FormItem>
+                <FormItem className="!mt-3">
                   <FormLabel>Amount</FormLabel>
                   <FormControl>
                     <Input
+                      className="py-5"
                       type="number"
                       placeholder="e.g. 1500"
                       {...field}
@@ -382,13 +366,13 @@ export default function BudgetFormModal({
               )}
             />
 
-            {/* Category */}
             <FormField
               control={form.control}
               name="categoryId"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Category</FormLabel>
+
                   <div className="max-h-72 overflow-y-auto -mx-1 px-1">
                     {expenseCategories.length === 0 ? (
                       <p className="text-center text-sm text-muted-foreground py-4">
@@ -422,7 +406,9 @@ export default function BudgetFormModal({
                       </div>
                     )}
                   </div>
+
                   <FormMessage />
+
                   {selectedCategory && (
                     <p className="text-xs text-muted-foreground mt-1.5 text-center">
                       Selected: {selectedCategory.emoji} {selectedCategory.name}
@@ -436,6 +422,7 @@ export default function BudgetFormModal({
               <Button type="button" variant="outline" onClick={handleCancel}>
                 Cancel
               </Button>
+
               <Button
                 type="submit"
                 disabled={isSubmitting}
