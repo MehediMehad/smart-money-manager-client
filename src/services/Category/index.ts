@@ -1,34 +1,34 @@
+// src/services/Category/index.ts
 "use server";
 
 import config from "@/configs";
 import { cookies } from "next/headers";
 import { revalidateTag } from "next/cache";
+import { TApiResponse } from "@/types";
 
-/**
- * Create Single Category
- */
+const TAG = "categories";
 
 export const createCategory = async (data: {
     name: string;
     type: "INCOME" | "EXPENSE";
     emoji: string;
-}) => {
+}): Promise<TApiResponse<any>> => {
     try {
         const accessToken = (await cookies()).get("accessToken")?.value;
 
         if (!accessToken) {
-            throw new Error("Authentication required");
+            return {
+                success: false,
+                message: "Authentication required",
+            };
         }
 
         if (!data.name || !data.type) {
-            throw new Error("Name and type are required");
+            return {
+                success: false,
+                message: "Name and type are required",
+            };
         }
-
-        const payload = {
-            name: data.name,
-            type: data.type,
-            emoji: data.emoji,
-        };
 
         const res = await fetch(`${config.base_api}/categories`, {
             method: "POST",
@@ -36,40 +36,34 @@ export const createCategory = async (data: {
                 Authorization: `Bearer ${accessToken}`,
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify(payload),
+            body: JSON.stringify(data),
         });
 
+        const result = await res.json().catch(() => ({}));
+
         if (!res.ok) {
-            const errorData = await res.json().catch(() => ({}));
-            throw new Error(
-                errorData.message ||
-                `Failed to create category (HTTP ${res.status})`
-            );
+            return {
+                success: false,
+                message: result.message || "Failed to create category",
+            };
         }
 
-        const result = await res.json();
-
-        revalidateTag("categories", { expire: 0 });
+        revalidateTag(TAG, { expire: 0 });
 
         return {
             success: true,
-            data: result.data || result,
-            message: "Category created successfully",
+            statusCode: res.status,
+            message: result.message || "Category created successfully",
+            data: result.data,
         };
     } catch (error: any) {
-        console.error("createCategory error:", error);
-
         return {
             success: false,
-            message: error?.message || "Failed to create category",
-            error: error,
+            statusCode: 500,
+            message: error.message || "Failed to create category",
         };
     }
 };
-
-/**
- * Create Multiple Categories
- */
 
 export const createCategories = async (data: {
     categories: {
@@ -77,16 +71,24 @@ export const createCategories = async (data: {
         type: "INCOME" | "EXPENSE";
         emoji: string;
     }[];
-}) => {
+}): Promise<TApiResponse<any>> => {
     try {
         const accessToken = (await cookies()).get("accessToken")?.value;
 
         if (!accessToken) {
-            throw new Error("Authentication required");
+            return {
+                success: false,
+                statusCode: 401,
+                message: "Authentication required",
+            };
         }
 
-        if (!data.categories || data.categories.length === 0) {
-            throw new Error("Categories array is required");
+        if (!data.categories?.length) {
+            return {
+                success: false,
+                statusCode: 400,
+                message: "Categories array is required",
+            };
         }
 
         const res = await fetch(`${config.base_api}/categories/bulk-create`, {
@@ -98,40 +100,45 @@ export const createCategories = async (data: {
             body: JSON.stringify(data.categories),
         });
 
+        const result = await res.json().catch(() => ({}));
+
         if (!res.ok) {
-            const errorData = await res.json().catch(() => ({}));
-            throw new Error(
-                errorData.message ||
-                `Failed to create categories (HTTP ${res.status})`
-            );
+            return {
+                success: false,
+                statusCode: res.status,
+                message: result.message || "Failed to create categories",
+                data: result.data,
+            };
         }
 
-        const result = await res.json();
-
-        revalidateTag("categories", { expire: 0 });
+        revalidateTag(TAG, { expire: 0 });
 
         return {
             success: true,
-            data: result.data || result,
-            message: "Categories created successfully",
+            statusCode: res.status,
+            message: result.message || "Categories created successfully",
+            data: result,
         };
     } catch (error: any) {
-        console.error("createCategories error:", error);
-
         return {
             success: false,
-            message: error?.message || "Failed to create categories",
-            error: error,
+            statusCode: 500,
+            message: error.message || "Failed to create categories",
         };
     }
 };
-// Get all categories
+
 export const getCategories = async () => {
     try {
         const accessToken = (await cookies()).get("accessToken")?.value;
 
         if (!accessToken) {
-            throw new Error("No access token found");
+            return {
+                success: false,
+                statusCode: 401,
+                message: "No access token found",
+                data: [],
+            };
         }
 
         const res = await fetch(`${config.base_api}/categories`, {
@@ -140,32 +147,42 @@ export const getCategories = async () => {
                 Authorization: `Bearer ${accessToken}`,
                 "Content-Type": "application/json",
             },
-            next: {
-                tags: ["categories"],
-            },
+            next: { tags: [TAG] },
         });
 
+        const result = await res.json().catch(() => ({}));
+
         if (!res.ok) {
-            const errorData = await res.json().catch(() => ({}));
-            throw new Error(errorData.message || `HTTP ${res.status}`);
+            return {
+                success: false,
+                statusCode: res.status,
+                message: result.message || "Failed to fetch categories",
+                data: [],
+            };
         }
 
-        const result = await res.json();
-        return result.data ?? [];
+        return result.data || [];
     } catch (error: any) {
-        console.error("getCategories error:", error);
-        throw new Error(error?.message || "Failed to fetch categories");
+        return {
+            success: false,
+            statusCode: 500,
+            message: error.message || "Failed to fetch categories",
+            data: [],
+        };
     }
 };
 
-
-// Delete Category
-export const deleteCategory = async (id: string) => {
+export const deleteCategory = async (id: string): Promise<TApiResponse<null>> => {
     try {
         const accessToken = (await cookies()).get("accessToken")?.value;
 
         if (!accessToken) {
-            throw new Error("No access token found");
+            return {
+                success: false,
+                statusCode: 401,
+                message: "No access token found",
+                data: null,
+            };
         }
 
         const res = await fetch(`${config.base_api}/categories/hide/${id}`, {
@@ -176,18 +193,31 @@ export const deleteCategory = async (id: string) => {
             },
         });
 
+        const result = await res.json().catch(() => ({}));
+
         if (!res.ok) {
-            const errorData = await res.json().catch(() => ({}));
-            throw new Error(errorData.message || `HTTP ${res.status}`);
+            return {
+                success: false,
+                statusCode: res.status,
+                message: result.message || "Failed to delete category",
+                data: null,
+            };
         }
 
-        const result = await res.json();
-        revalidateTag("categories", { expire: 0 });
+        revalidateTag(TAG, { expire: 0 });
 
-        return result.data;
+        return {
+            success: true,
+            statusCode: res.status,
+            message: result.message || "Category deleted successfully",
+            data: null,
+        };
     } catch (error: any) {
-        console.error("deleteCategory error:", error);
-        throw new Error(error?.message || "Failed to delete category");
+        return {
+            success: false,
+            statusCode: 500,
+            message: error.message || "Failed to delete category",
+            data: null,
+        };
     }
 };
-
