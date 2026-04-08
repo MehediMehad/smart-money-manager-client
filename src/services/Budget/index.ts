@@ -1,3 +1,4 @@
+// src/services/Budget/index.ts
 "use server";
 
 import config from "@/configs";
@@ -17,10 +18,9 @@ type ServerActionResponse<T = any> = {
     success: boolean;
     message: string;
     data?: T;
-    error?: string;
 };
 
-export const createBudgetLimit = async (data: {
+export const createBudget = async (data: {
     categoryId: string;
     amount: number;
     type: "DAILY" | "MONTHLY";
@@ -91,7 +91,7 @@ export const createBudgetLimit = async (data: {
     }
 };
 
-export const updateBudgetLimit = async (data: {
+export const updateBudget = async (data: {
     id: string;
     amount: number;
     // type is NOT sent on update — backend doesn't allow changing type
@@ -147,7 +147,6 @@ export const updateBudgetLimit = async (data: {
         };
     }
 };
-
 
 export const getBudgets = async (params?: GetBudgetsParams) => {
     try {

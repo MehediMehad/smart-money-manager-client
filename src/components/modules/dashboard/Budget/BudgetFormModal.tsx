@@ -43,7 +43,7 @@ import { cn } from "@/lib/utils";
 import { MonthPicker } from "@/components/shared/core/MonthPicker";
 import { budgetSchema, BudgetFormValues } from "@/validations/budgetValidation";
 import { TCategory } from "@/types";
-import { createBudgetLimit, updateBudgetLimit } from "@/services/Budget";
+import { createBudget, updateBudget } from "@/services/Budget";
 
 type Props = {
   mode: "create" | "edit";
@@ -145,12 +145,12 @@ export default function BudgetFormModal({
       let result;
 
       if (isEdit) {
-        result = await updateBudgetLimit({
+        result = await updateBudget({
           id: budget.id,
           amount: Number(values.amount),
         });
       } else {
-        result = await createBudgetLimit({
+        result = await createBudget({
           categoryId: values.categoryId,
           amount: Number(values.amount),
           type: values.type,

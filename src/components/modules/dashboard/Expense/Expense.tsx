@@ -34,94 +34,94 @@ import { Badge } from "@/components/ui/badge";
 import { Plus, Pencil, Trash2, Filter } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { format } from "date-fns";
-import { bn } from "date-fns/locale";
+import { enUS } from "date-fns/locale";
 
 const dummyExpenses = [
   {
     id: "e1",
     date: "2026-03-04",
-    category: "খাবার",
+    category: "Food",
     amount: 450,
-    note: "দুপুরের খাবার",
+    note: "Lunch at restaurant",
   },
   {
     id: "e2",
     date: "2026-03-04",
-    category: "যাতায়াত",
+    category: "Transport",
     amount: 380,
-    note: "উবার",
+    note: "Uber ride",
   },
   {
     id: "e3",
     date: "2026-03-03",
-    category: "খাবার",
+    category: "Food",
     amount: 1200,
-    note: "গ্রোসারি",
+    note: "Grocery shopping",
   },
   {
     id: "e4",
     date: "2026-03-03",
-    category: "বিল",
+    category: "Bills",
     amount: 3200,
-    note: "ইন্টারনেট বিল",
+    note: "Internet bill",
   },
   {
     id: "e5",
     date: "2026-03-02",
-    category: "শিক্ষা",
+    category: "Education",
     amount: 5000,
-    note: "কোর্স পেমেন্ট",
+    note: "Course payment",
   },
   {
     id: "e6",
     date: "2026-03-01",
-    category: "খাবার",
+    category: "Food",
     amount: 2800,
-    note: "মাসিক বাজার",
+    note: "Monthly grocery",
   },
   {
     id: "e7",
     date: "2026-02-28",
-    category: "যাতায়াত",
+    category: "Transport",
     amount: 1400,
-    note: "বাস + রিকশা",
+    note: "Bus + Rickshaw",
   },
   {
     id: "e8",
     date: "2026-02-15",
-    category: "বিনোদন",
+    category: "Entertainment",
     amount: 1800,
-    note: "সিনেমা",
+    note: "Movie ticket",
   },
   {
     id: "e9",
     date: "2026-04-01",
-    category: "খাবার",
+    category: "Food",
     amount: 600,
-    note: "রাতের খাবার",
+    note: "Dinner",
   },
 ];
 
 const categories = [
-  "সব ক্যাটাগরি",
-  "খাবার",
-  "যাতায়াত",
-  "বিল",
-  "শিক্ষা",
-  "বিনোদন",
-  "শপিং",
+  "All Categories",
+  "Food",
+  "Transport",
+  "Bills",
+  "Education",
+  "Entertainment",
+  "Shopping",
 ];
 
 function formatBDT(amount: number) {
-  return "৳" + amount.toLocaleString("bn-BD");
+  return "৳" + amount.toLocaleString("en-US");
 }
 
-function formatDateBD(dateStr: string) {
+function formatDate(dateStr: string) {
   const d = new Date(dateStr);
-  return format(d, "dd MMM yyyy", { locale: bn });
+  return format(d, "dd MMM yyyy", { locale: enUS });
 }
 
-export default function Expense() {
+export default function ExpensePage() {
   const searchParams = useSearchParams();
 
   // Read initial values from URL query params
@@ -134,7 +134,7 @@ export default function Expense() {
   const [month, setMonth] = useState(initialMonth);
   const [specificDate, setSpecificDate] = useState(initialDate);
   const [searchTerm, setSearchTerm] = useState(initialSearch);
-  const [categoryFilter, setCategoryFilter] = useState("সব ক্যাটাগরি");
+  const [categoryFilter, setCategoryFilter] = useState("All Categories");
 
   const [openAdd, setOpenAdd] = useState(false);
 
@@ -157,7 +157,10 @@ export default function Expense() {
         return false;
 
       // Category filter
-      if (categoryFilter !== "সব ক্যাটাগরি" && exp.category !== categoryFilter)
+      if (
+        categoryFilter !== "All Categories" &&
+        exp.category !== categoryFilter
+      )
         return false;
 
       // Search term in note or category
@@ -173,7 +176,7 @@ export default function Expense() {
     });
   }, [year, month, specificDate, categoryFilter, searchTerm]);
 
-  // Update URL when filters change (optional - for shareable links)
+  // Update URL when filters change (for shareable links)
   useEffect(() => {
     const params = new URLSearchParams();
     if (year) params.set("year", year);
@@ -187,31 +190,34 @@ export default function Expense() {
 
   return (
     <div className="space-y-6 pb-20">
-      {/* Filters Section */}
+      {/* Header & Add Button */}
       <div className="flex flex-col gap-4 bg-card rounded-2xl p-4 border shadow-sm">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <h2 className="text-2xl font-bold">ব্যয় তালিকা</h2>
+          <h2 className="text-2xl font-bold">Expense</h2>
 
           <Dialog open={openAdd} onOpenChange={setOpenAdd}>
             <DialogTrigger asChild>
               <div className="hidden sm:block">
                 <Button className="gap-2 bg-gradient-to-r from-orange-600 to-rose-600 hover:from-orange-700 hover:to-rose-700">
-                  <Plus className="h-4 w-4" /> নতুন ব্যয় যোগ করুন
+                  <Plus className="h-4 w-4" /> Add New Expense
                 </Button>
               </div>
             </DialogTrigger>
+
             <DialogContent className="max-w-xl rounded-2xl">
               <DialogHeader>
-                <DialogTitle>নতুন খরচ যোগ করুন</DialogTitle>
-                <DialogDescription>সঠিক তথ্য দিয়ে সেভ করুন</DialogDescription>
+                <DialogTitle>Add New Expense</DialogTitle>
+                <DialogDescription>
+                  Enter accurate details for this expense
+                </DialogDescription>
               </DialogHeader>
 
               <div className="grid gap-4 py-4">
                 <div className="grid gap-2">
-                  <Label>ক্যাটাগরি</Label>
+                  <Label>Category</Label>
                   <Select>
                     <SelectTrigger>
-                      <SelectValue placeholder="বেছে নিন" />
+                      <SelectValue placeholder="Select category" />
                     </SelectTrigger>
                     <SelectContent>
                       {categories.slice(1).map((cat) => (
@@ -224,28 +230,26 @@ export default function Expense() {
                 </div>
 
                 <div className="grid gap-2">
-                  <Label>পরিমাণ (৳)</Label>
+                  <Label>Amount (৳)</Label>
                   <Input type="number" placeholder="0" />
                 </div>
 
                 <div className="grid gap-2">
-                  <Label>তারিখ</Label>
+                  <Label>Date</Label>
                   <Input type="date" defaultValue="2026-03-04" />
                 </div>
 
                 <div className="grid gap-2">
-                  <Label>নোট / বিবরণ</Label>
-                  <Textarea placeholder="যেমন: দুপুরের খাবার - কফি শপ" />
+                  <Label>Note / Description</Label>
+                  <Textarea placeholder="e.g. Lunch at Coffee Shop" />
                 </div>
               </div>
 
               <DialogFooter>
                 <Button variant="outline" onClick={() => setOpenAdd(false)}>
-                  বাতিল
+                  Cancel
                 </Button>
-                <Button onClick={() => setOpenAdd(false)}>
-                  ব্যয় যোগ করুন
-                </Button>
+                <Button onClick={() => setOpenAdd(false)}>Save Expense</Button>
               </DialogFooter>
             </DialogContent>
           </Dialog>
@@ -254,10 +258,10 @@ export default function Expense() {
         {/* Filter Controls */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           <div className="flex flex-col gap-1">
-            <Label className="text-xs">বছর</Label>
+            <Label className="text-xs">Year</Label>
             <Select value={year} onValueChange={setYear}>
               <SelectTrigger>
-                <SelectValue placeholder="বছর" />
+                <SelectValue placeholder="Year" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="2025">2025</SelectItem>
@@ -268,15 +272,15 @@ export default function Expense() {
           </div>
 
           <div className="flex flex-col gap-1">
-            <Label className="text-xs">মাস</Label>
+            <Label className="text-xs">Month</Label>
             <Select value={month} onValueChange={setMonth}>
               <SelectTrigger>
-                <SelectValue placeholder="মাস" />
+                <SelectValue placeholder="Month" />
               </SelectTrigger>
               <SelectContent>
                 {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
                   <SelectItem key={m} value={m.toString().padStart(2, "0")}>
-                    {new Date(2000, m - 1).toLocaleString("bn-BD", {
+                    {new Date(2000, m - 1).toLocaleString("en-US", {
                       month: "long",
                     })}
                   </SelectItem>
@@ -286,35 +290,35 @@ export default function Expense() {
           </div>
 
           <div className="flex flex-col gap-1">
-            <Label className="text-xs">নির্দিষ্ট তারিখ (ঐচ্ছিক)</Label>
+            <Label className="text-xs">Specific Day (Optional)</Label>
             <Input
               type="number"
               min="1"
               max="31"
-              placeholder="দিন (1-31)"
+              placeholder="Day (1-31)"
               value={specificDate}
               onChange={(e) => setSpecificDate(e.target.value)}
             />
           </div>
 
           <div className="flex flex-col gap-1">
-            <Label className="text-xs">সার্চ (নোট/ক্যাটাগরি)</Label>
+            <Label className="text-xs">Search (Note/Category)</Label>
             <Input
-              placeholder="যেমন: গ্রোসারি"
+              placeholder="e.g. Grocery"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
         </div>
 
+        {/* Category Filter */}
         <div className="w-[200px] flex items-center gap-2 border rounded-md px-3 py-1.5 text-sm">
           <Filter className="h-4 w-4" />
           <Select value={categoryFilter} onValueChange={setCategoryFilter}>
             <SelectTrigger className="border-0 shadow-none p-0 h-auto w-36">
-              <SelectValue placeholder="ক্যাটাগরি" />
+              <SelectValue placeholder="Category" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">সব ক্যাটাগরি</SelectItem>
               {categories.map((cat) => (
                 <SelectItem key={cat} value={cat}>
                   {cat}
@@ -331,11 +335,11 @@ export default function Expense() {
           <Table>
             <TableHeader className="bg-muted/60">
               <TableRow>
-                <TableHead>তারিখ</TableHead>
-                <TableHead>ক্যাটাগরি</TableHead>
-                <TableHead>নোট</TableHead>
-                <TableHead className="text-right">পরিমাণ</TableHead>
-                <TableHead className="w-24 text-right">অ্যাকশন</TableHead>
+                <TableHead>Date</TableHead>
+                <TableHead>Category</TableHead>
+                <TableHead>Note</TableHead>
+                <TableHead className="text-right">Amount</TableHead>
+                <TableHead className="w-24 text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -345,14 +349,14 @@ export default function Expense() {
                     colSpan={5}
                     className="text-center py-8 text-muted-foreground"
                   >
-                    কোনো ব্যয় পাওয়া যায়নি। ফিল্টার পরিবর্তন করুন।
+                    No expenses found. Try changing the filters.
                   </TableCell>
                 </TableRow>
               ) : (
                 filteredExpenses.map((exp) => (
                   <TableRow key={exp.id} className="hover:bg-muted/60">
                     <TableCell className="font-medium">
-                      {formatDateBD(exp.date)}
+                      {formatDate(exp.date)}
                     </TableCell>
                     <TableCell>
                       <Badge variant="outline">{exp.category}</Badge>
@@ -385,7 +389,7 @@ export default function Expense() {
         </div>
       </Card>
 
-      {/* Floating Add Button on Mobile */}
+      {/* Mobile Floating Add Button */}
       <div className="fixed bottom-6 right-6 z-50 md:hidden">
         <Button
           size="icon"
