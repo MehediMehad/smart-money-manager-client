@@ -1,39 +1,21 @@
 // src/services/Budget/index.ts
 "use server";
 
-import config from "@/configs";
-import { cookies } from "next/headers";
+import { serverFetch } from "@/lib/utils/serverFetch";
 import { revalidateTag } from "next/cache";
+import { getValidToken } from "../Auth/verifyToken";
+import { GetBudgetsParams, TApiResponse, TCreateBudgetForm, TUpdateBudgetForm } from "@/types";
 
-type BudgetType = "DAILY" | "MONTHLY";
-type GetBudgetsParams = {
-    type?: BudgetType;
-    date?: string;
-    month?: string;
-    year?: string;
-};
+const TAG = "budgets";
 
 
-type ServerActionResponse<T = any> = {
-    success: boolean;
-    message: string;
-    data?: T;
-};
-
-export const createBudget = async (data: {
-    categoryId: string;
-    amount: number;
-    type: "DAILY" | "MONTHLY";
-    date?: string;     // "2025-03-19" for daily
-    month?: string;    // "2025-03" for monthly
-}): Promise<ServerActionResponse> => {
+export const createBudget = async (
+    data: TCreateBudgetForm
+): Promise<TApiResponse<any>> => {
     try {
-        const accessToken = (await cookies()).get("accessToken")?.value;
-        if (!accessToken) {
-            return { success: false, message: "Authentication required" };
-        }
+        const accessToken = await getValidToken();
 
-        const payload: any = {
+        const payload: Record<string, any> = {
             categoryId: data.categoryId,
             amount: Math.round(data.amount),
             type: data.type,
@@ -41,120 +23,64 @@ export const createBudget = async (data: {
 
         if (data.type === "DAILY") {
             if (!data.date) {
-                return { success: false, message: "Date is required for daily budget" };
+                return {
+                    success: false,
+                    message: "Date is required for daily budget",
+                };
             }
             payload.date = data.date;
-        } else if (data.type === "MONTHLY") {
-            if (!data.month) {
-                return { success: false, message: "Month is required for monthly budget" };
-            }
-            const [year, month] = data.month.split("-");
-            payload.month = Number(month);
-            payload.year = Number(year);
         }
 
-        const res = await fetch(`${config.base_api}/budgets`, {
-            method: "POST",
+        if (data.type === "MONTHLY") {
+            if (!data.month) {
+                return {
+                    success: false,
+                    message: "Month is required for monthly budget",
+                };
+            }
+
+            const [year, month] = data.month.split("-");
+            payload.year = Number(year);
+            payload.month = Number(month);
+        }
+
+        const response = await serverFetch.post("/budgets", {
+            body: JSON.stringify(payload),
             headers: {
                 Authorization: `Bearer ${accessToken}`,
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify(payload),
+            next: { tags: [TAG] },
         });
 
-        let result;
-        try {
-            result = await res.json();
-        } catch {
-            result = {};
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            return {
+                success: false,
+                message: errorData.message || "Failed to create budget",
+                data: errorData.data,
+            };
         }
 
-        if (!res.ok) {
-            throw new Error(
-                result.message || result.error || `Server error (${res.status})`
-            );
-        }
-
-        revalidateTag("budgets", { expire: 0 });
+        const result = await response.json();
+        revalidateTag(TAG, { expire: 0 });
 
         return {
             success: true,
             message: result.message || "Budget created successfully",
-            data: result.data || result,
+            data: result.data,
         };
-    } catch (err: any) {
-        console.error("[createBudgetLimit]", err);
+    } catch (error: any) {
         return {
             success: false,
-            message: err.message || "Failed to create budget",
-        };
-    }
-};
-
-export const updateBudget = async (data: {
-    id: string;
-    amount: number;
-    // type is NOT sent on update — backend doesn't allow changing type
-}): Promise<ServerActionResponse> => {
-    try {
-        const accessToken = (await cookies()).get("accessToken")?.value;
-        if (!accessToken) {
-            return { success: false, message: "Authentication required" };
-        }
-
-        if (!data.id) {
-            return { success: false, message: "Budget ID is required" };
-        }
-
-        const payload = {
-            amount: Math.round(data.amount),
-        };
-
-        const res = await fetch(`${config.base_api}/budgets/${data.id}`, {
-            method: "PATCH",
-            headers: {
-                Authorization: `Bearer ${accessToken}`,
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(payload),
-        });
-
-        let result;
-        try {
-            result = await res.json();
-        } catch {
-            result = {};
-        }
-
-        if (!res.ok) {
-            throw new Error(
-                result.message || result.error || `Server error (${res.status})`
-            );
-        }
-
-        revalidateTag("budgets", { expire: 0 });
-
-        return {
-            success: true,
-            message: result.message || "Budget updated successfully",
-            data: result.data || result,
-        };
-    } catch (err: any) {
-        console.error("[updateBudgetLimit]", err);
-        return {
-            success: false,
-            message: err.message || "Failed to update budget",
+            message: error.message || "Failed to create budget",
         };
     }
 };
 
 export const getBudgets = async (params?: GetBudgetsParams) => {
     try {
-        const accessToken = (await cookies()).get("accessToken")?.value;
-
-        if (!accessToken) {
-            throw new Error("No access token found");
-        }
+        const accessToken = await getValidToken();
 
         const searchParams = new URLSearchParams();
 
@@ -163,32 +89,120 @@ export const getBudgets = async (params?: GetBudgetsParams) => {
         if (params?.month) searchParams.set("month", params.month);
         if (params?.year) searchParams.set("year", params.year);
 
-        const url = `${config.base_api}/budgets${searchParams.toString() ? `?${searchParams.toString()}` : ""
+        const endpoint = `/budgets${searchParams.toString() ? `?${searchParams.toString()}` : ""
             }`;
 
-        const res = await fetch(url, {
-            method: "GET",
+        const response = await serverFetch.get(endpoint, {
+            headers: {
+                Authorization: `Bearer ${accessToken}`,
+            },
+            next: { tags: [TAG] },
+            cache: "no-store",
+        });
+
+        if (!response.ok) return [];
+
+        const result = await response.json();
+        return result.data || [];
+    } catch (error) {
+        console.error("getBudgets error:", error);
+        return [];
+    }
+};
+
+export const getSingleBudget = async (id: string) => {
+    try {
+        const accessToken = await getValidToken();
+        const response = await serverFetch.get(`/budgets/${id}`, {
+            headers: {
+                Authorization: `Bearer ${accessToken}`,
+            },
+            next: { tags: [TAG] },
+            cache: "no-store",
+        });
+
+        if (!response.ok) return null;
+
+        const result = await response.json();
+        return result.data || null;
+    } catch (error) {
+        console.error("getSingleBudget error:", error);
+        return null;
+    }
+};
+
+export const updateBudget = async (
+    id: string,
+    data: TUpdateBudgetForm
+): Promise<TApiResponse> => {
+    try {
+        const accessToken = await getValidToken();
+        const payload = {
+            amount: Math.round(data.amount),
+        };
+
+        const response = await serverFetch.patch(`/budgets/${id}`, {
+            body: JSON.stringify(payload),
             headers: {
                 Authorization: `Bearer ${accessToken}`,
                 "Content-Type": "application/json",
             },
-            next: {
-                tags: ["budgets"],
-            },
-            cache: "no-store",
         });
 
-        if (!res.ok) {
-            const errorData = await res.json().catch(() => ({}));
-            throw new Error(errorData.message || `HTTP ${res.status}`);
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            return {
+                success: false,
+                message: errorData.message || "Failed to update budget",
+            };
         }
 
-        const result = await res.json();
-        return result.data ?? [];
+        const result = await response.json();
+        revalidateTag(TAG, { expire: 0 });
+
+        return {
+            success: true,
+            message: result.message || "Budget updated successfully",
+            data: result.data,
+        };
     } catch (error: any) {
-        console.error("getBudgets error:", error);
-        throw new Error(error?.message || "Failed to fetch budgets");
+        return {
+            success: false,
+            message: error.message || "Failed to update budget",
+        };
     }
 };
 
+export const deleteBudget = async (
+    id: string
+): Promise<TApiResponse> => {
+    try {
+        const accessToken = await getValidToken();
 
+        const response = await serverFetch.delete(`/budgets/${id}`, {
+            headers: {
+                Authorization: `Bearer ${accessToken}`,
+            },
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            return {
+                success: false,
+                message: errorData.message || "Failed to delete budget",
+            };
+        }
+
+        revalidateTag(TAG, { expire: 0 });
+
+        return {
+            success: true,
+            message: "Budget deleted successfully",
+        };
+    } catch (error: any) {
+        return {
+            success: false,
+            message: error.message || "Failed to delete budget",
+        };
+    }
+};
