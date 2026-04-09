@@ -8,6 +8,9 @@ import { TCategory } from "@/types";
 import { toast } from "sonner";
 import ExpenseFilters from "./ExpenseFilters";
 import ExpenseGrid from "./ExpenseGrid";
+import { NMTable } from "@/components/shared/core/NMTable";
+import { ColumnDef } from "@tanstack/react-table";
+import { Edit, Trash2 } from "lucide-react"; // ← আইকনের জন্য
 
 interface TExpense {
   id: string;
@@ -127,6 +130,72 @@ export default function ExpensePage({ categories }: Props) {
     !!debouncedSearchTerm ||
     categoryFilter !== ALL_CATEGORIES;
 
+  const expenseColumns: ColumnDef<TExpense>[] = [
+    {
+      accessorKey: "date",
+      header: "Date",
+      cell: ({ row }) => {
+        const date = new Date(row.original.date);
+        return date.toLocaleDateString("en-GB");
+      },
+    },
+    {
+      accessorKey: "note",
+      header: "Note",
+    },
+    {
+      accessorKey: "category",
+      header: "Category",
+      cell: ({ row }) => (
+        <div className="flex items-center gap-2">
+          {row.original.category.emoji && (
+            <span>{row.original.category.emoji}</span>
+          )}
+          <span>{row.original.category.name}</span>
+        </div>
+      ),
+    },
+    {
+      accessorKey: "amount",
+      header: "Amount",
+      cell: ({ row }) => (
+        <span className="font-medium">
+          ৳{row.original.amount.toLocaleString()}
+        </span>
+      ),
+    },
+    {
+      id: "actions",
+      header: "Action",
+      cell: ({ row }) => {
+        const expense = row.original;
+
+        return (
+          <div className="flex gap-3">
+            {/* Edit Button */}
+            <button
+              onClick={() => {
+                // Edit logic এখানে লিখবে (modal খুলবে)
+                alert(`Edit expense: ${expense.note}`); // পরে Modal দিয়ে replace করবে
+              }}
+              className="text-blue-600 hover:text-blue-700 transition-colors"
+            >
+              <Edit size={18} />
+            </button>
+
+            {/* Delete Button */}
+            <button
+              onClick={() => handleDelete(expense.id, expense.note)}
+              className="text-red-600 hover:text-red-700 transition-colors"
+            >
+              <Trash2 size={18} />
+            </button>
+          </div>
+        );
+      },
+    },
+  ];
+
   return (
     <div className="space-y-6 pb-24 md:pb-6">
       <ExpenseHeader categories={categories} />
@@ -173,25 +242,12 @@ export default function ExpensePage({ categories }: Props) {
         }}
       />
 
-      {filteredExpenses.length > 0 ? (
-        <ExpenseGrid
-          expenses={filteredExpenses}
-          loading={loading || isPending}
-          onDelete={handleDelete}
-        />
-      ) : (
-        <div className="text-center py-12">
-          {hasActiveFilters ? (
-            <p className="text-muted-foreground">
-              No expenses found for the selected filters
-            </p>
-          ) : (
-            <p className="text-muted-foreground">
-              No expenses found for the selected month
-            </p>
-          )}
-        </div>
-      )}
+      {/* TABLE */}
+      <NMTable
+        columns={expenseColumns}
+        data={filteredExpenses}
+        isLoading={loading}
+      />
     </div>
   );
 }

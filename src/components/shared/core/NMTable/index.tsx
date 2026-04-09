@@ -44,7 +44,7 @@ export function NMTable<TData, TValue>({
           {table?.getHeaderGroups().map((headerGroup) => (
             <TableRow
               key={headerGroup.id}
-              className="bg-gray-300/60 hover:bg-gray-300/60"
+              className="bg-white hover:bg-white border-b-2"
             >
               {headerGroup.headers.map((header) => (
                 <TableHead className="font-bold text-gray-600" key={header.id}>
@@ -60,14 +60,14 @@ export function NMTable<TData, TValue>({
           ))}
         </TableHeader>
 
-        <TableBody>
+        <TableBody className="">
           {isLoading ? (
             // ==================== SKELETON LOADING ====================
             <>
               {skeletonRows.map((_, rowIndex) => (
                 <TableRow
                   key={`skeleton-${rowIndex}`}
-                  className="bg-gray-100/40"
+                  className="bg-gray-100/20"
                 >
                   {columns.map((_, colIndex) => (
                     <TableCell
@@ -84,12 +84,12 @@ export function NMTable<TData, TValue>({
             // ==================== ACTUAL DATA ====================
             table.getRowModel().rows.map((row) => (
               <TableRow
-                className="bg-gray-100/40 hover:bg-gray-200/40"
+                className="bg-white hover:bg-white"
                 key={row.id}
                 data-state={row.getIsSelected() && "selected"}
               >
                 {row.getVisibleCells().map((cell) => (
-                  <TableCell className="py-4" key={cell.id}>
+                  <TableCell className="py-5" key={cell.id}>
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </TableCell>
                 ))}
