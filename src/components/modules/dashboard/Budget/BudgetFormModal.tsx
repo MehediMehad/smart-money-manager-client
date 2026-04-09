@@ -144,20 +144,13 @@ export default function BudgetFormModal({
     try {
       let result;
 
-      if (isEdit) {
-        result = await updateBudget({
-          id: budget.id,
-          amount: Number(values.amount),
-        });
-      } else {
-        result = await createBudget({
-          categoryId: values.categoryId,
-          amount: Number(values.amount),
-          type: values.type,
-          date: values.date || undefined,
-          month: values.month || undefined,
-        });
-      }
+      result = await createBudget({
+        categoryId: values.categoryId,
+        amount: Number(values.amount),
+        type: values.type,
+        date: values.date || undefined,
+        month: values.month || undefined,
+      });
 
       if (!result.success) {
         throw new Error(result.message);
