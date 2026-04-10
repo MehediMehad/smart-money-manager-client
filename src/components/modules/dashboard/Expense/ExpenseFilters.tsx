@@ -1,3 +1,4 @@
+// @/components/modules/dashboard/Expense/ExpenseFilters.tsx
 "use client";
 
 import { Input } from "@/components/ui/input";
@@ -46,6 +47,9 @@ export default function ExpenseFilters({
   onCategoryChange,
   onReset,
 }: Props) {
+  const currentYear = new Date().getFullYear();
+  const years = Array.from({ length: 5 }, (_, i) => String(currentYear - i));
+
   const hasActiveFilters =
     !!specificDate || !!searchTerm || categoryFilter !== ALL_CATEGORIES;
 
@@ -89,14 +93,20 @@ export default function ExpenseFilters({
         {/* Year */}
         <div className="space-y-2">
           <Label className="text-sm font-medium text-gray-700">Year</Label>
-          <Select value={year} onValueChange={onYearChange}>
+          <Select
+            value={year}
+            onValueChange={onYearChange}
+            disabled={isPending}
+          >
             <SelectTrigger className="h-11">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="2024">2024</SelectItem>
-              <SelectItem value="2025">2025</SelectItem>
-              <SelectItem value="2026">2026</SelectItem>
+              {years.map((item) => (
+                <SelectItem key={item} value={item}>
+                  {item}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>

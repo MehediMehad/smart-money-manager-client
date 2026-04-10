@@ -21,12 +21,14 @@ interface NMTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   isLoading?: boolean;
+  emptyMessage?: string;
 }
 
 export function NMTable<TData, TValue>({
   columns,
   data,
   isLoading = false,
+  emptyMessage = "No results found.",
 }: NMTableProps<TData, TValue>) {
   const table = useReactTable({
     data,
@@ -38,18 +40,18 @@ export function NMTable<TData, TValue>({
 
   return (
     <div className="my-5">
-      <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+      <div className="overflow-x-auto rounded-xl border border-gray-200 bg-white shadow-sm">
         <Table>
           <TableHeader>
-            {table?.getHeaderGroups().map((headerGroup) => (
+            {table.getHeaderGroups().map((headerGroup) => (
               <TableRow
                 key={headerGroup.id}
-                className="bg-gray-50 hover:bg-gray-50 border-b"
+                className="border-b bg-gray-50 hover:bg-gray-50"
               >
                 {headerGroup.headers.map((header) => (
                   <TableHead
-                    className="font-bold text-gray-700 py-4"
                     key={header.id}
+                    className="py-4 font-bold text-gray-700"
                   >
                     {header.isPlaceholder
                       ? null
@@ -65,29 +67,27 @@ export function NMTable<TData, TValue>({
 
           <TableBody>
             {isLoading ? (
-              <>
-                {skeletonRows.map((_, rowIndex) => (
-                  <TableRow key={`skeleton-${rowIndex}`} className="border-b">
-                    {columns.map((_, colIndex) => (
-                      <TableCell
-                        key={`skeleton-cell-${rowIndex}-${colIndex}`}
-                        className="py-5"
-                      >
-                        <Skeleton className="h-6 w-full rounded-md" />
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                ))}
-              </>
-            ) : table.getRowModel().rows?.length ? (
+              skeletonRows.map((_, rowIndex) => (
+                <TableRow key={`skeleton-${rowIndex}`} className="border-b">
+                  {columns.map((_, colIndex) => (
+                    <TableCell
+                      key={`skeleton-cell-${rowIndex}-${colIndex}`}
+                      className="py-5"
+                    >
+                      <Skeleton className="h-6 w-full rounded-md" />
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : table.getRowModel().rows.length > 0 ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow
-                  className="hover:bg-gray-50 border-b last:border-b-0"
                   key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
+                  data-state={row.getIsSelected() ? "selected" : undefined}
+                  className="border-b hover:bg-gray-50 last:border-b-0"
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell className="py-5" key={cell.id}>
+                    <TableCell key={cell.id} className="py-5">
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext(),
@@ -102,7 +102,7 @@ export function NMTable<TData, TValue>({
                   colSpan={columns.length}
                   className="h-24 text-center text-muted-foreground"
                 >
-                  No results found.
+                  {emptyMessage}
                 </TableCell>
               </TableRow>
             )}

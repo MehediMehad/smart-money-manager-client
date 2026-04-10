@@ -1,9 +1,11 @@
-import Expense from "@/components/modules/dashboard/Expense/Expense";
+// app/dashboard/expense/page.tsx
+import ExpenseView from "@/components/modules/dashboard/Expense/Expense";
 import { getCategories } from "@/services/Category";
 
 const ExpensePage = async () => {
-  const categoriesRes = await getCategories();
+  const categories = await getCategories();
 
-  return <Expense categories={categoriesRes || []} />;
+  return <ExpenseView categories={categories || []} />;
 };
+
 export default ExpensePage;
