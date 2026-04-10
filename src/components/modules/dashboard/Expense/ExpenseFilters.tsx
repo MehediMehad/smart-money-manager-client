@@ -10,7 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Filter } from "lucide-react";
+import { Filter, X } from "lucide-react";
 import { TCategory } from "@/types";
 
 interface Props {
@@ -49,38 +49,63 @@ export default function ExpenseFilters({
   const hasActiveFilters =
     !!specificDate || !!searchTerm || categoryFilter !== ALL_CATEGORIES;
 
-  console.log("categories", categories);
-
   return (
-    <div className="bg-card border rounded-xl p-4 space-y-4 shadow-sm">
-      <div className="flex items-center justify-between gap-3">
-        <h3 className="font-medium text-base">Filter & Search</h3>
-        {isPending && (
-          <span className="text-xs text-muted-foreground animate-pulse">
-            Updating...
-          </span>
+    <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-green-100 text-green-600 rounded-xl">
+            <Filter className="h-5 w-5" />
+          </div>
+          <h3 className="font-semibold text-lg text-gray-800">
+            Filters & Search
+          </h3>
+          {isPending && (
+            <span className="text-xs text-muted-foreground flex items-center gap-1.5 animate-pulse">
+              <div className="w-2 h-2 bg-green-500 rounded-full animate-ping" />
+              Updating...
+            </span>
+          )}
+        </div>
+
+        {/* Reset Button */}
+        {hasActiveFilters && (
+          <div className="flex justify-end">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onReset}
+              className="flex items-center gap-2 text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
+            >
+              <X className="h-4 w-4" />
+              Clear All Filters
+            </Button>
+          </div>
         )}
       </div>
 
-      <div className="flex flex-wrap gap-x-6 gap-y-4 items-end">
-        <div className="space-y-1.5">
-          <Label className="text-sm">Year</Label>
+      {/* Filters Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+        {/* Year */}
+        <div className="space-y-2">
+          <Label className="text-sm font-medium text-gray-700">Year</Label>
           <Select value={year} onValueChange={onYearChange}>
-            <SelectTrigger className="w-[140px] h-9">
+            <SelectTrigger className="h-11">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
+              <SelectItem value="2024">2024</SelectItem>
               <SelectItem value="2025">2025</SelectItem>
               <SelectItem value="2026">2026</SelectItem>
-              <SelectItem value="2027">2027</SelectItem>
             </SelectContent>
           </Select>
         </div>
 
-        <div className="space-y-1.5">
-          <Label className="text-sm">Month</Label>
+        {/* Month */}
+        <div className="space-y-2">
+          <Label className="text-sm font-medium text-gray-700">Month</Label>
           <Select value={month} onValueChange={onMonthChange}>
-            <SelectTrigger className="w-[180px] h-9">
+            <SelectTrigger className="h-11">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -98,52 +123,52 @@ export default function ExpenseFilters({
           </Select>
         </div>
 
-        <div className="space-y-1.5 min-w-[180px]">
-          <Label className="text-sm">Specific Day</Label>
+        {/* Specific Day */}
+        <div className="space-y-2">
+          <Label className="text-sm font-medium text-gray-700">
+            Specific Day
+          </Label>
           <Input
             type="number"
             min="1"
             max="31"
-            placeholder="Day (1-31)"
+            placeholder="Enter day (1-31)"
             value={specificDate}
             onChange={(e) => onDateChange(e.target.value)}
+            className="h-11"
           />
         </div>
 
-        <div className="space-y-1.5 min-w-[240px]">
-          <Label className="text-sm">Search</Label>
+        {/* Search */}
+        <div className="space-y-2">
+          <Label className="text-sm font-medium text-gray-700">
+            Search Note
+          </Label>
           <Input
-            placeholder="Search note..."
+            placeholder="Search by note..."
             value={searchTerm}
             onChange={(e) => onSearchChange(e.target.value)}
+            className="h-11"
           />
         </div>
 
-        <div className="space-y-1.5">
-          <Label className="text-sm">Category</Label>
-          <div className="flex items-center gap-2 border rounded-md px-4 py-2 w-fit">
-            <Filter className="h-4 w-4" />
-            <Select value={categoryFilter} onValueChange={onCategoryChange}>
-              <SelectTrigger className="border-0 shadow-none p-0 h-auto w-44">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value={ALL_CATEGORIES}>All Categories</SelectItem>
-                {categories.map((cat) => (
-                  <SelectItem key={cat.id} value={cat.id}>
-                    {cat.emoji} {cat.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+        {/* Category */}
+        <div className="space-y-2">
+          <Label className="text-sm font-medium text-gray-700">Category</Label>
+          <Select value={categoryFilter} onValueChange={onCategoryChange}>
+            <SelectTrigger className="h-11">
+              <SelectValue placeholder="All Categories" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value={ALL_CATEGORIES}>All Categories</SelectItem>
+              {categories.map((cat) => (
+                <SelectItem key={cat.id} value={cat.id}>
+                  {cat.emoji} {cat.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
-
-        {hasActiveFilters && (
-          <Button variant="ghost" size="sm" onClick={onReset}>
-            Clear all
-          </Button>
-        )}
       </div>
     </div>
   );

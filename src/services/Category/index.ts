@@ -128,46 +128,60 @@ export const createCategories = async (data: {
     }
 };
 
-export const getCategories = async () => {
+type TGetCategoriesParams = {
+    type?: "EXPENSE" | "INCOME";
+    year?: string;
+    month?: string;
+    searchTerm?: string;
+};
+
+export const getCategories = async (params?: TGetCategoriesParams) => {
     try {
         const accessToken = (await cookies()).get("accessToken")?.value;
 
         if (!accessToken) {
             return {
                 success: false,
-                statusCode: 401,
-                message: "No access token found",
                 data: [],
+                message: "No access token found",
             };
         }
 
-        const res = await fetch(`${config.base_api}/categories`, {
-            method: "GET",
-            headers: {
-                Authorization: `Bearer ${accessToken}`,
-                "Content-Type": "application/json",
-            },
-            next: { tags: [TAG] },
-        });
+        const query = new URLSearchParams();
 
-        const result = await res.json().catch(() => ({}));
+        if (params?.type) query.append("type", params.type);
+        if (params?.year) query.append("year", params.year);
+        if (params?.month) query.append("month", params.month);
+        if (params?.searchTerm) query.append("searchTerm", params.searchTerm);
+
+        const res = await fetch(
+            `${config.base_api}/categories?${query.toString()}`,
+            {
+                method: "GET",
+                headers: {
+                    Authorization: `Bearer ${accessToken}`,
+                    "Content-Type": "application/json",
+                },
+                cache: "no-store",
+            }
+        );
+
+        const result = await res.json();
 
         if (!res.ok) {
             return {
                 success: false,
-                statusCode: res.status,
-                message: result.message || "Failed to fetch categories",
                 data: [],
+                message: result?.message || "Failed to fetch categories",
             };
         }
 
-        return result.data || [];
+        return result.data;
     } catch (error: any) {
         return {
             success: false,
-            statusCode: 500,
-            message: error.message || "Failed to fetch categories",
             data: [],
+            message: error.message || "Failed to fetch categories",
         };
     }
 };

@@ -4,13 +4,13 @@ import { useEffect, useMemo, useState, useTransition } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import ExpenseHeader from "./ExpenseHeader";
 import { getExpenses, deleteExpense } from "@/services/Expense";
+import { getCategories } from "@/services/Category";
 import { TCategory } from "@/types";
 import { toast } from "sonner";
 import ExpenseFilters from "./ExpenseFilters";
-import ExpenseGrid from "./ExpenseGrid";
 import { NMTable } from "@/components/shared/core/NMTable";
 import { ColumnDef } from "@tanstack/react-table";
-import { Edit, Trash2 } from "lucide-react"; // ← আইকনের জন্য
+import { Edit, Trash2 } from "lucide-react";
 
 interface TExpense {
   id: string;
@@ -20,7 +20,8 @@ interface TExpense {
   category: {
     id: string;
     name: string;
-    emoji?: string;
+    emoji: string;
+    type: "EXPENSE" | "INCOME";
   };
 }
 
@@ -51,6 +52,9 @@ export default function ExpensePage({ categories }: Props) {
 
   const [expenses, setExpenses] = useState<TExpense[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const [expenseCategories, setExpenseCategories] = useState<TCategory[]>([]);
+  const [categoryLoading, setCategoryLoading] = useState(false);
 
   const updateQuery = (updates: Record<string, string | undefined>) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -112,6 +116,39 @@ export default function ExpensePage({ categories }: Props) {
     });
   }, [expenses, specificDate]);
 
+  const fetchCategories = async () => {
+    setCategoryLoading(true);
+    try {
+      const result = await getCategories({
+        type: "EXPENSE",
+        year,
+        month,
+      });
+      const categories = result || [];
+      setExpenseCategories(categories);
+    } catch {
+      setExpenseCategories([]);
+      toast.error("Something went wrong while loading categories");
+    } finally {
+      setCategoryLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    const exists = expenseCategories.some((cat) => cat.id === categoryFilter);
+
+    if (categoryFilter !== "all" && !exists) {
+      setCategoryFilter("all");
+      updateQuery({
+        categoryId: undefined,
+      });
+    }
+  }, [expenseCategories, categoryFilter]);
+
+  useEffect(() => {
+    fetchCategories();
+  }, [year, month]);
+
   const handleDelete = async (id: string, note: string) => {
     if (!confirm(`Delete expense "${note}"?`)) return;
 
@@ -124,11 +161,6 @@ export default function ExpensePage({ categories }: Props) {
       toast.error(res.message || "Failed to delete expense");
     }
   };
-
-  const hasActiveFilters =
-    !!specificDate ||
-    !!debouncedSearchTerm ||
-    categoryFilter !== ALL_CATEGORIES;
 
   const expenseColumns: ColumnDef<TExpense>[] = [
     {
@@ -206,7 +238,7 @@ export default function ExpensePage({ categories }: Props) {
         specificDate={specificDate}
         searchTerm={searchTerm}
         categoryFilter={categoryFilter}
-        categories={categories}
+        categories={expenseCategories}
         isPending={isPending}
         onYearChange={(value) => {
           setYear(value);
