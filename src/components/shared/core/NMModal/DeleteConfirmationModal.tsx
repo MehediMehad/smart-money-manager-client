@@ -10,6 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 
 interface DeleteModalProps {
+  item: string;
   name: string | null;
   isOpen: boolean;
   onOpenChange: (isOpen: boolean) => void;
@@ -17,6 +18,7 @@ interface DeleteModalProps {
 }
 
 const DeleteConfirmationModal: React.FC<DeleteModalProps> = ({
+  item = "Item",
   name,
   isOpen,
   onOpenChange,
@@ -26,11 +28,11 @@ const DeleteConfirmationModal: React.FC<DeleteModalProps> = ({
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Delete Item</DialogTitle>
+          <DialogTitle>Delete {item}</DialogTitle>
           <DialogDescription>
             Are you sure you want to delete{" "}
-            <span className="font-semibold text-red-500">{name}</span>? This
-            action cannot be undone.
+            <span className="font-semibold text-red-500">{name}</span>? <br />{" "}
+            This action cannot be undone.
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>

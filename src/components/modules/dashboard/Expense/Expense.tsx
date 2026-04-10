@@ -18,6 +18,12 @@ import { NMTable } from "@/components/shared/core/NMTable";
 import { deleteExpense, getExpenses } from "@/services/Expense";
 import { getCategories } from "@/services/Category";
 import { TCategory } from "@/types";
+import dynamic from "next/dynamic";
+
+const DeleteConfirmationModal = dynamic(
+  () => import("@/components/shared/core/NMModal/DeleteConfirmationModal"),
+  { ssr: false },
+);
 
 interface TExpense {
   id: string;
@@ -46,7 +52,7 @@ const getCurrentYearMonth = () => {
   };
 };
 
-export default function ExpenseView({ categories }: Props) {
+export default function Expense({ categories }: Props) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -73,6 +79,13 @@ export default function ExpenseView({ categories }: Props) {
 
   const [expenseCategories, setExpenseCategories] = useState<TCategory[]>([]);
   const [categoryLoading, setCategoryLoading] = useState(false);
+
+  // Delete Modal
+  const [deleteModal, setDeleteModal] = useState({
+    isOpen: false,
+    id: "",
+    name: "",
+  });
 
   const updateQuery = useCallback(
     (updates: Record<string, string | undefined>) => {
@@ -184,27 +197,27 @@ export default function ExpenseView({ categories }: Props) {
     });
   }, [expenses, specificDate]);
 
-  const handleDelete = useCallback(
-    async (id: string, note: string) => {
-      const confirmed = window.confirm(`Delete expense "${note}"?`);
-      if (!confirmed) return;
+  // const handleDelete = useCallback(
+  //   async (id: string, note: string) => {
+  //     const confirmed = window.confirm(`Delete expense "${note}"?`);
+  //     if (!confirmed) return;
 
-      try {
-        const res = await deleteExpense(id);
+  //     try {
+  //       const res = await deleteExpense(id);
 
-        if (res?.success) {
-          toast.success("Expense deleted successfully");
-          await fetchExpenses();
-        } else {
-          toast.error(res?.message || "Failed to delete expense");
-        }
-      } catch (error) {
-        console.error("Failed to delete expense:", error);
-        toast.error("Something went wrong while deleting expense");
-      }
-    },
-    [fetchExpenses],
-  );
+  //       if (res?.success) {
+  //         toast.success("Expense deleted successfully");
+  //         await fetchExpenses();
+  //       } else {
+  //         toast.error(res?.message || "Failed to delete expense");
+  //       }
+  //     } catch (error) {
+  //       console.error("Failed to delete expense:", error);
+  //       toast.error("Something went wrong while deleting expense");
+  //     }
+  //   },
+  //   [fetchExpenses],
+  // );
 
   const handleEdit = useCallback(
     (expense: TExpense) => {
@@ -213,6 +226,27 @@ export default function ExpenseView({ categories }: Props) {
     },
     [router],
   );
+
+  const openDeleteModal = (id: string, name: string) => {
+    setDeleteModal({ isOpen: true, id, name });
+  };
+
+  const closeDeleteModal = () => {
+    setDeleteModal({ isOpen: false, id: "", name: "" });
+  };
+
+  const handleDelete = async () => {
+    if (!deleteModal.id) return;
+
+    const res = await deleteExpense(deleteModal.id);
+    if (res.success) {
+      toast.success(res.message);
+      await fetchExpenses();
+    } else {
+      toast.error(res.message);
+    }
+    closeDeleteModal();
+  };
 
   const expenseColumns = useMemo<ColumnDef<TExpense>[]>(
     () => [
@@ -272,7 +306,7 @@ export default function ExpenseView({ categories }: Props) {
               <button
                 type="button"
                 aria-label={`Delete expense ${expense.note}`}
-                onClick={() => handleDelete(expense.id, expense.note)}
+                onClick={() => openDeleteModal(expense.id, expense.note)}
                 className="text-red-600 transition-colors hover:text-red-700"
               >
                 <Trash2 size={18} />
@@ -336,6 +370,15 @@ export default function ExpenseView({ categories }: Props) {
         columns={expenseColumns}
         data={filteredExpenses}
         isLoading={loading}
+      />
+
+      {/* Delete Modal */}
+      <DeleteConfirmationModal
+        item="Expense"
+        name={deleteModal.name}
+        isOpen={deleteModal.isOpen}
+        onOpenChange={(open) => !open && closeDeleteModal()}
+        onConfirm={handleDelete}
       />
     </div>
   );
