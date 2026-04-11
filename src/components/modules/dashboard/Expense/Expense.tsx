@@ -12,13 +12,13 @@ import { ColumnDef } from "@tanstack/react-table";
 import { Edit, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
-import ExpenseHeader from "./ExpenseHeader";
 import ExpenseFilters from "./ExpenseFilters";
 import { NMTable } from "@/components/shared/core/NMTable";
 import { deleteExpense, getExpenses } from "@/services/Expense";
 import { getCategories } from "@/services/Category";
 import { TCategory } from "@/types";
 import dynamic from "next/dynamic";
+import ExpenseFormModal from "./ExpenseFormModal";
 
 const DeleteConfirmationModal = dynamic(
   () => import("@/components/shared/core/NMModal/DeleteConfirmationModal"),
@@ -170,6 +170,7 @@ export default function Expense({ categories }: Props) {
     fetchExpenseCategories();
   }, [fetchExpenseCategories]);
 
+  // Reset category filter if it no longer exists
   useEffect(() => {
     const categoryExists = expenseCategories.some(
       (cat) => cat.id === categoryFilter,
@@ -196,36 +197,6 @@ export default function Expense({ categories }: Props) {
       return expenseDay === normalizedDay;
     });
   }, [expenses, specificDate]);
-
-  // const handleDelete = useCallback(
-  //   async (id: string, note: string) => {
-  //     const confirmed = window.confirm(`Delete expense "${note}"?`);
-  //     if (!confirmed) return;
-
-  //     try {
-  //       const res = await deleteExpense(id);
-
-  //       if (res?.success) {
-  //         toast.success("Expense deleted successfully");
-  //         await fetchExpenses();
-  //       } else {
-  //         toast.error(res?.message || "Failed to delete expense");
-  //       }
-  //     } catch (error) {
-  //       console.error("Failed to delete expense:", error);
-  //       toast.error("Something went wrong while deleting expense");
-  //     }
-  //   },
-  //   [fetchExpenses],
-  // );
-
-  const handleEdit = useCallback(
-    (expense: TExpense) => {
-      // later: open edit modal or navigate to edit page
-      router.push(`/dashboard/expense/edit/${expense.id}`);
-    },
-    [router],
-  );
 
   const openDeleteModal = (id: string, name: string) => {
     setDeleteModal({ isOpen: true, id, name });
@@ -294,14 +265,22 @@ export default function Expense({ categories }: Props) {
 
           return (
             <div className="flex items-center gap-3">
-              <button
+              {/* <button
                 type="button"
                 aria-label={`Edit expense ${expense.note}`}
-                onClick={() => handleEdit(expense)}
+                onClick={() => openEditModal(expense)}
                 className="text-blue-600 transition-colors hover:text-blue-700"
               >
                 <Edit size={18} />
-              </button>
+              </button> */}
+
+              <div className="hidden sm:block">
+                <ExpenseFormModal
+                  mode="edit"
+                  expense={expense}
+                  categories={categories}
+                />
+              </div>
 
               <button
                 type="button"
@@ -316,12 +295,23 @@ export default function Expense({ categories }: Props) {
         },
       },
     ],
-    [handleDelete, handleEdit],
+    [],
   );
 
   return (
     <div className="space-y-6 pb-24 md:pb-6">
-      <ExpenseHeader categories={categories} />
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h1 className="text-2xl font-bold flex items-center gap-2">
+            Expense
+          </h1>
+          <p className="text-sm text-muted-foreground mt-1 hidden sm:block"></p>
+        </div>
+
+        <div className="hidden sm:block">
+          <ExpenseFormModal mode="create" categories={categories} />
+        </div>
+      </div>
 
       <ExpenseFilters
         year={year}

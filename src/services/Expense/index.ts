@@ -1,6 +1,4 @@
 // src/services/Expense/index.ts
-
-// src/services/Expense/index.ts
 "use server";
 
 import { revalidateTag } from "next/cache";
@@ -47,10 +45,14 @@ export const createExpense = async (
             };
         }
 
+        console.log("data", data);
+
+
         const response = await serverFetch.post("/expenses", {
             body: JSON.stringify({
                 ...data,
                 amount: Math.round(data.amount),
+                date: new Date(data.date).toISOString(),
             }),
             headers: {
                 Authorization: `Bearer ${accessToken}`,
@@ -117,8 +119,8 @@ export const getExpenses = async (
             headers: {
                 Authorization: `Bearer ${accessToken}`,
             },
+            cache: "no-cache",
             next: { tags: [TAG] },
-            cache: "no-store",
         });
 
         const result = await response.json().catch(() => ({}));
@@ -168,8 +170,8 @@ export const getSingleExpense = async (
             headers: {
                 Authorization: `Bearer ${accessToken}`,
             },
-            next: { tags: [TAG] },
             cache: "no-store",
+            next: { tags: [TAG] },
         });
 
         const result = await response.json().catch(() => ({}));
@@ -218,6 +220,7 @@ export const updateExpense = async (
         const payload = {
             ...data,
             ...(data.amount !== undefined ? { amount: Math.round(data.amount) } : {}),
+            ...(data.date !== undefined ? { date: new Date(data.date).toISOString() } : {}),
         };
 
         const response = await serverFetch.patch(`/expenses/${id}`, {
