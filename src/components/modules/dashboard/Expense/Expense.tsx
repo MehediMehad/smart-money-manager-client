@@ -265,20 +265,15 @@ export default function Expense({ categories }: Props) {
 
           return (
             <div className="flex items-center gap-3">
-              {/* <button
-                type="button"
-                aria-label={`Edit expense ${expense.note}`}
-                onClick={() => openEditModal(expense)}
-                className="text-blue-600 transition-colors hover:text-blue-700"
-              >
-                <Edit size={18} />
-              </button> */}
-
               <div className="hidden sm:block">
                 <ExpenseFormModal
                   mode="edit"
                   expense={expense}
                   categories={categories}
+                  onSuccess={async () => {
+                    await fetchExpenses();
+                    await fetchExpenseCategories();
+                  }}
                 />
               </div>
 
