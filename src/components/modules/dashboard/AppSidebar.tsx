@@ -34,7 +34,7 @@ const menuItems = [
     url: "/dashboard/today-update",
     icon: Clock,
   },
-  { title: "আয়", url: "/dashboard/income", icon: ArrowDownCircle },
+  { title: "Income", url: "/dashboard/income", icon: ArrowDownCircle },
   { title: "Expense", url: "/dashboard/expense", icon: ArrowUpCircle },
 
   { title: "Budget", url: "/dashboard/budget", icon: Receipt },

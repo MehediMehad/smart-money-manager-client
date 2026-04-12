@@ -1,8 +1,10 @@
 import IncomePage from "@/components/modules/dashboard/Income/IncomePage";
+import { getCategories } from "@/services/Category";
 import { getDashboardSummary } from "@/services/Income";
 
 const page = async () => {
   const getSummaryResponse = await getDashboardSummary();
+  const categories = await getCategories();
 
   if (!getSummaryResponse.success || !getSummaryResponse.data) {
     return (
@@ -14,7 +16,7 @@ const page = async () => {
 
   return (
     <>
-      <IncomePage summary={getSummaryResponse.data} />
+      <IncomePage summary={getSummaryResponse.data} categories={categories} />
     </>
   );
 };

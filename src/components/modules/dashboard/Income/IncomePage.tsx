@@ -1,26 +1,14 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useMemo, useState, useCallback } from "react";
+import { ColumnDef } from "@tanstack/react-table";
+import dynamic from "next/dynamic";
+import { Trash2 } from "lucide-react";
+import { toast } from "sonner";
+
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-  DialogDescription,
-} from "@/components/ui/dialog";
 import {
   Select,
   SelectContent,
@@ -28,25 +16,39 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
-import { Plus, Pencil, Trash2, Filter } from "lucide-react";
-import { Textarea } from "@/components/ui/textarea";
-import { TDashboardSummary } from "@/services/Income";
+import { Filter } from "lucide-react";
+
+import { deleteIncome } from "@/services/Income";
+import { TCategory, TDashboardSummary, TIncomeRow } from "@/types";
+
 import StatCard from "./StatCard";
 import Charts from "./Charts";
 import FinancialInsight from "./FinancialInsight";
 import SourceSummary from "./SourceSummary";
+import IncomeFormModal from "./IncomeFormModal";
+import { NMTable } from "@/components/shared/core/NMTable";
+
+const DeleteConfirmationModal = dynamic(
+  () => import("@/components/shared/core/NMModal/DeleteConfirmationModal"),
+  { ssr: false },
+);
 
 type Props = {
   summary: TDashboardSummary;
+  categories: TCategory[];
+  onRefresh?: () => Promise<void> | void;
 };
 
-export default function IncomePage({ summary }: Props) {
-  const [openAdd, setOpenAdd] = useState(false);
+export default function IncomePage({ summary, categories, onRefresh }: Props) {
   const [sourceFilter, setSourceFilter] = useState("all");
   const [searchNote, setSearchNote] = useState("");
 
-  // Use real data from backend
+  const [deleteModal, setDeleteModal] = useState({
+    isOpen: false,
+    id: "",
+    name: "",
+  });
+
   const {
     totalThisMonth,
     todayIncome,
@@ -57,7 +59,6 @@ export default function IncomePage({ summary }: Props) {
     incomes,
   } = summary;
 
-  // Filter incomes for the table
   const filteredIncomes = useMemo(() => {
     return incomes.filter((item) => {
       const matchSource =
@@ -65,9 +66,117 @@ export default function IncomePage({ summary }: Props) {
       const matchNote =
         !searchNote ||
         item.note.toLowerCase().includes(searchNote.toLowerCase());
+
       return matchSource && matchNote;
     });
   }, [incomes, sourceFilter, searchNote]);
+
+  const openDeleteModal = (id: string, name: string) => {
+    setDeleteModal({
+      isOpen: true,
+      id,
+      name,
+    });
+  };
+
+  const closeDeleteModal = () => {
+    setDeleteModal({
+      isOpen: false,
+      id: "",
+      name: "",
+    });
+  };
+
+  const handleDelete = useCallback(async () => {
+    if (!deleteModal.id) return;
+
+    const res = await deleteIncome(deleteModal.id);
+
+    if (res.success) {
+      toast.success(res.message || "Income deleted successfully");
+      await onRefresh?.();
+    } else {
+      toast.error(res.message || "Failed to delete income");
+    }
+
+    closeDeleteModal();
+  }, [deleteModal.id, onRefresh]);
+
+  const incomeColumns = useMemo<ColumnDef<TIncomeRow>[]>(
+    () => [
+      {
+        accessorKey: "date",
+        header: "Date",
+        cell: ({ row }) => {
+          const date = new Date(row.original.date);
+          return date.toLocaleDateString("en-GB");
+        },
+      },
+      {
+        accessorKey: "source",
+        header: "Source",
+      },
+      {
+        accessorKey: "note",
+        header: "Note",
+        cell: ({ row }) => (
+          <span className="line-clamp-1">{row.original.note || "—"}</span>
+        ),
+      },
+      {
+        accessorKey: "amount",
+        header: "Amount",
+        cell: ({ row }) => (
+          <span className="font-semibold text-emerald-600">
+            ৳{row.original.amount.toLocaleString()}
+          </span>
+        ),
+      },
+      {
+        id: "actions",
+        header: "Actions",
+        cell: ({ row }) => {
+          const income = row.original;
+          const matchedCategory = categories.find(
+            (cat) => cat.name === income.source && cat.type === "INCOME",
+          );
+
+          return (
+            <div className="flex items-center gap-2">
+              <IncomeFormModal
+                mode="edit"
+                income={{
+                  ...income,
+                  category: matchedCategory
+                    ? {
+                        id: matchedCategory.id,
+                        name: matchedCategory.name,
+                        emoji: matchedCategory.emoji,
+                      }
+                    : undefined,
+                  categoryId: matchedCategory?.id,
+                }}
+                categories={categories}
+                onSuccess={onRefresh}
+              />
+
+              <button
+                type="button"
+                aria-label={`Delete income ${income.note}`}
+                onClick={() =>
+                  openDeleteModal(income.id, income.note || "income")
+                }
+                className="text-red-600 transition-colors hover:text-red-700"
+              >
+                <Trash2 size={18} />
+              </button>
+            </div>
+          );
+        },
+      },
+    ],
+    [categories, onRefresh],
+  );
 
   return (
     <div className="min-h-screen pb-24 md:pb-12 space-y-6">
@@ -140,72 +249,20 @@ export default function IncomePage({ summary }: Props) {
             />
           </div>
 
-          <Button
-            onClick={() => setOpenAdd(true)}
-            className="gap-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 sm:w-auto w-full"
-          >
-            <Plus className="h-4 w-4" /> Add New Income
-          </Button>
+          <IncomeFormModal
+            mode="create"
+            categories={categories}
+            onSuccess={onRefresh}
+          />
         </div>
       </div>
 
       {/* Income History Table */}
-      <Card className="rounded-2xl shadow-sm overflow-hidden">
-        <Table>
-          <TableHeader className="bg-muted/60">
-            <TableRow>
-              <TableHead>Date</TableHead>
-              <TableHead>Source</TableHead>
-              <TableHead>Note</TableHead>
-              <TableHead className="text-right">Amount</TableHead>
-              <TableHead className="w-24 text-right">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredIncomes.length > 0 ? (
-              filteredIncomes.map((item) => (
-                <TableRow key={item.id} className="hover:bg-muted/50">
-                  <TableCell className="font-medium">{item.date}</TableCell>
-                  <TableCell>
-                    <Badge variant="outline" className="bg-background">
-                      {item.source}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-muted-foreground">
-                    {item.note || "—"}
-                  </TableCell>
-                  <TableCell className="text-right font-semibold text-emerald-600">
-                    {item.amount.toLocaleString()}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end gap-1">
-                      <Button variant="ghost" size="icon" className="h-8 w-8">
-                        <Pencil className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 text-destructive"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={5}
-                  className="text-center py-8 text-muted-foreground"
-                >
-                  No incomes found
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </Card>
+      <NMTable
+        columns={incomeColumns}
+        data={filteredIncomes}
+        isLoading={false}
+      />
 
       {/* Source Summary */}
       <SourceSummary
@@ -213,68 +270,23 @@ export default function IncomePage({ summary }: Props) {
         totalThisMonth={totalThisMonth}
       />
 
-      {/* Add Income Modal */}
-      <Dialog open={openAdd} onOpenChange={setOpenAdd}>
-        <DialogContent className="sm:max-w-md rounded-2xl">
-          <DialogHeader>
-            <DialogTitle>Add New Income</DialogTitle>
-            <DialogDescription>
-              Enter the details correctly and save
-            </DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid gap-2">
-              <Label>Income Source</Label>
-              <Select>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select source" />
-                </SelectTrigger>
-                <SelectContent>
-                  {sourceSummary.map((s) => (
-                    <SelectItem key={s.name} value={s.name}>
-                      {s.name}
-                    </SelectItem>
-                  ))}
-                  <SelectItem value="Others">Others</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="grid gap-2">
-              <Label>Amount (৳)</Label>
-              <Input type="number" placeholder="0" />
-            </div>
-            <div className="grid gap-2">
-              <Label>Date</Label>
-              <Input
-                type="date"
-                defaultValue={new Date().toISOString().split("T")[0]}
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label>Note (Optional)</Label>
-              <Textarea placeholder="Add more details..." rows={3} />
-            </div>
-          </div>
-          <DialogFooter className="sm:justify-start">
-            <Button variant="outline" onClick={() => setOpenAdd(false)}>
-              Cancel
-            </Button>
-            <Button className="bg-emerald-600 hover:bg-emerald-700">
-              Save Income
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {/* Delete Modal */}
+      <DeleteConfirmationModal
+        item="Income"
+        name={deleteModal.name}
+        isOpen={deleteModal.isOpen}
+        onOpenChange={(open) => !open && closeDeleteModal()}
+        onConfirm={handleDelete}
+      />
 
       {/* Mobile floating add button */}
       <div className="fixed bottom-6 right-6 z-50 md:hidden">
-        <Button
-          size="icon"
-          className="rounded-full h-14 w-14 shadow-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700"
-          onClick={() => setOpenAdd(true)}
-        >
-          <Plus className="h-7 w-7" />
-        </Button>
+        <IncomeFormModal
+          mode="create"
+          categories={categories}
+          onSuccess={onRefresh}
+          isIcon
+        />
       </div>
     </div>
   );

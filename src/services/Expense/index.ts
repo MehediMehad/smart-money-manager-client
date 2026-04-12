@@ -4,31 +4,11 @@
 import { revalidateTag } from "next/cache";
 import { serverFetch } from "@/lib/utils/serverFetch";
 import { getValidToken } from "../Auth/verifyToken";
-import { TApiResponse } from "@/types";
+import { TApiResponse, TUpdateExpenseForm, TCreateExpenseForm, TGetExpensesParams } from "@/types";
 
 const TAG = "expenses";
 
-export type TCreateExpenseForm = {
-    categoryId: string;
-    amount: number;
-    note: string;
-    date: string;
-};
 
-export type TUpdateExpenseForm = {
-    categoryId?: string;
-    amount?: number;
-    note?: string;
-    date?: string;
-};
-
-export type TGetExpensesParams = {
-    searchTerm?: string;
-    categoryId?: string;
-    month?: string;
-    year?: string;
-    date_range?: string;
-};
 
 export const createExpense = async (
     data: TCreateExpenseForm
