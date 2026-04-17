@@ -1,5 +1,4 @@
 // src/services/Income/index.ts
-// src/services/Income/index.ts
 "use server";
 
 import { revalidateTag } from "next/cache";
@@ -8,8 +7,6 @@ import { getValidToken } from "../Auth/verifyToken";
 import { TApiResponse, TDashboardSummary, TCreateIncomeForm, TUpdateIncomeForm, TGetIncomesParams, } from "@/types";
 
 const TAG = "incomes";
-
-
 
 export const createIncome = async (
     data: TCreateIncomeForm

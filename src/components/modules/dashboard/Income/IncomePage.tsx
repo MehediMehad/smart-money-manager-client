@@ -5,9 +5,6 @@ import { ColumnDef } from "@tanstack/react-table";
 import dynamic from "next/dynamic";
 import { Trash2 } from "lucide-react";
 import { toast } from "sonner";
-
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -22,7 +19,6 @@ import { deleteIncome } from "@/services/Income";
 import { TCategory, TDashboardSummary, TIncomeRow } from "@/types";
 
 import StatCard from "./StatCard";
-import Charts from "./Charts";
 import FinancialInsight from "./FinancialInsight";
 import SourceSummary from "./SourceSummary";
 import IncomeFormModal from "./IncomeFormModal";
@@ -55,7 +51,6 @@ export default function IncomePage({ summary, categories, onRefresh }: Props) {
     avgDaily,
     mainSource,
     sourceSummary,
-    monthlyTrend,
     incomes,
   } = summary;
 
@@ -180,46 +175,6 @@ export default function IncomePage({ summary, categories, onRefresh }: Props) {
 
   return (
     <div className="min-h-screen pb-24 md:pb-12 space-y-6">
-      {/* 1. Summary Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard
-          title="Total Income This Month"
-          value={totalThisMonth}
-          subtitle="March 2026"
-          variant="emerald"
-        />
-        <StatCard
-          title="Today's Income"
-          value={todayIncome}
-          subtitle={new Date().toLocaleDateString("en-US", {
-            month: "long",
-            day: "numeric",
-          })}
-          variant="blue"
-        />
-        <StatCard
-          title="Average Daily Income"
-          value={avgDaily}
-          subtitle="This Month"
-          variant="emerald"
-        />
-        <StatCard
-          title="Main Source"
-          value={mainSource.value}
-          subtitle={mainSource.name}
-          variant="purple"
-        />
-      </div>
-
-      {/* 2. Charts */}
-      <Charts sourceSummary={sourceSummary} monthlyTrend={monthlyTrend} />
-
-      {/* Financial Insight Section */}
-      <FinancialInsight
-        totalThisMonth={totalThisMonth}
-        mainSource={mainSource}
-      />
-
       {/* Filters + Add Button */}
       <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-sm py-3 md:static md:py-0">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -257,11 +212,51 @@ export default function IncomePage({ summary, categories, onRefresh }: Props) {
         </div>
       </div>
 
+      {/* 1. Summary Cards */}
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <StatCard
+          title="Total Income This Month"
+          value={totalThisMonth}
+          subtitle="March 2026"
+          variant="emerald"
+        />
+        <StatCard
+          title="Today's Income"
+          value={todayIncome}
+          subtitle={new Date().toLocaleDateString("en-US", {
+            month: "long",
+            day: "numeric",
+          })}
+          variant="blue"
+        />
+        <StatCard
+          title="Average Daily Income"
+          value={avgDaily}
+          subtitle="This Month"
+          variant="emerald"
+        />
+        <StatCard
+          title="Main Source"
+          value={mainSource.value}
+          subtitle={mainSource.name}
+          variant="purple"
+        />
+      </div>
+
+      {/* 2. Charts */}
+      {/* <Charts sourceSummary={sourceSummary} monthlyTrend={monthlyTrend} /> */}
+
       {/* Income History Table */}
       <NMTable
         columns={incomeColumns}
         data={filteredIncomes}
         isLoading={false}
+      />
+
+      {/* Financial Insight Section */}
+      <FinancialInsight
+        totalThisMonth={totalThisMonth}
+        mainSource={mainSource}
       />
 
       {/* Source Summary */}

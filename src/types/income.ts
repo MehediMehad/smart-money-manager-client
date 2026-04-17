@@ -48,10 +48,6 @@ export type TDashboardSummary = {
         value: number;
         // color: string;
     }[];
-    monthlyTrend: {
-        month: string;
-        amount: number;
-    }[];
     incomes: {
         id: string;
         date: string;
