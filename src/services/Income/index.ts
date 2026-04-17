@@ -295,9 +295,16 @@ export const deleteIncome = async (
     }
 };
 
-export const getDashboardSummary = async (): Promise<
+type TGetSummaryParams = {
+    year?: number, // 2026
+    month?: number,// 4
+    today?: string, // '2026-04-16'
+}
+
+export const getDashboardSummary = async (params: TGetSummaryParams): Promise<
     TApiResponse<TDashboardSummary | null>
 > => {
+    const { year, month, today } = params
     try {
         const accessToken = await getValidToken();
 

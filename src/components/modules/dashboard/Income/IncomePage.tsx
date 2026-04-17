@@ -20,9 +20,9 @@ import { TCategory, TDashboardSummary, TIncomeRow } from "@/types";
 
 import StatCard from "./StatCard";
 import FinancialInsight from "./FinancialInsight";
-import SourceSummary from "./SourceSummary";
 import IncomeFormModal from "./IncomeFormModal";
 import { NMTable } from "@/components/shared/core/NMTable";
+import CategorySummary from "./CategorySummary";
 
 const DeleteConfirmationModal = dynamic(
   () => import("@/components/shared/core/NMModal/DeleteConfirmationModal"),
@@ -49,8 +49,8 @@ export default function IncomePage({ summary, categories, onRefresh }: Props) {
     totalThisMonth,
     todayIncome,
     avgDaily,
-    mainSource,
-    sourceSummary,
+    mainCategory,
+    categorySummary,
     incomes,
   } = summary;
 
@@ -175,6 +175,21 @@ export default function IncomePage({ summary, categories, onRefresh }: Props) {
 
   return (
     <div className="min-h-screen pb-24 md:pb-12 space-y-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h1 className="text-2xl font-bold flex items-center gap-2">Income</h1>
+          <p className="text-sm text-muted-foreground mt-1 hidden sm:block"></p>
+        </div>
+
+        <div className="hidden sm:block">
+          <IncomeFormModal
+            mode="create"
+            categories={categories}
+            onSuccess={onRefresh}
+          />
+        </div>
+      </div>
+
       {/* Filters + Add Button */}
       <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-sm py-3 md:static md:py-0">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -183,11 +198,11 @@ export default function IncomePage({ summary, categories, onRefresh }: Props) {
               <Filter className="h-4 w-4" />
               <Select value={sourceFilter} onValueChange={setSourceFilter}>
                 <SelectTrigger className="border-0 bg-transparent shadow-none h-7 min-w-[140px] p-0">
-                  <SelectValue placeholder="Source" />
+                  <SelectValue placeholder="Category" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Sources</SelectItem>
-                  {sourceSummary.map((s) => (
+                  <SelectItem value="all">All Category</SelectItem>
+                  {categorySummary.map((s) => (
                     <SelectItem key={s.name} value={s.name}>
                       {s.name}
                     </SelectItem>
@@ -203,12 +218,6 @@ export default function IncomePage({ summary, categories, onRefresh }: Props) {
               onChange={(e) => setSearchNote(e.target.value)}
             />
           </div>
-
-          <IncomeFormModal
-            mode="create"
-            categories={categories}
-            onSuccess={onRefresh}
-          />
         </div>
       </div>
 
@@ -237,14 +246,11 @@ export default function IncomePage({ summary, categories, onRefresh }: Props) {
         />
         <StatCard
           title="Main Source"
-          value={mainSource.value}
-          subtitle={mainSource.name}
+          value={mainCategory.value}
+          subtitle={mainCategory.name}
           variant="purple"
         />
       </div>
-
-      {/* 2. Charts */}
-      {/* <Charts sourceSummary={sourceSummary} monthlyTrend={monthlyTrend} /> */}
 
       {/* Income History Table */}
       <NMTable
@@ -256,12 +262,12 @@ export default function IncomePage({ summary, categories, onRefresh }: Props) {
       {/* Financial Insight Section */}
       <FinancialInsight
         totalThisMonth={totalThisMonth}
-        mainSource={mainSource}
+        mainSource={mainCategory}
       />
 
-      {/* Source Summary */}
-      <SourceSummary
-        sourceSummary={sourceSummary}
+      {/* Category Summary */}
+      <CategorySummary
+        categorySummary={categorySummary}
         totalThisMonth={totalThisMonth}
       />
 

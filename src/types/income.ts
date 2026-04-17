@@ -39,14 +39,14 @@ export type TDashboardSummary = {
     totalThisMonth: number;
     todayIncome: number;
     avgDaily: number;
-    mainSource: {
+    mainCategory: {
         name: string;
         value: number;
     };
-    sourceSummary: {
+    categorySummary: {
         name: string;
         value: number;
-        // color: string;
+        color: string;
     }[];
     incomes: {
         id: string;
