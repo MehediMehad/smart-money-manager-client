@@ -4,7 +4,7 @@
 import { revalidateTag } from "next/cache";
 import { serverFetch } from "@/lib/utils/serverFetch";
 import { getValidToken } from "../Auth/verifyToken";
-import { TApiResponse, TDashboardSummary, TCreateIncomeForm, TUpdateIncomeForm, TGetIncomesParams, } from "@/types";
+import { TApiResponse, TCreateIncomeForm, TUpdateIncomeForm, TGetIncomesParams, TGetExpensesParams, } from "@/types";
 
 const TAG = "incomes";
 
@@ -66,7 +66,7 @@ export const createIncome = async (
 };
 
 export const getIncomes = async (
-    params?: TGetIncomesParams
+    params?: TGetExpensesParams
 ): Promise<TApiResponse<any[]>> => {
     try {
         const accessToken = await getValidToken();
@@ -84,16 +84,11 @@ export const getIncomes = async (
 
         if (params?.searchTerm) searchParams.set("searchTerm", params.searchTerm);
         if (params?.categoryId) searchParams.set("categoryId", params.categoryId);
-        if (params?.date) searchParams.set("date", params.date);
         if (params?.month) searchParams.set("month", params.month);
         if (params?.year) searchParams.set("year", params.year);
-        if (params?.page) searchParams.set("page", params.page);
-        if (params?.limit) searchParams.set("limit", params.limit);
-        if (params?.sortBy) searchParams.set("sortBy", params.sortBy);
-        if (params?.sortOrder) searchParams.set("sortOrder", params.sortOrder);
+        if (params?.date_range) searchParams.set("date_range", params.date_range);
 
-        const endpoint = `/incomes${searchParams.toString() ? `?${searchParams.toString()}` : ""
-            }`;
+        const endpoint = `/incomes${searchParams.toString() ? `?${searchParams.toString()}` : ""}`;
 
         const response = await serverFetch.get(endpoint, {
             headers: {
@@ -109,7 +104,7 @@ export const getIncomes = async (
             return {
                 success: false,
                 statusCode: response.status,
-                message: result.message || "Failed to fetch incomes",
+                message: result.message || "Failed to fetch expenses",
                 data: [],
                 meta: result.meta,
             };
@@ -118,20 +113,18 @@ export const getIncomes = async (
         return {
             success: true,
             statusCode: response.status,
-            message: result.message || "Incomes fetched successfully",
+            message: result.message || "Expenses fetched successfully",
             data: result.data ?? [],
-            meta: result.meta,
         };
     } catch (error: any) {
         return {
             success: false,
             statusCode: 500,
-            message: error.message || "Failed to fetch incomes",
+            message: error.message || "Failed to fetch expenses",
             data: [],
         };
     }
 };
-
 export const getSingleIncome = async (
     id: string
 ): Promise<TApiResponse<any | null>> => {
@@ -290,63 +283,6 @@ export const deleteIncome = async (
             success: false,
             statusCode: 500,
             message: error.message || "Failed to delete income",
-            data: null,
-        };
-    }
-};
-
-type TGetSummaryParams = {
-    year?: number, // 2026
-    month?: number,// 4
-    today?: string, // '2026-04-16'
-}
-
-export const getDashboardSummary = async (params: TGetSummaryParams): Promise<
-    TApiResponse<TDashboardSummary | null>
-> => {
-    const { year, month, today } = params
-    try {
-        const accessToken = await getValidToken();
-
-        if (!accessToken) {
-            return {
-                success: false,
-                statusCode: 401,
-                message: "Authentication required",
-                data: null,
-            };
-        }
-
-        const response = await serverFetch.get("/incomes/dashboard-summary", {
-            headers: {
-                Authorization: `Bearer ${accessToken}`,
-            },
-            cache: "no-cache",
-            next: { tags: [TAG] },
-        });
-
-        const result = await response.json().catch(() => ({}));
-
-        if (!response.ok) {
-            return {
-                success: false,
-                statusCode: response.status,
-                message: result.message || "Failed to fetch dashboard summary",
-                data: null,
-            };
-        }
-
-        return {
-            success: true,
-            statusCode: response.status,
-            message: result.message || "Dashboard summary fetched successfully",
-            data: result.data ?? null,
-        };
-    } catch (error: any) {
-        return {
-            success: false,
-            statusCode: 500,
-            message: error.message || "Failed to fetch dashboard summary",
             data: null,
         };
     }

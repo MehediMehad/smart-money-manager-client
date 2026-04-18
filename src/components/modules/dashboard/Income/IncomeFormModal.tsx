@@ -172,9 +172,9 @@ export default function IncomeFormModal({
             <Pencil className="h-4 w-4" />
           </Button>
         ) : (
-          <Button className="gap-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 sm:w-auto w-full">
+          <Button className="gap-2 py-5 bg-gradient-to-r from-emerald-700 to-teal-600 hover:from-emerald-800 hover:to-teal-700">
             <Plus className="h-4 w-4" />
-            Add New Income
+            Add Income
           </Button>
         )}
       </DialogTrigger>

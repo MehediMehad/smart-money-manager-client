@@ -9,7 +9,7 @@ import {
 } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { ColumnDef } from "@tanstack/react-table";
-import { Edit, Trash2 } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 import ExpenseFilters from "./ExpenseFilters";
@@ -298,7 +298,7 @@ export default function Expense({ categories }: Props) {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-2xl font-bold flex items-center gap-2">
-            Expense
+            📉 Expense
           </h1>
           <p className="text-sm text-muted-foreground mt-1 hidden sm:block"></p>
         </div>

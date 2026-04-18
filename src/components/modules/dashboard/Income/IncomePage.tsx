@@ -1,103 +1,225 @@
 "use client";
 
-import { useMemo, useState, useCallback } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  useTransition,
+} from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { ColumnDef } from "@tanstack/react-table";
-import dynamic from "next/dynamic";
 import { Trash2 } from "lucide-react";
 import { toast } from "sonner";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Filter } from "lucide-react";
 
-import { deleteIncome } from "@/services/Income";
-import { TCategory, TDashboardSummary, TIncomeRow } from "@/types";
-
-import StatCard from "./StatCard";
-import FinancialInsight from "./FinancialInsight";
-import IncomeFormModal from "./IncomeFormModal";
+import IncomeFilters from "./IncomeFilters";
 import { NMTable } from "@/components/shared/core/NMTable";
-import CategorySummary from "./CategorySummary";
+import { deleteIncome, getIncomes } from "@/services/Income";
+import { getCategories } from "@/services/Category";
+import { TCategory } from "@/types";
+import dynamic from "next/dynamic";
+import IncomeFormModal from "./IncomeFormModal";
 
 const DeleteConfirmationModal = dynamic(
   () => import("@/components/shared/core/NMModal/DeleteConfirmationModal"),
   { ssr: false },
 );
 
-type Props = {
-  summary: TDashboardSummary;
+interface TIncome {
+  id: string;
+  note: string;
+  amount: number;
+  date: string;
+  category: {
+    id: string;
+    name: string;
+    emoji: string;
+    type: "EXPENSE" | "INCOME";
+  };
+}
+
+interface Props {
   categories: TCategory[];
-  onRefresh?: () => Promise<void> | void;
+}
+
+const ALL_CATEGORIES = "all";
+
+const getCurrentYearMonth = () => {
+  const now = new Date();
+  return {
+    year: String(now.getFullYear()),
+    month: String(now.getMonth() + 1).padStart(2, "0"),
+  };
 };
 
-export default function IncomePage({ summary, categories, onRefresh }: Props) {
-  const [sourceFilter, setSourceFilter] = useState("all");
-  const [searchNote, setSearchNote] = useState("");
+export default function Income({ categories }: Props) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const [isPending, startTransition] = useTransition();
 
+  const { year: currentYear, month: currentMonth } = getCurrentYearMonth();
+
+  const initialYear = searchParams.get("year") || currentYear;
+  const initialMonth =
+    searchParams.get("month")?.padStart(2, "0") || currentMonth;
+  const initialDate = searchParams.get("date") || "";
+  const initialSearch = searchParams.get("searchTerm") || "";
+  const initialCategory = searchParams.get("categoryId") || ALL_CATEGORIES;
+
+  const [year, setYear] = useState(initialYear);
+  const [month, setMonth] = useState(initialMonth);
+  const [specificDate, setSpecificDate] = useState(initialDate);
+  const [searchTerm, setSearchTerm] = useState(initialSearch);
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState(initialSearch);
+  const [categoryFilter, setCategoryFilter] = useState(initialCategory);
+
+  const [incomes, setIncomes] = useState<TIncome[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const [incomeCategories, setIncomeCategories] = useState<TCategory[]>([]);
+  const [categoryLoading, setCategoryLoading] = useState(false);
+
+  // Delete Modal
   const [deleteModal, setDeleteModal] = useState({
     isOpen: false,
     id: "",
     name: "",
   });
 
-  const {
-    totalThisMonth,
-    todayIncome,
-    avgDaily,
-    mainCategory,
-    categorySummary,
-    incomes,
-  } = summary;
+  const updateQuery = useCallback(
+    (updates: Record<string, string | undefined>) => {
+      const params = new URLSearchParams(searchParams.toString());
+
+      Object.entries(updates).forEach(([key, value]) => {
+        if (!value || value.trim() === "") {
+          params.delete(key);
+        } else {
+          params.set(key, value);
+        }
+      });
+
+      startTransition(() => {
+        const queryString = params.toString();
+        router.push(queryString ? `${pathname}?${queryString}` : pathname);
+      });
+    },
+    [pathname, router, searchParams],
+  );
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm.trim());
+    }, 400);
+
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+
+  const fetchIncomes = useCallback(async () => {
+    setLoading(true);
+
+    try {
+      const result = await getIncomes({
+        year,
+        month,
+        searchTerm: debouncedSearchTerm || undefined,
+        categoryId:
+          categoryFilter === ALL_CATEGORIES ? undefined : categoryFilter,
+      });
+
+      if (result?.success) {
+        setIncomes(result.data || []);
+      } else {
+        setIncomes([]);
+        toast.error(result?.message || "Failed to load incomes");
+      }
+    } catch (error) {
+      console.error("Failed to fetch incomes:", error);
+      setIncomes([]);
+      toast.error("Something went wrong while loading incomes");
+    } finally {
+      setLoading(false);
+    }
+  }, [year, month, debouncedSearchTerm, categoryFilter]);
+
+  const fetchIncomeCategories = useCallback(async () => {
+    setCategoryLoading(true);
+
+    try {
+      const result = await getCategories({
+        type: "INCOME",
+        year,
+        month,
+      });
+
+      setIncomeCategories(result || []);
+    } catch (error) {
+      console.error("Failed to fetch categories:", error);
+      setIncomeCategories([]);
+      toast.error("Something went wrong while loading categories");
+    } finally {
+      setCategoryLoading(false);
+    }
+  }, [year, month]);
+
+  useEffect(() => {
+    fetchIncomes();
+  }, [fetchIncomes]);
+
+  useEffect(() => {
+    fetchIncomeCategories();
+  }, [fetchIncomeCategories]);
+
+  // Reset category filter if it no longer exists
+  useEffect(() => {
+    const categoryExists = incomeCategories.some(
+      (cat) => cat.id === categoryFilter,
+    );
+
+    if (
+      categoryFilter !== ALL_CATEGORIES &&
+      !categoryExists &&
+      !categoryLoading
+    ) {
+      setCategoryFilter(ALL_CATEGORIES);
+      updateQuery({ categoryId: undefined });
+    }
+  }, [incomeCategories, categoryFilter, categoryLoading, updateQuery]);
 
   const filteredIncomes = useMemo(() => {
-    return incomes.filter((item) => {
-      const matchSource =
-        sourceFilter === "all" || item.source === sourceFilter;
-      const matchNote =
-        !searchNote ||
-        item.note.toLowerCase().includes(searchNote.toLowerCase());
+    if (!specificDate) return incomes;
 
-      return matchSource && matchNote;
+    const normalizedDay = Number(specificDate);
+    if (Number.isNaN(normalizedDay)) return incomes;
+
+    return incomes.filter((income) => {
+      const incomeDay = new Date(income.date).getDate();
+      return incomeDay === normalizedDay;
     });
-  }, [incomes, sourceFilter, searchNote]);
+  }, [incomes, specificDate]);
 
   const openDeleteModal = (id: string, name: string) => {
-    setDeleteModal({
-      isOpen: true,
-      id,
-      name,
-    });
+    setDeleteModal({ isOpen: true, id, name });
   };
 
   const closeDeleteModal = () => {
-    setDeleteModal({
-      isOpen: false,
-      id: "",
-      name: "",
-    });
+    setDeleteModal({ isOpen: false, id: "", name: "" });
   };
 
-  const handleDelete = useCallback(async () => {
+  const handleDelete = async () => {
     if (!deleteModal.id) return;
 
     const res = await deleteIncome(deleteModal.id);
-
     if (res.success) {
-      toast.success(res.message || "Income deleted successfully");
-      await onRefresh?.();
+      toast.success(res.message);
+      await fetchIncomes();
     } else {
-      toast.error(res.message || "Failed to delete income");
+      toast.error(res.message);
     }
-
     closeDeleteModal();
-  }, [deleteModal.id, onRefresh]);
+  };
 
-  const incomeColumns = useMemo<ColumnDef<TIncomeRow>[]>(
+  const incomeColumns = useMemo<ColumnDef<TIncome>[]>(
     () => [
       {
         accessorKey: "date",
@@ -108,21 +230,29 @@ export default function IncomePage({ summary, categories, onRefresh }: Props) {
         },
       },
       {
-        accessorKey: "source",
-        header: "Source",
-      },
-      {
         accessorKey: "note",
         header: "Note",
         cell: ({ row }) => (
-          <span className="line-clamp-1">{row.original.note || "—"}</span>
+          <span className="line-clamp-1">{row.original.note}</span>
+        ),
+      },
+      {
+        accessorKey: "category",
+        header: "Category",
+        cell: ({ row }) => (
+          <div className="flex items-center gap-2">
+            {row.original.category.emoji ? (
+              <span aria-hidden="true">{row.original.category.emoji}</span>
+            ) : null}
+            <span>{row.original.category.name}</span>
+          </div>
         ),
       },
       {
         accessorKey: "amount",
         header: "Amount",
         cell: ({ row }) => (
-          <span className="font-semibold text-emerald-600">
+          <span className="font-medium text-emerald-600">
             ৳{row.original.amount.toLocaleString()}
           </span>
         ),
@@ -132,35 +262,25 @@ export default function IncomePage({ summary, categories, onRefresh }: Props) {
         header: "Actions",
         cell: ({ row }) => {
           const income = row.original;
-          const matchedCategory = categories.find(
-            (cat) => cat.name === income.source && cat.type === "INCOME",
-          );
 
           return (
-            <div className="flex items-center gap-2">
-              <IncomeFormModal
-                mode="edit"
-                income={{
-                  ...income,
-                  category: matchedCategory
-                    ? {
-                        id: matchedCategory.id,
-                        name: matchedCategory.name,
-                        emoji: matchedCategory.emoji,
-                      }
-                    : undefined,
-                  categoryId: matchedCategory?.id,
-                }}
-                categories={categories}
-                onSuccess={onRefresh}
-              />
+            <div className="flex items-center gap-3">
+              <div className="hidden sm:block">
+                <IncomeFormModal
+                  mode="edit"
+                  income={income}
+                  categories={categories}
+                  onSuccess={async () => {
+                    await fetchIncomes();
+                    await fetchIncomeCategories();
+                  }}
+                />
+              </div>
 
               <button
                 type="button"
                 aria-label={`Delete income ${income.note}`}
-                onClick={() =>
-                  openDeleteModal(income.id, income.note || "income")
-                }
+                onClick={() => openDeleteModal(income.id, income.note)}
                 className="text-red-600 transition-colors hover:text-red-700"
               >
                 <Trash2 size={18} />
@@ -170,105 +290,77 @@ export default function IncomePage({ summary, categories, onRefresh }: Props) {
         },
       },
     ],
-    [categories, onRefresh],
+    [categories],
   );
 
   return (
-    <div className="min-h-screen pb-24 md:pb-12 space-y-6">
+    <div className="space-y-6 pb-24 md:pb-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold flex items-center gap-2">Income</h1>
-          <p className="text-sm text-muted-foreground mt-1 hidden sm:block"></p>
+          <h1 className="text-2xl font-bold flex items-center gap-2">
+            📈 Income
+          </h1>
         </div>
 
         <div className="hidden sm:block">
           <IncomeFormModal
             mode="create"
             categories={categories}
-            onSuccess={onRefresh}
+            onSuccess={async () => {
+              await fetchIncomes();
+              await fetchIncomeCategories();
+            }}
           />
         </div>
       </div>
 
-      {/* Filters + Add Button */}
-      <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-sm py-3 md:static md:py-0">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="flex flex-wrap gap-3 items-center">
-            <div className="inline-flex items-center gap-2 border rounded-lg px-3 py-1.5 bg-muted/40">
-              <Filter className="h-4 w-4" />
-              <Select value={sourceFilter} onValueChange={setSourceFilter}>
-                <SelectTrigger className="border-0 bg-transparent shadow-none h-7 min-w-[140px] p-0">
-                  <SelectValue placeholder="Category" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Category</SelectItem>
-                  {categorySummary.map((s) => (
-                    <SelectItem key={s.name} value={s.name}>
-                      {s.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+      <IncomeFilters
+        year={year}
+        month={month}
+        specificDate={specificDate}
+        searchTerm={searchTerm}
+        categoryFilter={categoryFilter}
+        categories={incomeCategories}
+        isPending={isPending}
+        onYearChange={(value) => {
+          setYear(value);
+          updateQuery({ year: value });
+        }}
+        onMonthChange={(value) => {
+          setMonth(value);
+          updateQuery({ month: value });
+        }}
+        onDateChange={(value) => {
+          setSpecificDate(value);
+          updateQuery({ date: value || undefined });
+        }}
+        onSearchChange={(value) => {
+          setSearchTerm(value);
+          updateQuery({ searchTerm: value || undefined });
+        }}
+        onCategoryChange={(value) => {
+          setCategoryFilter(value);
+          updateQuery({
+            categoryId: value === ALL_CATEGORIES ? undefined : value,
+          });
+        }}
+        onReset={() => {
+          setSpecificDate("");
+          setSearchTerm("");
+          setCategoryFilter(ALL_CATEGORIES);
 
-            <Input
-              placeholder="Search by note..."
-              className="max-w-[240px] h-10"
-              value={searchNote}
-              onChange={(e) => setSearchNote(e.target.value)}
-            />
-          </div>
-        </div>
-      </div>
+          updateQuery({
+            date: undefined,
+            searchTerm: undefined,
+            categoryId: undefined,
+          });
+        }}
+      />
 
-      {/* 1. Summary Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard
-          title="Total Income This Month"
-          value={totalThisMonth}
-          subtitle="March 2026"
-          variant="emerald"
-        />
-        <StatCard
-          title="Today's Income"
-          value={todayIncome}
-          subtitle={new Date().toLocaleDateString("en-US", {
-            month: "long",
-            day: "numeric",
-          })}
-          variant="blue"
-        />
-        <StatCard
-          title="Average Daily Income"
-          value={avgDaily}
-          subtitle="This Month"
-          variant="emerald"
-        />
-        <StatCard
-          title="Main Source"
-          value={mainCategory.value}
-          subtitle={mainCategory.name}
-          variant="purple"
-        />
-      </div>
-
-      {/* Income History Table */}
       <NMTable
         columns={incomeColumns}
         data={filteredIncomes}
-        isLoading={false}
-      />
-
-      {/* Financial Insight Section */}
-      <FinancialInsight
-        totalThisMonth={totalThisMonth}
-        mainSource={mainCategory}
-      />
-
-      {/* Category Summary */}
-      <CategorySummary
-        categorySummary={categorySummary}
-        totalThisMonth={totalThisMonth}
+        isLoading={loading}
       />
 
       {/* Delete Modal */}
@@ -279,16 +371,6 @@ export default function IncomePage({ summary, categories, onRefresh }: Props) {
         onOpenChange={(open) => !open && closeDeleteModal()}
         onConfirm={handleDelete}
       />
-
-      {/* Mobile floating add button */}
-      <div className="fixed bottom-6 right-6 z-50 md:hidden">
-        <IncomeFormModal
-          mode="create"
-          categories={categories}
-          onSuccess={onRefresh}
-          isIcon
-        />
-      </div>
     </div>
   );
 }
