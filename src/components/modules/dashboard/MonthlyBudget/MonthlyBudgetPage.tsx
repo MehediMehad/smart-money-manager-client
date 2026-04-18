@@ -38,22 +38,23 @@ const currentMonth = "03"; // March
 
 // Dummy budget data for March 2026
 const dummyBudgets = [
-  { category: "খাবার", budget: 12000, spent: 9500, remaining: 2500 },
-  { category: "যাতায়াত", budget: 5000, spent: 6200, remaining: -1200 },
+  { category: "Food", budget: 12000, spent: 9500, remaining: 2500 },
+  { category: "Transportation", budget: 5000, spent: 6200, remaining: -1200 },
   {
-    category: "বিল (ইন্টারনেট+বিদ্যুৎ)",
+    category: "Bills (Internet + Electricity)",
     budget: 6000,
     spent: 4800,
     remaining: 1200,
   },
-  { category: "শপিং", budget: 4000, spent: 1800, remaining: 2200 },
-  { category: "বিনোদন", budget: 3000, spent: 4200, remaining: -1200 },
-  { category: "শিক্ষা", budget: 8000, spent: 3000, remaining: 5000 },
+  { category: "Shopping", budget: 4000, spent: 1800, remaining: 2200 },
+  { category: "Entertainment", budget: 3000, spent: 4200, remaining: -1200 },
+  { category: "Education", budget: 8000, spent: 3000, remaining: 5000 },
 ];
+
 const currentBalance = 50000;
 
 function formatBDT(amount: number) {
-  return "৳" + Math.abs(amount).toLocaleString("bn-BD");
+  return "৳" + Math.abs(amount).toLocaleString("en-US");
 }
 
 function getStatus(spent: number, budget: number) {
@@ -96,18 +97,18 @@ export default function MonthlyBudget() {
 
   return (
     <div className="space-y-6 pb-20 md:pb-12">
-      {/* 1. Month Selector */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-card rounded-2xl p-4 border shadow-sm">
-        <h2 className="text-2xl font-bold">মাসিক বাজেট</h2>
+      {/* 1. Month & Year Selector */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-card rounded-2xl p-6 border shadow-sm">
+        <h2 className="text-xl font-bold tracking-tight">Monthly Budget</h2>
         <div className="flex flex-wrap gap-3 items-center">
           <Select value={selectedMonth} onValueChange={setSelectedMonth}>
-            <SelectTrigger className="w-40">
-              <SelectValue placeholder="মাস" />
+            <SelectTrigger className="w-44 h-11">
+              <SelectValue placeholder="Select Month" />
             </SelectTrigger>
             <SelectContent>
               {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
                 <SelectItem key={m} value={m.toString().padStart(2, "0")}>
-                  {new Date(2000, m - 1).toLocaleString("bn-BD", {
+                  {new Date(2000, m - 1).toLocaleString("en-US", {
                     month: "long",
                   })}
                 </SelectItem>
@@ -116,11 +117,11 @@ export default function MonthlyBudget() {
           </Select>
 
           <Select value={selectedYear} onValueChange={setSelectedYear}>
-            <SelectTrigger className="w-32">
-              <SelectValue placeholder="বছর" />
+            <SelectTrigger className="w-32 h-11">
+              <SelectValue placeholder="Year" />
             </SelectTrigger>
             <SelectContent>
-              {[2025, 2026, 2027].map((y) => (
+              {[2025, 2026, 2027, 2028].map((y) => (
                 <SelectItem key={y} value={y.toString()}>
                   {y}
                 </SelectItem>
@@ -128,85 +129,87 @@ export default function MonthlyBudget() {
             </SelectContent>
           </Select>
 
-          <Button className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700">
-            আপডেট করুন
+          <Button className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 h-11 px-6">
+            Download
           </Button>
         </div>
       </div>
 
       {/* 2. Summary Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <BudgetSummaryCard
-          title="বর্তমান ব্যালেন্স"
+          title="Current Balance"
           value={currentBalance}
-          subtitle="সর্বশেষ ব্যালেন্স"
+          subtitle="Latest balance"
           variant="emerald"
         />
         <BudgetSummaryCard
-          title="মোট বাজেট"
+          title="Total Budget"
           value={totalBudget}
-          subtitle="এই মাসে"
+          subtitle="This month"
           variant="blue"
         />
         <BudgetSummaryCard
-          title="খরচ"
+          title="Total Spent"
           value={totalSpent}
-          subtitle="এই মাসে"
+          subtitle="This month"
           variant="red"
         />
         <BudgetSummaryCard
-          title="বাকি বাজেট"
+          title="Remaining Budget"
           value={totalRemaining}
-          subtitle={totalRemaining >= 0 ? "অবশিষ্ট" : "অতিরিক্ত খরচ"}
+          subtitle={totalRemaining >= 0 ? "Left to spend" : "Overspent"}
           variant={totalRemaining >= 0 ? "purple" : "destructive"}
         />
       </div>
 
-      {/* 4. Budget List Table */}
+      {/* 3. Budget List Table */}
       <Card className="rounded-2xl shadow-sm overflow-hidden">
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle>ক্যাটাগরি বাজেট</CardTitle>
+        <CardHeader className="flex flex-row items-center justify-between pb-4">
+          <CardTitle className="text-xl">Category Budgets</CardTitle>
           <Dialog open={openAdd} onOpenChange={setOpenAdd}>
             <DialogTrigger asChild>
               <Button className="gap-2 bg-emerald-600 hover:bg-emerald-700">
-                <Plus className="h-4 w-4" /> নতুন বাজেট যোগ করুন
+                <Plus className="h-4 w-4" /> Add New Budget
               </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-md rounded-2xl">
               <DialogHeader>
-                <DialogTitle>নতুন ক্যাটাগরি বাজেট</DialogTitle>
-                <DialogDescription>
-                  এই মাসের জন্য বাজেট সেট করুন
-                </DialogDescription>
+                <DialogTitle>New Category Budget</DialogTitle>
+                <DialogDescription>Set budget for this month</DialogDescription>
               </DialogHeader>
               <div className="grid gap-4 py-4">
                 <div className="grid gap-2">
-                  <Label>ক্যাটাগরি</Label>
+                  <Label>Category</Label>
                   <Select>
                     <SelectTrigger>
-                      <SelectValue placeholder="বেছে নিন" />
+                      <SelectValue placeholder="Select category" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="খাবার">খাবার</SelectItem>
-                      <SelectItem value="যাতায়াত">যাতায়াত</SelectItem>
-                      <SelectItem value="বিল">বিল</SelectItem>
-                      <SelectItem value="শপিং">শপিং</SelectItem>
-                      <SelectItem value="বিনোদন">বিনোদন</SelectItem>
-                      <SelectItem value="শিক্ষা">শিক্ষা</SelectItem>
-                      <SelectItem value="অন্যান্য">অন্যান্য</SelectItem>
+                      <SelectItem value="food">Food</SelectItem>
+                      <SelectItem value="transportation">
+                        Transportation
+                      </SelectItem>
+                      <SelectItem value="bills">Bills</SelectItem>
+                      <SelectItem value="shopping">Shopping</SelectItem>
+                      <SelectItem value="entertainment">
+                        Entertainment
+                      </SelectItem>
+                      <SelectItem value="education">Education</SelectItem>
+                      <SelectItem value="others">Others</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 <div className="grid gap-2">
-                  <Label>বাজেট পরিমাণ (৳)</Label>
+                  <Label>Budget Amount (৳)</Label>
                   <Input type="number" placeholder="8000" />
                 </div>
               </div>
               <DialogFooter>
                 <Button variant="outline" onClick={() => setOpenAdd(false)}>
-                  বাতিল
+                  Cancel
                 </Button>
-                <Button>সেভ করুন</Button>
+                <Button>Save Budget</Button>
               </DialogFooter>
             </DialogContent>
           </Dialog>
@@ -216,21 +219,17 @@ export default function MonthlyBudget() {
           <Table>
             <TableHeader className="bg-muted/60">
               <TableRow>
-                <TableHead>ক্যাটাগরি</TableHead>
-                <TableHead>বাজেট</TableHead>
-                <TableHead>খরচ</TableHead>
-                <TableHead>বাকি</TableHead>
-                <TableHead>অবস্থা</TableHead>
-                <TableHead className="text-right">অ্যাকশন</TableHead>
+                <TableHead>Category</TableHead>
+                <TableHead>Budget</TableHead>
+                <TableHead>Spent</TableHead>
+                <TableHead>Remaining</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {budgets.map((item, index) => {
                 const status = getStatus(item.spent, item.budget);
-                const percent = Math.min(
-                  Math.round((item.spent / item.budget) * 100),
-                  100,
-                );
                 const isOver = status === "over";
 
                 return (
@@ -238,7 +237,9 @@ export default function MonthlyBudget() {
                     <TableCell className="font-medium">
                       {item.category}
                     </TableCell>
-                    <TableCell>{formatBDT(item.budget)}</TableCell>
+                    <TableCell className="font-medium">
+                      {formatBDT(item.budget)}
+                    </TableCell>
                     <TableCell
                       className={cn(
                         "font-semibold",
@@ -259,16 +260,14 @@ export default function MonthlyBudget() {
                     </TableCell>
                     <TableCell>{getStatusBadge(status)}</TableCell>
                     <TableCell className="text-right">
-                      <div className="flex justify-end pr-2 gap-1">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8"
-                          onClick={() => setOpenEdit(item.category)}
-                        >
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                      </div>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8"
+                        onClick={() => setOpenEdit(item.category)}
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </Button>
                     </TableCell>
                   </TableRow>
                 );
@@ -278,23 +277,23 @@ export default function MonthlyBudget() {
         </div>
       </Card>
 
-      {/* Edit Modal (placeholder - same form as add) */}
+      {/* Edit Modal */}
       <Dialog open={!!openEdit} onOpenChange={() => setOpenEdit(null)}>
         <DialogContent className="sm:max-w-md rounded-2xl">
           <DialogHeader>
-            <DialogTitle>{openEdit} বাজেট আপডেট করুন</DialogTitle>
+            <DialogTitle>Update Budget - {openEdit}</DialogTitle>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
-              <Label>বাজেট পরিমাণ (৳)</Label>
-              <Input type="number" defaultValue="12000" />
+              <Label>Budget Amount (৳)</Label>
+              <Input type="number" placeholder="Enter amount" />
             </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setOpenEdit(null)}>
-              বাতিল
+              Cancel
             </Button>
-            <Button>আপডেট করুন</Button>
+            <Button>Update Budget</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -330,7 +329,7 @@ function BudgetSummaryCard({
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className={`text-2xl font-bold ${colors[variant]}`}>
+        <div className={`text-3xl font-bold ${colors[variant]}`}>
           {formatBDT(value)}
         </div>
         <p className="text-xs text-muted-foreground mt-1">{subtitle}</p>

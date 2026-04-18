@@ -38,8 +38,7 @@ const menuItems = [
   { title: "Expense", url: "/dashboard/expense", icon: ArrowUpCircle },
 
   { title: "Budget", url: "/dashboard/budget", icon: Receipt },
-  { title: "দৈনিক বাজেট", url: "/dashboard/daily-budget", icon: Receipt },
-  { title: "মাসিক বাজেট", url: "/dashboard/monthly-budget", icon: PieChart },
+  { title: "Monthly Budget", url: "/dashboard/monthly-budget", icon: PieChart },
 
   { title: "সঞ্চয়", url: "/dashboard/savings", icon: PiggyBank },
   { title: "ধার-দেনা", url: "/dashboard/debts", icon: HandCoins },
