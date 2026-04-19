@@ -30,34 +30,34 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { format } from "date-fns";
-import { bn } from "date-fns/locale";
 
 const dummyGoal = {
   id: "1",
-  name: "নতুন ল্যাপটপ 💻",
+  name: "New Laptop 💻",
   target: 80000,
   saved: 32000,
   deadline: "2026-07-15",
   note: "M3 Max, 32GB RAM, Space Black",
   transactions: [
-    { date: "2026-01-05", amount: 15000, note: "বোনাস থেকে" },
-    { date: "2026-02-10", amount: 8000, note: "ফ্রিল্যান্স পেমেন্ট" },
-    { date: "2026-03-01", amount: 9000, note: "মাসিক সেভিংস" },
+    { date: "2026-01-05", amount: 15000, note: "From Bonus" },
+    { date: "2026-02-10", amount: 8000, note: "Freelance Payment" },
+    { date: "2026-03-01", amount: 9000, note: "Monthly Savings" },
   ],
 };
 
 function formatBDT(amount: number) {
-  return "৳" + amount.toLocaleString("bn-BD");
+  return "৳" + amount.toLocaleString("en-US");
 }
 
 function daysLeft(deadline: string) {
   const d = new Date(deadline);
-  const today = new Date("2026-03-04");
+  const today = new Date("2026-03-04"); // You can make this dynamic later
   return Math.ceil((d.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
 }
 
 export default function SavingsGoalDetail() {
   const [openAddMoney, setOpenAddMoney] = useState(false);
+
   const percent = Math.round((dummyGoal.saved / dummyGoal.target) * 100);
   const remaining = dummyGoal.target - dummyGoal.saved;
   const dailyNeed = Math.ceil(
@@ -66,6 +66,7 @@ export default function SavingsGoalDetail() {
 
   return (
     <div className="space-y-6 pb-20">
+      {/* Header */}
       <div className="flex items-center gap-3">
         <Link href="/dashboard/savings">
           <Button variant="ghost" size="icon">
@@ -82,9 +83,9 @@ export default function SavingsGoalDetail() {
         {/* Main Progress Card */}
         <Card className="md:col-span-2 rounded-2xl shadow-sm">
           <CardHeader>
-            <CardTitle>অগ্রগতি</CardTitle>
+            <CardTitle>Progress</CardTitle>
             <CardDescription>
-              আপনি এখন পর্যন্ত {percent}% পথ অতিক্রম করেছেন
+              You have completed {percent}% of your goal
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
@@ -102,17 +103,17 @@ export default function SavingsGoalDetail() {
 
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 text-center">
               <div className="p-3 bg-muted/40 rounded-lg">
-                <p className="text-xs text-muted-foreground">বাকি</p>
+                <p className="text-xs text-muted-foreground">Remaining</p>
                 <p className="text-lg font-bold">{formatBDT(remaining)}</p>
               </div>
               <div className="p-3 bg-muted/40 rounded-lg">
-                <p className="text-xs text-muted-foreground">দিন বাকি</p>
+                <p className="text-xs text-muted-foreground">Days Left</p>
                 <p className="text-lg font-bold">
                   {daysLeft(dummyGoal.deadline)}
                 </p>
               </div>
               <div className="p-3 bg-muted/40 rounded-lg">
-                <p className="text-xs text-muted-foreground">দৈনিক দরকার</p>
+                <p className="text-xs text-muted-foreground">Daily Required</p>
                 <p className="text-lg font-bold text-amber-600">
                   {formatBDT(dailyNeed)}
                 </p>
@@ -121,12 +122,13 @@ export default function SavingsGoalDetail() {
 
             <div className="pt-4 border-t">
               <h4 className="font-medium mb-3 flex items-center gap-2">
-                <Calendar className="h-4 w-4" /> সময়সীমা
+                <Calendar className="h-4 w-4" /> Deadline
               </h4>
               <p className="text-sm">
-                {format(new Date(dummyGoal.deadline), "dd MMMM yyyy", {
-                  locale: bn,
-                })}
+                {format(new Date(dummyGoal.deadline), "dd MMMM yyyy")}
+              </p>
+              <p className="text-xs text-muted-foreground mt-1">
+                {dummyGoal.note}
               </p>
             </div>
           </CardContent>
@@ -135,27 +137,27 @@ export default function SavingsGoalDetail() {
         {/* Quick Actions */}
         <Card className="rounded-2xl shadow-sm h-fit">
           <CardHeader>
-            <CardTitle>দ্রুত অ্যাকশন</CardTitle>
+            <CardTitle>Quick Actions</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <Dialog open={openAddMoney} onOpenChange={setOpenAddMoney}>
               <DialogTrigger asChild>
                 <Button className="w-full gap-2 bg-emerald-600 hover:bg-emerald-700">
-                  <Plus className="h-4 w-4" /> টাকা যোগ করুন
+                  <Plus className="h-4 w-4" /> Add Money
                 </Button>
               </DialogTrigger>
               <DialogContent className="sm:max-w-sm rounded-2xl">
                 <DialogHeader>
-                  <DialogTitle>সঞ্চয়ে টাকা যোগ করুন</DialogTitle>
+                  <DialogTitle>Add Money to Savings</DialogTitle>
                 </DialogHeader>
                 <div className="space-y-4 py-4">
                   <div className="space-y-2">
-                    <Label>পরিমাণ (৳)</Label>
+                    <Label>Amount (৳)</Label>
                     <Input type="number" placeholder="5000" />
                   </div>
                   <div className="space-y-2">
-                    <Label>নোট (ঐচ্ছিক)</Label>
-                    <Input placeholder="বোনাস থেকে..." />
+                    <Label>Note (Optional)</Label>
+                    <Input placeholder="e.g. Monthly savings, Bonus..." />
                   </div>
                 </div>
                 <DialogFooter>
@@ -163,23 +165,24 @@ export default function SavingsGoalDetail() {
                     variant="outline"
                     onClick={() => setOpenAddMoney(false)}
                   >
-                    বাতিল
+                    Cancel
                   </Button>
                   <Button onClick={() => setOpenAddMoney(false)}>
-                    যোগ করুন
+                    Add Amount
                   </Button>
                 </DialogFooter>
               </DialogContent>
             </Dialog>
 
             <Button variant="outline" className="w-full gap-2">
-              <Pencil className="h-4 w-4" /> লক্ষ্য সম্পাদনা
+              <Pencil className="h-4 w-4" /> Edit Goal
             </Button>
+
             <Button
               variant="outline"
-              className="w-full gap-2 text-destructive hover:text-destructive"
+              className="w-full gap-2 text-destructive hover:text-destructive hover:bg-destructive/10"
             >
-              <Trash2 className="h-4 w-4" /> লক্ষ্য মুছে ফেলুন
+              <Trash2 className="h-4 w-4" /> Delete Goal
             </Button>
           </CardContent>
         </Card>
@@ -188,25 +191,34 @@ export default function SavingsGoalDetail() {
       {/* Transaction History */}
       <Card className="rounded-2xl shadow-sm">
         <CardHeader>
-          <CardTitle>সঞ্চয়ের ইতিহাস</CardTitle>
+          <CardTitle>Savings History</CardTitle>
+          <CardDescription>All contributions to this goal</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="space-y-3">
+          <div className="space-y-4">
             {dummyGoal.transactions.map((tx, i) => (
               <div
                 key={i}
-                className="flex justify-between items-center border-b pb-3 last:border-0"
+                className="flex justify-between items-center border-b pb-4 last:border-0 last:pb-0"
               >
                 <div>
-                  <p className="font-medium">{formatBDT(tx.amount)}</p>
-                  <p className="text-xs text-muted-foreground">{tx.note}</p>
+                  <p className="font-semibold text-lg text-emerald-600">
+                    {formatBDT(tx.amount)}
+                  </p>
+                  <p className="text-sm text-muted-foreground">{tx.note}</p>
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  {format(new Date(tx.date), "dd MMM yyyy", { locale: bn })}
+                  {format(new Date(tx.date), "dd MMM yyyy")}
                 </p>
               </div>
             ))}
           </div>
+
+          {dummyGoal.transactions.length === 0 && (
+            <p className="text-center text-muted-foreground py-8">
+              No transactions yet. Add your first contribution!
+            </p>
+          )}
         </CardContent>
       </Card>
     </div>

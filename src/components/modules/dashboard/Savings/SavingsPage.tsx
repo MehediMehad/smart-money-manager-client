@@ -11,7 +11,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Progress } from "@/components/ui/progress";
 import {
   Dialog,
   DialogContent,
@@ -30,63 +29,56 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
+  Area,
 } from "recharts";
 import Link from "next/link";
 import { format } from "date-fns";
-import { bn } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 
 const savingsGoals = [
   {
     id: "1",
-    name: "নতুন ল্যাপটপ 💻",
+    name: "New Laptop 💻",
     target: 80000,
     saved: 32000,
     deadline: "2026-07-15",
-    note: "M3 MacBook Pro",
   },
   {
     id: "2",
-    name: "জরুরি তহবিল 🏦",
+    name: "Emergency Fund 🏦",
     target: 150000,
     saved: 98000,
     deadline: "2026-12-31",
-    note: "৬ মাসের খরচ",
   },
   {
     id: "3",
-    name: "বিদেশ ভ্রমন ✈️",
+    name: "International Trip ✈️",
     target: 250000,
     saved: 45000,
     deadline: "2027-04-01",
-    note: "থাইল্যান্ড + মালয়েশিয়া",
   },
   {
     id: "4",
-    name: "নতুন মোবাইল 📱",
+    name: "New Smartphone 📱",
     target: 65000,
     saved: 62000,
     deadline: "2026-05-20",
-    note: "iPhone 16 Pro",
   },
 ];
 
 const monthlySavingsTrend = [
-  { month: "অক্টো", saved: 12000 },
-  { month: "নভে", saved: 18000 },
-  { month: "ডিসে", saved: 22000 },
-  { month: "জানু", saved: 15000 },
-  { month: "ফেব্রু", saved: 28000 },
-  { month: "মার্চ", saved: 34000 },
+  { month: "Oct", saved: 12000 },
+  { month: "Nov", saved: 18000 },
+  { month: "Dec", saved: 22000 },
+  { month: "Jan", saved: 15000 },
+  { month: "Feb", saved: 28000 },
+  { month: "Mar", saved: 34000 },
+  { month: "April", saved: 90000 },
 ];
-
-function formatBDT(amount: number) {
-  return "৳" + amount.toLocaleString("bn-BD");
-}
 
 function daysLeft(deadline: string) {
   const d = new Date(deadline);
-  const today = new Date("2026-03-04"); // current date from context
+  const today = new Date("2026-03-04"); // You can make this dynamic later
   const diff = d.getTime() - today.getTime();
   return Math.ceil(diff / (1000 * 60 * 60 * 24));
 }
@@ -118,22 +110,26 @@ export default function SavingsDashboard() {
       {/* Summary Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
-          title="মোট সঞ্চয়"
+          title="Total Saved"
           value={totalSaved}
-          subtitle="সব লক্ষ্য মিলিয়ে"
+          subtitle="Across all goals"
           variant="emerald"
         />
-        <StatCard title="চলমান লক্ষ্য" value={activeGoals} subtitle="সক্রিয়" />
         <StatCard
-          title="সম্পন্ন লক্ষ্য"
+          title="Active Goals"
+          value={activeGoals}
+          subtitle="In progress"
+        />
+        <StatCard
+          title="Completed Goals"
           value={completedGoals}
-          subtitle="অর্জিত 🎉"
+          subtitle="Achieved 🎉"
           variant="purple"
         />
         <StatCard
-          title="এই মাসে সেভ"
+          title="Saved This Month"
           value={thisMonthSaved}
-          subtitle="মার্চ ২০২৬"
+          subtitle="March 2026"
           variant="blue"
         />
       </div>
@@ -143,7 +139,7 @@ export default function SavingsDashboard() {
         <Card className="rounded-2xl border-amber-400/50 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/20">
           <CardHeader className="pb-2">
             <CardTitle className="flex items-center gap-2 text-amber-700 dark:text-amber-400">
-              <AlertTriangle className="h-5 w-5" /> জরুরি সতর্কতা
+              <AlertTriangle className="h-5 w-5" /> Urgent Alerts
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
@@ -155,12 +151,11 @@ export default function SavingsDashboard() {
                 <div>
                   <p className="font-medium">{g.name}</p>
                   <p className="text-xs text-muted-foreground">
-                    ডেডলাইন বাকি {daysLeft(g.deadline)} দিন
+                    {daysLeft(g.deadline)} days left until deadline
                   </p>
                 </div>
                 <p className="font-semibold text-amber-600">
-                  দৈনিক দরকার:{" "}
-                  {formatBDT(dailyRequired(g.target, g.saved, g.deadline))}
+                  Daily needed: {dailyRequired(g.target, g.saved, g.deadline)}
                 </p>
               </div>
             ))}
@@ -171,43 +166,43 @@ export default function SavingsDashboard() {
       {/* Active Goals */}
       <div className="space-y-4">
         <div className="flex justify-between items-center">
-          <h3 className="text-xl font-semibold">চলমান লক্ষ্যসমূহ</h3>
+          <h3 className="text-xl font-semibold">Active Savings Goals</h3>
           <Dialog open={openAddGoal} onOpenChange={setOpenAddGoal}>
             <DialogTrigger asChild>
               <Button className="gap-2 bg-gradient-to-r from-emerald-700 to-teal-600">
-                <Plus className="h-4 w-4" /> নতুন লক্ষ্য
+                <Plus className="h-4 w-4" /> New Goal
               </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-md rounded-2xl">
               <DialogHeader>
-                <DialogTitle>নতুন সঞ্চয় লক্ষ্য</DialogTitle>
+                <DialogTitle>Create New Savings Goal</DialogTitle>
                 <DialogDescription>
-                  আপনার স্বপ্নের জন্য পরিকল্পনা করুন
+                  Plan for your dreams and financial targets
                 </DialogDescription>
               </DialogHeader>
               <div className="grid gap-4 py-4">
                 <div className="grid gap-2">
-                  <Label>লক্ষ্যের নাম</Label>
-                  <Input placeholder="যেমন: নতুন ল্যাপটপ" />
+                  <Label>Goal Name</Label>
+                  <Input placeholder="e.g. New Laptop" />
                 </div>
                 <div className="grid gap-2">
-                  <Label>লক্ষ্য পরিমাণ (৳)</Label>
+                  <Label>Target Amount (৳)</Label>
                   <Input type="number" placeholder="80000" />
                 </div>
                 <div className="grid gap-2">
-                  <Label>সময়সীমা</Label>
+                  <Label>Deadline</Label>
                   <Input type="date" />
                 </div>
                 <div className="grid gap-2">
-                  <Label>নোট (ঐচ্ছিক)</Label>
-                  <Input placeholder="বিস্তারিত..." />
+                  <Label>Note (Optional)</Label>
+                  <Input placeholder="Additional details..." />
                 </div>
               </div>
               <DialogFooter>
                 <Button variant="outline" onClick={() => setOpenAddGoal(false)}>
-                  বাতিল
+                  Cancel
                 </Button>
-                <Button>লক্ষ্য তৈরি করুন</Button>
+                <Button>Create Goal</Button>
               </DialogFooter>
             </DialogContent>
           </Dialog>
@@ -237,7 +232,7 @@ export default function SavingsDashboard() {
                       "border-2 border-emerald-500/50 bg-emerald-50/30 dark:bg-emerald-950/20",
                   )}
                 >
-                  <CardContent className="p-5 space-y-4">
+                  <CardContent className="p-6 space-y-4">
                     <div className="flex justify-between items-start">
                       <h4 className="font-semibold text-lg">{goal.name}</h4>
                       {isCompleted && (
@@ -247,7 +242,7 @@ export default function SavingsDashboard() {
 
                     <div className="space-y-1.5">
                       <div className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">অগ্রগতি</span>
+                        <span className="text-muted-foreground">Progress</span>
                         <span className="font-medium">{percent}%</span>
                       </div>
                       <div className="h-2.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
@@ -262,23 +257,21 @@ export default function SavingsDashboard() {
 
                     <div className="grid grid-cols-2 gap-3 text-sm">
                       <div>
-                        <p className="text-muted-foreground">সঞ্চিত</p>
+                        <p className="text-muted-foreground">Saved</p>
                         <p className="font-bold text-emerald-600">
-                          {formatBDT(goal.saved)}
+                          {goal.saved}
                         </p>
                       </div>
                       <div className="text-right">
-                        <p className="text-muted-foreground">বাকি</p>
-                        <p className="font-bold">{formatBDT(remaining)}</p>
+                        <p className="text-muted-foreground">Remaining</p>
+                        <p className="font-bold">{remaining}</p>
                       </div>
                     </div>
 
                     <div className="text-xs space-y-1 pt-2 border-t">
                       <p>
-                        সময়সীমা:{" "}
-                        {format(new Date(goal.deadline), "dd MMM yyyy", {
-                          locale: bn,
-                        })}
+                        Deadline:{" "}
+                        {format(new Date(goal.deadline), "dd MMM yyyy")}
                       </p>
                       {days > 0 && !isCompleted && (
                         <p
@@ -286,7 +279,7 @@ export default function SavingsDashboard() {
                             days < 15 ? "text-amber-600 font-medium" : ""
                           }
                         >
-                          দৈনিক দরকার: {formatBDT(dailyNeed)}
+                          Daily required: {dailyNeed}
                         </p>
                       )}
                     </div>
@@ -299,26 +292,108 @@ export default function SavingsDashboard() {
       </div>
 
       {/* Savings Growth Chart */}
-      <Card className="rounded-2xl shadow-sm">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <LineChart className="h-5 w-5" /> সঞ্চয়ের বৃদ্ধি
-          </CardTitle>
-          <CardDescription>মাসভিত্তিক সেভিংস ট্রেন্ড</CardDescription>
+      {/* Savings Growth Chart - Beautiful Version */}
+      <Card className="rounded-2xl shadow-sm overflow-hidden">
+        <CardHeader className="pb-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="flex items-center gap-2 text-xl">
+                <LineChart className="h-5 w-5 text-emerald-600" />
+                Savings Growth
+              </CardTitle>
+              <CardDescription className="mt-1">
+                Monthly savings trend • March 2026
+              </CardDescription>
+            </div>
+            <div className="text-right">
+              <p className="text-xs text-muted-foreground">This Month</p>
+              <p className="text-2xl font-semibold text-emerald-600">
+                ৳
+                {monthlySavingsTrend[
+                  monthlySavingsTrend.length - 1
+                ]?.saved.toLocaleString("en-US")}
+              </p>
+            </div>
+          </div>
         </CardHeader>
-        <CardContent className="h-64 sm:h-72">
-          <ResponsiveContainer>
+
+        <CardContent className="h-80 pt-2">
+          <ResponsiveContainer width="100%" height="100%">
             <RechartsLine data={monthlySavingsTrend}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="month" />
-              <YAxis />
-              <Tooltip formatter={(v: number) => formatBDT(v)} />
+              <defs>
+                <linearGradient
+                  id="savingsGradient"
+                  x1="0"
+                  y1="0"
+                  x2="0"
+                  y2="1"
+                >
+                  <stop offset="5%" stopColor="#10b981" stopOpacity={0.35} />
+                  <stop offset="95%" stopColor="#10b981" stopOpacity={0.05} />
+                </linearGradient>
+              </defs>
+
+              <CartesianGrid
+                strokeDasharray="3 3"
+                stroke="#e5e7eb"
+                vertical={false}
+              />
+
+              <XAxis
+                dataKey="month"
+                tick={{ fill: "#6b7280", fontSize: 12 }}
+                axisLine={false}
+                tickLine={false}
+              />
+
+              <YAxis
+                tickFormatter={(value) => `৳${(value / 1000).toFixed(0)}k`}
+                tick={{ fill: "#6b7280", fontSize: 12 }}
+                axisLine={false}
+                tickLine={false}
+              />
+
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: "#fff",
+                  border: "none",
+                  borderRadius: "12px",
+                  boxShadow: "0 10px 15px -3px rgb(0 0 0 / 0.1)",
+                  padding: "12px 16px",
+                }}
+                formatter={(value: number) => [
+                  `৳${value.toLocaleString("en-US")}`,
+                  "Saved",
+                ]}
+                labelStyle={{ color: "#374151", fontWeight: 600 }}
+              />
+
+              {/* Gradient Area */}
+              <Area
+                type="natural" // Smooth natural curve
+                dataKey="saved"
+                stroke="none"
+                fill="url(#savingsGradient)"
+              />
+
+              {/* Main Line */}
               <Line
-                type="monotone"
+                type="natural"
                 dataKey="saved"
                 stroke="#10b981"
-                strokeWidth={2.5}
-                dot={{ r: 4 }}
+                strokeWidth={4}
+                dot={{
+                  fill: "#10b981",
+                  strokeWidth: 3,
+                  stroke: "#fff",
+                  r: 6,
+                }}
+                activeDot={{
+                  r: 8,
+                  fill: "#10b981",
+                  stroke: "#fff",
+                  strokeWidth: 3,
+                }}
               />
             </RechartsLine>
           </ResponsiveContainer>
@@ -368,7 +443,7 @@ function StatCard({
         <div
           className={`text-2xl font-bold ${colors[variant as keyof typeof colors] || ""}`}
         >
-          {typeof value === "number" ? formatBDT(value) : value}
+          {typeof value === "number" ? value : value}
         </div>
         <p className="text-xs text-muted-foreground mt-1">{subtitle}</p>
       </CardContent>
