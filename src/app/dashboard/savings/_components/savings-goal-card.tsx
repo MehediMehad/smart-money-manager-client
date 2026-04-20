@@ -7,6 +7,7 @@ import {
   formatGoalDate,
   getDailyRequiredAmount,
   getDaysLeft,
+  getDeadLineOver,
   getGoalProgress,
   getRemainingAmount,
   isGoalCompleted,
@@ -23,6 +24,7 @@ const SavingsGoalCard = ({ goal }: Props) => {
   const daysLeft = getDaysLeft(goal.deadline);
   const dailyNeed = getDailyRequiredAmount(goal);
   const completed = isGoalCompleted(goal);
+  const deadlineOver = getDeadLineOver(goal.deadline);
 
   return (
     <Link href={`/dashboard/savings/${goal.id}`}>
@@ -74,6 +76,8 @@ const SavingsGoalCard = ({ goal }: Props) => {
               <p className={cn(daysLeft < 15 && "font-medium text-amber-600")}>
                 Daily required: {dailyNeed}
               </p>
+            ) : deadlineOver ? (
+              <p className="font-medium text-red-600">Deadline over</p>
             ) : null}
           </div>
         </CardContent>

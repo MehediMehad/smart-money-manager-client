@@ -9,6 +9,12 @@ export function getDaysLeft(deadline: string, now = new Date()): number {
     return Math.max(0, Math.ceil(diff / DAY_IN_MS));
 }
 
+export const getDeadLineOver = (deadline: string, now = new Date()): boolean => {
+    const end = new Date(deadline);
+    const diff = end.getTime() - now.getTime();
+    return diff < 0;
+}
+
 export function getGoalProgress(savedAmount: number, targetAmount: number): number {
     if (targetAmount <= 0) return 0;
     return Math.min(100, Math.round((savedAmount / targetAmount) * 100));

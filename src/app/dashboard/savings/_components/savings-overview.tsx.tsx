@@ -1,4 +1,4 @@
-import { AlertTriangle, LineChart as LineChartIcon } from "lucide-react";
+import { LineChart as LineChartIcon } from "lucide-react";
 
 import {
   Card,
@@ -8,11 +8,7 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 
-import {
-  getDailyRequiredAmount,
-  getDaysLeft,
-  isGoalCompleted,
-} from "@/lib/savings/utils";
+import { getDaysLeft, isGoalCompleted } from "@/lib/savings/utils";
 import { TMonthlySavingsTrend, TSavingsGoal } from "@/types";
 import { CreateGoalDialog } from "./create-goal-dialog";
 import { SavingsChart } from "./savings-chart";
@@ -81,7 +77,7 @@ export const SavingsOverview = ({ goals, trend, error }: Props) => {
       <SavingsAlertCard alertGoals={alertGoals} />
 
       <section className="space-y-4">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between pl-2">
           <h2 className="text-xl font-semibold">Active Savings Goals</h2>
           <CreateGoalDialog />
         </div>
