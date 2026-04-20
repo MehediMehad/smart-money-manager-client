@@ -27,6 +27,8 @@ import { TMonthlySavingsTrend, TSavingsGoal } from "@/types";
 import { CreateGoalDialog } from "./create-goal-dialog";
 import { SavingsChart } from "./savings-chart";
 import StatCard from "./stat-card";
+import DataNotFount from "../../../../components/shared/DataNotFount";
+import ErrorMessage from "@/components/shared/ErrorMessage";
 
 type Props = {
   goals: TSavingsGoal[];
@@ -34,7 +36,7 @@ type Props = {
   error: string | null;
 };
 
-export function SavingsOverview({ goals, trend, error }: Props) {
+export const SavingsOverview = ({ goals, trend, error }: Props) => {
   const totalSaved = goals.reduce((sum, goal) => sum + goal.savedAmount, 0);
   const activeGoals = goals.filter((goal) => !isGoalCompleted(goal)).length;
   const completedGoals = goals.filter(isGoalCompleted).length;
@@ -80,13 +82,7 @@ export function SavingsOverview({ goals, trend, error }: Props) {
         />
       </div>
 
-      {error ? (
-        <Card className="rounded-2xl border-destructive/40">
-          <CardContent className="p-5 text-sm text-destructive">
-            {error}
-          </CardContent>
-        </Card>
-      ) : null}
+      {error ? <ErrorMessage error={error} /> : null}
 
       {urgentGoals.length > 0 && (
         <Card className="rounded-2xl border-amber-400/50 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/20">
@@ -124,11 +120,7 @@ export function SavingsOverview({ goals, trend, error }: Props) {
         </div>
 
         {goals.length === 0 ? (
-          <Card className="rounded-2xl">
-            <CardContent className="p-8 text-center text-muted-foreground">
-              No savings goals found yet.
-            </CardContent>
-          </Card>
+          <DataNotFount message="No active savings goals found." />
         ) : (
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {goals.map((goal) => {
@@ -243,4 +235,4 @@ export function SavingsOverview({ goals, trend, error }: Props) {
       </Card>
     </div>
   );
-}
+};
