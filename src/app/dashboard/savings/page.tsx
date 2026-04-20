@@ -1,16 +1,18 @@
-import SavingsPage from "@/components/modules/dashboard/Savings/SavingsPage";
-import { getSavingsGoals } from "@/services/SavingsGoal";
+import { getSavingsDashboard } from "@/services/SavingsGoal";
+import { SavingsOverview } from "./_components/savings-overview.tsx";
 
-const Page = async () => {
-  const savings = await getSavingsGoals();
+export const dynamic = "force-dynamic";
 
-  console.log("savings", savings);
+export default async function SavingsPage() {
+  const response = await getSavingsDashboard();
+
+  console.log("response", response);
 
   return (
-    <>
-      <SavingsPage />
-    </>
+    <SavingsOverview
+      goals={response.data?.savingsGoal ?? []}
+      trend={response.data?.monthlySavingsTrend ?? []}
+      error={!response.success ? response.message : null}
+    />
   );
-};
-
-export default Page;
+}

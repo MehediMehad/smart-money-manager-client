@@ -3,13 +3,12 @@
 
 import { serverFetch } from "@/lib/utils/serverFetch";
 import { getValidToken } from "../Auth/verifyToken";
-import { TApiResponse } from "@/types";
+import { TApiResponse, TSavingsDashboardApiData } from "@/types";
 
 
 export const createSavingsGoal = async (data: {
-    title: string;
+    name: string;
     targetAmount: number;
-    savedAmount?: number;
     deadline: string;
 }): Promise<TApiResponse<any | null>> => {
     try {
@@ -19,7 +18,6 @@ export const createSavingsGoal = async (data: {
             body: JSON.stringify({
                 ...data,
                 targetAmount: Math.round(data.targetAmount),
-                savedAmount: data.savedAmount ?? 0,
                 deadline: new Date(data.deadline).toISOString(),
             }),
             headers: {
@@ -47,42 +45,39 @@ export const createSavingsGoal = async (data: {
     }
 };
 
-export const getSavingsGoals = async (): Promise<TApiResponse<any[]>> => {
-
+export const getSavingsDashboard = async (): Promise<
+    TApiResponse<TSavingsDashboardApiData | null>
+> => {
     try {
         const accessToken = await getValidToken();
+        const res = await serverFetch.get("/savings-goals", {
+            headers: {
+                Authorization: `Bearer ${accessToken}`,
+            },
+            cache: "no-store",
+        });
 
-        const res = await serverFetch.get(
-            `/savings-goals`,
-            {
-                headers: {
-                    Authorization: `Bearer ${accessToken}`,
-                },
-                cache: "no-store",
-            }
-        );
-
-        const result: TApiResponse<any[]> = await res.json();
+        const result = await res.json();
 
         if (!result.success) {
-            throw new Error(result.message);
+            throw new Error(result.message || "Failed to fetch savings dashboard");
         }
 
-        return {
-            ...result,
-            data: result.data ?? [],
-        };
+        return result;
     } catch (error) {
-        console.error("getSavingsGoals error:", error);
+        console.error("getSavingsDashboard error:", error);
+
         return {
             success: false,
             statusCode: 500,
-            message: "Failed to fetch savings goals",
-            data: [],
+            message: "Failed to fetch savings dashboard",
+            data: {
+                savingsGoal: [],
+                monthlySavingsTrend: [],
+            },
         };
     }
 };
-
 export const getSingleSavingsGoal = async (
     id: string
 ): Promise<TApiResponse<any | null>> => {

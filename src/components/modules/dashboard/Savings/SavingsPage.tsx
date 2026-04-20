@@ -20,7 +20,7 @@ import {
   DialogFooter,
   DialogDescription,
 } from "@/components/ui/dialog";
-import { Plus, Target, AlertTriangle, Trophy, LineChart } from "lucide-react";
+import { Plus, AlertTriangle, Trophy, LineChart } from "lucide-react";
 import {
   LineChart as RechartsLine,
   Line,

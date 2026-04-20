@@ -28,9 +28,9 @@ import clsx from "clsx";
 import { MdOutlineCategory } from "react-icons/md";
 
 const menuItems = [
-  { title: "ড্যাশবোর্ড", url: "/dashboard", icon: LayoutDashboard },
+  { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
   {
-    title: "আজকের আপডেট",
+    title: "Today Update",
     url: "/dashboard/today-update",
     icon: Clock,
   },
@@ -40,10 +40,10 @@ const menuItems = [
   { title: "Budget", url: "/dashboard/budget", icon: Receipt },
   { title: "Monthly Budget", url: "/dashboard/monthly-budget", icon: PieChart },
 
-  { title: "সঞ্চয়", url: "/dashboard/savings", icon: PiggyBank },
-  { title: "ধার-দেনা", url: "/dashboard/debts", icon: HandCoins },
+  { title: "Savings", url: "/dashboard/savings", icon: PiggyBank },
+  { title: "Debts", url: "/dashboard/debts", icon: HandCoins },
   {
-    title: "মাসিক রিপোর্ট",
+    title: "Monthly Reports",
     url: "/dashboard/monthly-reports",
     icon: BarChart3,
   },
@@ -52,8 +52,8 @@ const menuItems = [
     url: "/dashboard/categories",
     icon: MdOutlineCategory,
   },
-  { title: "নোটিফিকেশন", url: "/dashboard/notifications", icon: Bell },
-  { title: "সেটিংস", url: "/dashboard/settings", icon: Settings },
+  { title: "Notifications", url: "/dashboard/notifications", icon: Bell },
+  { title: "Settings", url: "/dashboard/settings", icon: Settings },
 ];
 
 const AppSidebar = () => {
@@ -66,7 +66,7 @@ const AppSidebar = () => {
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel className="text-base font-bold px-4 py-3 mb-4">
-            {!collapsed && "স্মার্ট মানি"}
+            {!collapsed && ""}
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
