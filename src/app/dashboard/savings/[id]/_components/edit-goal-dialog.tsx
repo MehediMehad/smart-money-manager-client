@@ -23,6 +23,7 @@ type Props = {
   goalName: string;
   targetAmount: number;
   deadline: string;
+  disabled?: boolean;
 };
 
 function toDateInputValue(date: string) {
@@ -38,6 +39,7 @@ export function EditGoalDialog({
   goalName,
   targetAmount,
   deadline,
+  disabled = false,
 }: Props) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -123,8 +125,13 @@ export function EditGoalDialog({
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={isPending}>
-              {isPending ? "Saving..." : "Save Changes"}
+            <Button
+              variant="outline"
+              className="w-full gap-2"
+              disabled={disabled}
+            >
+              <Pencil className="h-4 w-4" />
+              Edit Goal
             </Button>
           </DialogFooter>
         </form>

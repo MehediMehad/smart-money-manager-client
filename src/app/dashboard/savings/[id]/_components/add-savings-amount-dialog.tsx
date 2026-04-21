@@ -17,12 +17,20 @@ import {
 } from "@/components/ui/dialog";
 import { addSavingsAmount } from "../../_actions";
 
-export function AddSavingsAmountDialog({ goalId }: { goalId: string }) {
+export function AddSavingsAmountDialog({
+  goalId,
+  disabled = false,
+}: {
+  goalId: string;
+  disabled?: boolean;
+}) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
 
   async function handleSubmit(formData: FormData) {
+    if (disabled) return;
+
     const amount = Number(formData.get("amount") || 0);
 
     startTransition(async () => {
@@ -36,9 +44,12 @@ export function AddSavingsAmountDialog({ goalId }: { goalId: string }) {
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={disabled ? undefined : setOpen}>
       <DialogTrigger asChild>
-        <Button className="w-full gap-2 bg-emerald-600 hover:bg-emerald-700">
+        <Button
+          className="w-full gap-2 bg-emerald-600 hover:bg-emerald-700"
+          disabled={disabled}
+        >
           <Plus className="h-4 w-4" />
           Add Money
         </Button>
@@ -71,7 +82,7 @@ export function AddSavingsAmountDialog({ goalId }: { goalId: string }) {
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={isPending}>
+            <Button type="submit" disabled={isPending || disabled}>
               {isPending ? "Adding..." : "Add Amount"}
             </Button>
           </DialogFooter>

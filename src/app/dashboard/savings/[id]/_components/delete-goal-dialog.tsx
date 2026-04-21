@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Trash2 } from "lucide-react";
 
@@ -33,18 +33,16 @@ export function DeleteGoalDialog({ goalId, goalName }: Props) {
 
     try {
       const result = await deleteSavingsGoal(goalId);
+
       if (result.success) {
-        setPending(false);
-        router.replace("/dashboard/savings");
         setOpen(false);
+        router.replace("/dashboard/savings");
+        router.refresh();
       }
-    } catch (err: any) {
-      setPending(false);
-      console.error(err);
+    } catch (error) {
+      console.error(error);
     } finally {
-      setOpen(false);
       setPending(false);
-      router.refresh();
     }
   };
 

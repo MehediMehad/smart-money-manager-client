@@ -142,6 +142,7 @@ export default async function SavingsGoalDetailPage({ params }: Props) {
           goalName={goal.name}
           targetAmount={goal.targetAmount}
           deadline={goal.deadline}
+          isCompleted={completed}
         />
       </div>
 
