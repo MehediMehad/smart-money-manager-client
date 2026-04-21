@@ -3,16 +3,16 @@ import { Trophy } from "lucide-react";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import { TSavingsGoal } from "../_lib/types";
 import {
-  formatGoalDate,
   getDailyRequiredAmount,
   getDaysLeft,
   getDeadLineOver,
   getGoalProgress,
   getRemainingAmount,
   isGoalCompleted,
-} from "@/lib/savings/utils";
-import { TSavingsGoal } from "@/types";
+} from "../_lib/calculations";
+import { formatGoalDate } from "../_lib/formatters";
 
 type Props = {
   goal: TSavingsGoal;

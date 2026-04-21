@@ -4,7 +4,6 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Trash2 } from "lucide-react";
 
-import { deleteSavingsGoal } from "@/services/SavingsGoal";
 import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
@@ -17,6 +16,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { deleteSavingsGoal } from "../../_actions";
 
 type Props = {
   goalId: string;

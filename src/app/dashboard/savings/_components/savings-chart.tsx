@@ -10,7 +10,7 @@ import {
   Tooltip,
   Area,
 } from "recharts";
-import { TMonthlySavingsTrend } from "@/types";
+import { TMonthlySavingsTrend } from "../_lib/types";
 
 export function SavingsChart({ data }: { data: TMonthlySavingsTrend[] }) {
   return (

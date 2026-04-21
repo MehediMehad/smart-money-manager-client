@@ -1,4 +1,4 @@
-import { getSavingsDashboard } from "@/services/SavingsGoal";
+import { getSavingsDashboard } from "../savings/_actions/index";
 import { SavingsOverview } from "./_components/savings-overview.tsx";
 
 export const dynamic = "force-dynamic";

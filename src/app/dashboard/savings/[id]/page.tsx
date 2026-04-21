@@ -2,7 +2,6 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, Calendar, Target } from "lucide-react";
 
-import { getSingleSavingsGoal } from "@/services/SavingsGoal";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import {
@@ -13,7 +12,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import {
-  formatGoalDate,
   getDailyRequiredAmount,
   getDaysLeft,
   getExceededAmount,
@@ -21,9 +19,11 @@ import {
   getRawProgressPercentage,
   getRemainingAmount,
   isGoalCompleted,
-} from "@/lib/savings/utils";
+} from "../_lib/calculations";
 import { GoalActions } from "./_components/goal-actions";
-import { TSavingsGoalTransaction } from "@/types";
+import { TSavingsGoalTransaction } from "../_lib/types";
+import { formatGoalDate } from "../_lib/formatters";
+import { getSingleSavingsGoal } from "../_actions";
 
 type Props = {
   params: Promise<{

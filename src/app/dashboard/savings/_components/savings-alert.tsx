@@ -1,8 +1,8 @@
 import { AlertTriangle } from "lucide-react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { getDailyRequiredAmount, getDaysLeft } from "@/lib/savings/utils";
-import { TSavingsGoal } from "@/types";
+import { getDailyRequiredAmount, getDaysLeft } from "../_lib/calculations";
+import { TSavingsGoal } from "../_lib/types";
 
 type Props = {
   alertGoals: TSavingsGoal[];

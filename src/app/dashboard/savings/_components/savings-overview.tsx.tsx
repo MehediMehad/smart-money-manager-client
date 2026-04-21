@@ -8,8 +8,8 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 
-import { getDaysLeft, isGoalCompleted } from "@/lib/savings/utils";
-import { TMonthlySavingsTrend, TSavingsGoal } from "@/types";
+import { getDaysLeft, isGoalCompleted } from "../_lib/calculations";
+import { TMonthlySavingsTrend, TSavingsGoal } from "../_lib/types";
 import { CreateGoalDialog } from "./create-goal-dialog";
 import { SavingsChart } from "./savings-chart";
 import StatCard from "./stat-card";

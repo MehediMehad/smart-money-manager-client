@@ -4,7 +4,6 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Plus } from "lucide-react";
 
-import { addSavingsAmount } from "@/services/SavingsGoal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -16,6 +15,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { addSavingsAmount } from "../../_actions";
 
 export function AddSavingsAmountDialog({ goalId }: { goalId: string }) {
   const router = useRouter();
