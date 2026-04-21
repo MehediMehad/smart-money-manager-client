@@ -20,6 +20,15 @@ export function getGoalProgress(savedAmount: number, targetAmount: number): numb
     return Math.min(100, Math.round((savedAmount / targetAmount) * 100));
 }
 
+export function getExceededAmount(savedAmount: number, targetAmount: number): number {
+    return Math.max(0, savedAmount - targetAmount);
+}
+
+export function getRawProgressPercentage(savedAmount: number, targetAmount: number): number {
+    if (targetAmount <= 0) return 0;
+    return Math.round((savedAmount / targetAmount) * 100);
+}
+
 export function getRemainingAmount(savedAmount: number, targetAmount: number): number {
     return Math.max(0, targetAmount - savedAmount);
 }
@@ -31,6 +40,7 @@ export function getDailyRequiredAmount(goal: TSavingsGoal, now = new Date()): nu
     if (daysLeft <= 0 || remaining <= 0) return 0;
     return Math.ceil(remaining / daysLeft);
 }
+
 
 export function isGoalCompleted(goal: TSavingsGoal): boolean {
     return goal.savedAmount >= goal.targetAmount;

@@ -74,8 +74,6 @@ export const SavingsOverview = ({ goals, trend, error }: Props) => {
 
       {error ? <ErrorMessage error={error} /> : null}
 
-      <SavingsAlertCard alertGoals={alertGoals} />
-
       <section className="space-y-4">
         <div className="flex items-center justify-between pl-2">
           <h2 className="text-xl font-semibold">Active Savings Goals</h2>
@@ -92,6 +90,8 @@ export const SavingsOverview = ({ goals, trend, error }: Props) => {
           </div>
         )}
       </section>
+
+      <SavingsAlertCard alertGoals={alertGoals} />
 
       <Card className="overflow-hidden rounded-2xl shadow-sm">
         <CardHeader className="pb-4">

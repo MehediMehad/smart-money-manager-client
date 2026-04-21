@@ -51,7 +51,7 @@ const SavingsGoalCard = ({ goal }: Props) => {
               <div
                 className={cn(
                   "h-full",
-                  completed ? "bg-yellow-500" : "bg-emerald-600",
+                  completed ? "bg-emerald-600" : "bg-emerald-600",
                 )}
                 style={{ width: `${progress}%` }}
               />
@@ -78,6 +78,10 @@ const SavingsGoalCard = ({ goal }: Props) => {
               </p>
             ) : deadlineOver ? (
               <p className="font-medium text-red-600">Deadline over</p>
+            ) : null}
+
+            {completed ? (
+              <p className="font-medium text-emerald-600">Completed</p>
             ) : null}
           </div>
         </CardContent>

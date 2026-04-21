@@ -16,6 +16,25 @@ export type TSavingsDashboardApiData = {
     monthlySavingsTrend: TMonthlySavingsTrendItem[];
 };
 
+
+export type TSavingsGoalDetails = {
+    id: string;
+    userId: string;
+    name: string;
+    targetAmount: number;
+    savedAmount: number;
+    deadline: string;
+    createdAt: string;
+    transactions: TSavingsGoalTransaction[];
+};
+
+export type TSavingsGoalTransaction = {
+    id: string;
+    goalId: string;
+    amount: number;
+    createdAt: string;
+};
+
 export type TSavingsGoal = {
     id: string;
     name: string;

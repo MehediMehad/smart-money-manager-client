@@ -3,7 +3,8 @@
 
 import { serverFetch } from "@/lib/utils/serverFetch";
 import { getValidToken } from "../Auth/verifyToken";
-import { TApiResponse, TSavingsDashboardApiData } from "@/types";
+import { TApiResponse, TSavingsDashboardApiData, TSavingsGoalDetails } from "@/types";
+import { revalidatePath } from "next/cache";
 
 
 export const createSavingsGoal = async (data: {
@@ -78,9 +79,10 @@ export const getSavingsDashboard = async (): Promise<
         };
     }
 };
+
 export const getSingleSavingsGoal = async (
-    id: string
-): Promise<TApiResponse<any | null>> => {
+    id: string,
+): Promise<TApiResponse<TSavingsGoalDetails | null>> => {
     try {
         const accessToken = await getValidToken();
 
@@ -91,7 +93,7 @@ export const getSingleSavingsGoal = async (
             cache: "no-store",
         });
 
-        const result: TApiResponse<any> = await res.json();
+        const result: TApiResponse<TSavingsGoalDetails> = await res.json();
 
         if (!result.success) {
             throw new Error(result.message);
@@ -100,6 +102,7 @@ export const getSingleSavingsGoal = async (
         return result;
     } catch (error) {
         console.error("getSingleSavingsGoal error:", error);
+
         return {
             success: false,
             statusCode: 500,
@@ -192,7 +195,7 @@ export const addSavingsAmount = async (
 };
 
 export const deleteSavingsGoal = async (
-    id: string
+    id: string,
 ): Promise<TApiResponse<null>> => {
     try {
         const accessToken = await getValidToken();
@@ -210,9 +213,11 @@ export const deleteSavingsGoal = async (
             throw new Error(result.message);
         }
 
+        revalidatePath("/dashboard/savings");
         return result;
     } catch (error) {
         console.error("deleteSavingsGoal error:", error);
+
         return {
             success: false,
             statusCode: 500,
