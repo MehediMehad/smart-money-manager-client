@@ -36,77 +36,77 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Plus, AlertTriangle, Pencil, Trash2, Info, Eye } from "lucide-react";
+import { Plus, AlertTriangle, Pencil, Trash2, Eye } from "lucide-react";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 import { format } from "date-fns";
-import { bn } from "date-fns/locale";
+import { enUS } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 
 const dummyDebts = [
-  // GIVEN (তুমি দিয়েছো → receivable)
+  // GIVEN (You gave → Receivable)
   {
     id: "g1",
-    person: "রহিম ভাই",
+    person: "Rahim Bhai",
     type: "GIVEN",
     amount: 10000,
     dueDate: "2026-04-01",
-    note: "ব্যবসায় সাহায্য",
+    note: "Business help",
     status: "active",
   },
   {
     id: "g2",
-    person: "করিম",
+    person: "Karim",
     type: "GIVEN",
     amount: 15000,
     dueDate: "2026-05-10",
-    note: "পার্সোনাল লোন",
+    note: "Personal loan",
     status: "active",
   },
   {
     id: "g3",
-    person: "জামাল",
+    person: "Jamal",
     type: "GIVEN",
     amount: 5000,
     dueDate: "2026-03-20",
-    note: "জরুরি",
+    note: "Emergency",
     status: "overdue",
   },
   {
     id: "g4",
-    person: "ফাহিম",
+    person: "Fahim",
     type: "GIVEN",
     amount: 8000,
     dueDate: "2026-03-05",
-    note: "পুরনো ধার",
+    note: "Old debt",
     status: "paid",
   },
 
-  // TAKEN (তুমি নিয়েছো → payable)
+  // TAKEN (You took → Payable)
   {
     id: "t1",
-    person: "সালাম ভাই",
+    person: "Salam Bhai",
     type: "TAKEN",
     amount: 25000,
     dueDate: "2026-04-15",
-    note: "ব্যাংক লোনের অংশ",
+    note: "Part of bank loan",
     status: "active",
   },
   {
     id: "t2",
-    person: "আরিফ",
+    person: "Arif",
     type: "TAKEN",
     amount: 12000,
     dueDate: "2026-03-25",
-    note: "বন্ধুর থেকে",
+    note: "From friend",
     status: "due_soon",
   },
   {
     id: "t3",
-    person: "বাবা",
+    person: "Father",
     type: "TAKEN",
     amount: 30000,
     dueDate: "2026-06-01",
-    note: "পড়াশোনার খরচ",
+    note: "Education expenses",
     status: "active",
   },
 ];
@@ -116,13 +116,13 @@ function formatBDT(amount: number) {
 }
 
 function formatDateBD(dateStr: string) {
-  return format(new Date(dateStr), "dd MMM yyyy", { locale: bn });
+  return format(new Date(dateStr), "dd MMM yyyy", { locale: enUS });
 }
 
 function getDebtStatus(dueDate: string, paid = false) {
   if (paid) return "paid";
 
-  const today = new Date("2026-03-04"); // current date
+  const today = new Date("2026-03-04"); // current date for demo
   const due = new Date(dueDate);
   const daysLeft = Math.ceil((due.getTime() - today.getTime()) / 86400000);
 
@@ -143,59 +143,62 @@ export default function DebtsPage() {
   const totalGiven = dummyDebts
     .filter((d) => d.type === "GIVEN" && d.status !== "paid")
     .reduce((sum, d) => sum + d.amount, 0);
+
   const totalTaken = dummyDebts
     .filter((d) => d.type === "TAKEN" && d.status !== "paid")
     .reduce((sum, d) => sum + d.amount, 0);
+
   const overdue = dummyDebts
     .filter(
       (d) => getDebtStatus(d.dueDate) === "overdue" && d.status !== "paid",
     )
     .reduce((sum, d) => sum + d.amount, 0);
+
   const dueSoonList = dummyDebts.filter(
     (d) => getDebtStatus(d.dueDate) === "due_soon" && d.status !== "paid",
   );
 
   const pieData = [
-    { name: "দেওয়া (Given)", value: totalGiven, color: "#3b82f6" },
-    { name: "নেওয়া (Taken)", value: totalTaken, color: "#ef4444" },
+    { name: "Given (Receivable)", value: totalGiven, color: "#3b82f6" },
+    { name: "Taken (Payable)", value: totalTaken, color: "#ef4444" },
   ];
 
   return (
     <div className="space-y-6 pb-24 md:pb-12">
-      {/* 1. Summary Cards */}
+      {/* Summary Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
-          title="মোট দেওয়া"
+          title="Total Given"
           value={totalGiven}
-          subtitle="পাবো"
+          subtitle="You will receive"
           variant="blue"
         />
         <StatCard
-          title="মোট নেওয়া"
+          title="Total Taken"
           value={totalTaken}
-          subtitle="দিতে হবে"
+          subtitle="You have to pay"
           variant="red"
         />
         <StatCard
-          title="শীঘ্রই পাবেন"
+          title="Overdue"
           value={overdue}
-          subtitle="আগামী ৭ দিনের মধ্যে"
+          subtitle="Past due date"
           variant="destructive"
         />
         <StatCard
-          title="শীঘ্রই দিতে হবে"
+          title="Due Soon"
           value={dueSoonList.length}
-          subtitle="আগামী ৭ দিনের মধ্যে"
+          subtitle="Within next 7 days"
           variant="amber"
         />
       </div>
 
-      {/* 6. Upcoming / Overdue Alerts */}
+      {/* Urgent Alerts */}
       {(dueSoonList.length > 0 || overdue > 0) && (
         <Card className="rounded-2xl border-red-400/40 bg-red-50/30 dark:bg-red-950/20">
           <CardHeader className="pb-2">
             <CardTitle className="flex items-center gap-2 text-red-700 dark:text-red-400">
-              <AlertTriangle className="h-5 w-5" /> জরুরি ধার-দেনা সতর্কতা
+              <AlertTriangle className="h-5 w-5" /> Urgent Debt Alerts
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
@@ -212,6 +215,7 @@ export default function DebtsPage() {
                     new Date("2026-03-04").getTime()) /
                     86400000,
                 );
+
                 return (
                   <div
                     key={d.id}
@@ -224,13 +228,13 @@ export default function DebtsPage() {
                   >
                     <div>
                       <p className="font-medium">
-                        {d.person} ({d.type === "GIVEN" ? "দেওয়া" : "নেওয়া"})
+                        {d.person} ({d.type === "GIVEN" ? "Given" : "Taken"})
                       </p>
                       <p className="text-xs text-muted-foreground">
                         Due: {formatDateBD(d.dueDate)}{" "}
                         {days < 0
-                          ? `(${Math.abs(days)} দিন অতিক্রান্ত)`
-                          : `(${days} দিন বাকি)`}
+                          ? `(${Math.abs(days)} days overdue)`
+                          : `(${days} days left)`}
                       </p>
                     </div>
                     <p className="font-semibold text-red-600">
@@ -243,49 +247,52 @@ export default function DebtsPage() {
         </Card>
       )}
 
-      {/* Tabs: Given / Taken */}
+      {/* Tabs & Add Button */}
       <div className="space-y-4">
         <div className="flex flex-col sm:flex-row justify-between gap-4">
           <Tabs
             value={tab}
-            onValueChange={(v) => setTab(v as any)}
-            className="w-full "
+            onValueChange={(v) => setTab(v as "GIVEN" | "TAKEN")}
+            className="w-full"
           >
             <TabsList className="grid w-full sm:w-auto sm:inline-grid grid-cols-2 gap-5 min-w-[320px]">
-              {/* <TabsTrigger value="all">সব</TabsTrigger> */}
-              <TabsTrigger value="GIVEN">দেওয়া টাকা</TabsTrigger>
-              <TabsTrigger value="TAKEN">নেওয়া টাকা</TabsTrigger>
+              <TabsTrigger value="GIVEN">Money Given (Receivable)</TabsTrigger>
+              <TabsTrigger value="TAKEN">Money Taken (Payable)</TabsTrigger>
             </TabsList>
           </Tabs>
 
           <Dialog open={openAdd} onOpenChange={setOpenAdd}>
             <DialogTrigger asChild>
               <Button className="gap-2 bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700 sm:w-auto w-full">
-                <Plus className="h-4 w-4" /> নতুন ধার যোগ
+                <Plus className="h-4 w-4" /> Add New Debt
               </Button>
             </DialogTrigger>
             <DialogContent className="w-[95%] sm:max-w-md rounded-2xl">
               <DialogHeader>
-                <DialogTitle>নতুন ধার-দেনা যোগ করুন</DialogTitle>
+                <DialogTitle>Add New Debt Record</DialogTitle>
               </DialogHeader>
               <div className="grid gap-4 py-4">
                 <div className="grid gap-2">
-                  <Label>ব্যক্তির নাম</Label>
-                  <Input placeholder="যেমন: রহিম ভাই" />
+                  <Label>Person Name</Label>
+                  <Input placeholder="e.g. Rahim Bhai" />
                 </div>
                 <div className="grid gap-2">
-                  <Label>পরিমাণ (৳)</Label>
+                  <Label>Amount (৳)</Label>
                   <Input type="number" placeholder="10000" />
                 </div>
                 <div className="grid gap-2">
-                  <Label>ধরন</Label>
+                  <Label>Type</Label>
                   <Select>
                     <SelectTrigger>
-                      <SelectValue placeholder="বেছে নিন" />
+                      <SelectValue placeholder="Select type" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="GIVEN">দেওয়া (পাবো)</SelectItem>
-                      <SelectItem value="TAKEN">নেওয়া (দিতে হবে)</SelectItem>
+                      <SelectItem value="GIVEN">
+                        Given (I will receive)
+                      </SelectItem>
+                      <SelectItem value="TAKEN">
+                        Taken (I have to pay)
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -294,19 +301,15 @@ export default function DebtsPage() {
                   <Input type="date" />
                 </div>
                 <div className="grid gap-2">
-                  <Label>নোট</Label>
-                  <Input placeholder="বিস্তারিত..." />
+                  <Label>Note</Label>
+                  <Input placeholder="Additional details..." />
                 </div>
               </div>
               <DialogFooter>
-                <Button
-                  className="mt-2 sm:mt-0"
-                  variant="outline"
-                  onClick={() => setOpenAdd(false)}
-                >
-                  বাতিল
+                <Button variant="outline" onClick={() => setOpenAdd(false)}>
+                  Cancel
                 </Button>
-                <Button>সংরক্ষণ করুন</Button>
+                <Button>Save Debt</Button>
               </DialogFooter>
             </DialogContent>
           </Dialog>
@@ -318,31 +321,22 @@ export default function DebtsPage() {
             <Table className="min-w-full">
               <TableHeader className="bg-muted/60">
                 <TableRow>
-                  <TableHead>ব্যক্তি</TableHead>
-                  {/* <TableHead>ধরন</TableHead> */}
-                  <TableHead>পরিমাণ</TableHead>
+                  <TableHead>Person</TableHead>
+                  <TableHead>Amount</TableHead>
                   <TableHead>Due Date</TableHead>
-                  <TableHead>অবস্থা</TableHead>
-                  <TableHead className="text-right">অ্যাকশন</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {filteredDebts.map((debt) => {
                   const status = getDebtStatus(debt.dueDate);
+
                   return (
                     <TableRow key={debt.id} className="hover:bg-muted/50">
                       <TableCell className="font-medium">
                         {debt.person}
                       </TableCell>
-                      {/* <TableCell>
-                        <Badge
-                          variant={
-                            debt.type === "GIVEN" ? "default" : "destructive"
-                          }
-                        >
-                          {debt.type === "GIVEN" ? "দেওয়া" : "নেওয়া"}
-                        </Badge>
-                      </TableCell> */}
                       <TableCell
                         className={cn(
                           "font-semibold",
@@ -367,34 +361,20 @@ export default function DebtsPage() {
                           }
                         >
                           {status === "paid"
-                            ? "পরিশোধিত"
+                            ? "Paid"
                             : status === "overdue"
-                              ? "মেয়াদোত্তীর্ণ"
+                              ? "Overdue"
                               : status === "due_soon"
-                                ? "শীঘ্রই শেষ হবে"
-                                : "বাকি"}
+                                ? "Due Soon"
+                                : "Active"}
                         </Badge>
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-1">
-                          {/* <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8"
-                          >
-                            <Pencil className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8 text-destructive"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button> */}
                           <Button
                             variant="outline"
                             size="icon"
-                            className="h-8 w-8 text-destructive"
+                            className="h-8 w-8"
                           >
                             <Eye className="h-4 w-4 text-gray-500" />
                           </Button>
@@ -409,11 +389,11 @@ export default function DebtsPage() {
         </Card>
       </div>
 
-      {/* 5. Analytics - Given vs Taken Pie */}
+      {/* Analytics - Pie Chart */}
       <Card className="rounded-2xl shadow-sm">
         <CardHeader>
-          <CardTitle>ধার-দেনার অনুপাত</CardTitle>
-          <CardDescription>দেওয়া vs নেওয়া</CardDescription>
+          <CardTitle>Debt Overview</CardTitle>
+          <CardDescription>Given vs Taken</CardDescription>
         </CardHeader>
         <CardContent className="h-64 sm:h-72">
           <ResponsiveContainer>
@@ -440,7 +420,7 @@ export default function DebtsPage() {
         </CardContent>
       </Card>
 
-      {/* Mobile floating add */}
+      {/* Mobile floating add button */}
       <div className="fixed bottom-6 right-6 z-50 md:hidden">
         <Button
           size="icon"
