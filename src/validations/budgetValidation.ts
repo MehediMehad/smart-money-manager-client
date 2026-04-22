@@ -1,10 +1,7 @@
 import { z } from "zod";
 
 export const budgetSchema = z.object({
-    type: z.enum(["DAILY", "MONTHLY"], {
-        required_error: "Please select budget type",
-    }),
-
+    type: z.enum(["DAILY", "MONTHLY"]),
     date: z.string().optional(),
     month: z.string().optional(),
 
