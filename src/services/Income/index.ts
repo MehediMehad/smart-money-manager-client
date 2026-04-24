@@ -65,66 +65,26 @@ export const createIncome = async (
     }
 };
 
-export const getIncomes = async (
-    params?: TGetExpensesParams
-): Promise<TApiResponse<any[]>> => {
+export async function getIncomes(queryString?: string) {
     try {
-        const accessToken = await getValidToken();
-
-        if (!accessToken) {
-            return {
-                success: false,
-                statusCode: 401,
-                message: "Authentication required",
-                data: [],
-            };
-        }
-
-        const searchParams = new URLSearchParams();
-
-        if (params?.searchTerm) searchParams.set("searchTerm", params.searchTerm);
-        if (params?.categoryId) searchParams.set("categoryId", params.categoryId);
-        if (params?.month) searchParams.set("month", params.month);
-        if (params?.year) searchParams.set("year", params.year);
-        if (params?.date_range) searchParams.set("date_range", params.date_range);
-
-        const endpoint = `/incomes${searchParams.toString() ? `?${searchParams.toString()}` : ""}`;
-
-        const response = await serverFetch.get(endpoint, {
-            headers: {
-                Authorization: `Bearer ${accessToken}`,
-            },
-            cache: "no-cache",
-            next: { tags: [TAG] },
+        const response = await serverFetch.get(`/incomes${queryString ? `?${queryString}` : ""}`, {
+            next: {
+                tags: [TAG],
+                revalidate: 180
+            }
         });
-
-        const result = await response.json().catch(() => ({}));
-
-        if (!response.ok) {
-            return {
-                success: false,
-                statusCode: response.status,
-                message: result.message || "Failed to fetch expenses",
-                data: [],
-                meta: result.meta,
-            };
-        }
-
-        return {
-            success: true,
-            statusCode: response.status,
-            message: result.message || "Expenses fetched successfully",
-            data: result.data ?? [],
-        };
+        const result = await response.json();
+        return result;
     } catch (error: any) {
+        console.log(error);
         return {
             success: false,
-            statusCode: 500,
-            message: error.message || "Failed to fetch expenses",
-            data: [],
+            message: `${process.env.NODE_ENV === 'development' ? error.message : 'Something went wrong'}`
         };
     }
-};
+}
+
+
 export const getSingleIncome = async (
     id: string
 ): Promise<TApiResponse<any | null>> => {
