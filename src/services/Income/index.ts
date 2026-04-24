@@ -67,7 +67,11 @@ export const createIncome = async (
 
 export async function getIncomes(queryString?: string) {
     try {
+        const accessToken = await getValidToken();
         const response = await serverFetch.get(`/incomes${queryString ? `?${queryString}` : ""}`, {
+            headers: {
+                Authorization: `Bearer ${accessToken}`,
+            },
             next: {
                 tags: [TAG],
                 revalidate: 180

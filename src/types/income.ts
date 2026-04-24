@@ -1,3 +1,18 @@
+export interface TIncome {
+    id: string
+    note: string
+    amount: number
+    date: string
+    category: Category
+}
+
+export interface Category {
+    id: string
+    name: string
+    emoji: string
+    type: string
+}
+
 
 export type TIncomeRow = {
     id: string;
