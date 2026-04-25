@@ -17,12 +17,10 @@ const IncomePage = async ({
   const searchParamsObj = await searchParams;
   const queryString = queryStringFormatter(searchParamsObj);
 
-  const incomesResult = await getIncomes(queryString);
-
-  const queryStringCategories = queryStringFormatter({
-    type: "INCOME",
-  });
-  const categoriesResult = await getCategories(queryStringCategories);
+  const [incomesResult, categoriesResult] = await Promise.all([
+    getIncomes(queryString),
+    getCategories(queryStringFormatter({ type: "INCOME" })),
+  ]);
 
   const categories = categoriesResult.data;
   const allUsedCategories = incomesResult.data.allUsedCategories || [];
@@ -36,7 +34,10 @@ const IncomePage = async ({
       <IncomesFilter categories={allUsedCategories || []} />
 
       <Suspense fallback={<TableSkeleton columns={5} rows={10} />}>
-        <IncomesTable incomes={incomesResult?.data.data || []} />
+        <IncomesTable
+          incomes={incomesResult?.data.data || []}
+          categories={categories || []}
+        />
       </Suspense>
     </div>
   );

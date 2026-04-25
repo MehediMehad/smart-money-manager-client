@@ -1,35 +1,34 @@
 "use client";
 
-import { deleteIncome } from "@/services/Income";
-import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { deleteIncome, updateIncome } from "@/services/Income";
+import { useState } from "react";
 import { toast } from "sonner";
-import IncomeFormDialog from "./IncomeFormDialog";
 import DeleteConfirmationDialog from "@/components/shared/DeleteConfirmationDialog";
 import ManagementTable from "@/components/shared/ManagementTable";
-import { TIncome } from "@/types";
+import { TCategory, TIncome } from "@/types";
 import { incomeColumns } from "./incomeColumns";
+import IncomeFormDialog from "./IncomeFormDialog";
 
-const IncomesTable = ({ incomes }: { incomes: TIncome[] }) => {
-  const router = useRouter();
-  const [, startTransition] = useTransition();
-
+const IncomesTable = ({
+  incomes = [],
+  categories,
+}: {
+  incomes: TIncome[];
+  categories: TCategory[];
+}) => {
   const [deleting, setDeleting] = useState<any>(null);
-  const [editing, setEditing] = useState<any>(null);
+  const [editing, setEditing] = useState<TIncome | null>(null);
 
-  const handleRefresh = () => {
-    startTransition(() => router.refresh());
+  const handleEdit = (item: TIncome) => {
+    setEditing(item);
   };
 
   const confirmDelete = async () => {
     if (!deleting) return;
-
     const result = await deleteIncome(deleting.id);
-
     if (result.success) {
       toast.success(result.message);
       setDeleting(null);
-      handleRefresh();
     } else {
       toast.error(result.message);
     }
@@ -40,24 +39,23 @@ const IncomesTable = ({ incomes }: { incomes: TIncome[] }) => {
       <ManagementTable
         data={incomes}
         columns={incomeColumns}
-        onEdit={(item) => setEditing(item)}
+        onEdit={handleEdit}
         onDelete={(item) => setDeleting(item)}
         getRowKey={(item) => item.id}
         emptyMessage="No income found"
       />
 
       {/* Edit */}
-      {/* <IncomeFormDialog
-        mode="edit"
-        income={editing}
+      <IncomeFormDialog
+        key={editing?.id || "edit-income"}
         open={!!editing}
+        income={editing || undefined}
+        categories={categories || []}
+        onClose={() => setEditing(null)}
         onSuccess={() => {
           setEditing(null);
-          handleRefresh();
         }}
-        onClose={() => setEditing(null)}
-        categories={[]}
-      /> */}
+      />
 
       {/* Delete */}
       <DeleteConfirmationDialog
@@ -65,7 +63,7 @@ const IncomesTable = ({ incomes }: { incomes: TIncome[] }) => {
         onOpenChange={() => setDeleting(null)}
         onConfirm={confirmDelete}
         title="Delete Income"
-        description={`Delete ${deleting?.note}?`}
+        description={`Are you sure you want to delete  ${deleting?.note}?`}
       />
     </>
   );

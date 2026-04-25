@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
 import { toast } from "sonner";
-import { CalendarIcon, Pencil, Plus } from "lucide-react";
+import { CalendarIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,7 +16,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import {
   Form,
@@ -39,24 +38,23 @@ import { createIncome, updateIncome } from "@/services/Income";
 import { IncomeFormValues, incomeSchema } from "@/validations/incomeValidation";
 
 type Props = {
-  mode: "create" | "edit";
+  open: boolean;
+  onClose: () => void;
+  onSuccess: () => void;
   income?: any;
-  isIcon?: boolean;
-  onSuccess?: () => void | Promise<void>;
   categories: TCategory[];
 };
 
 export default function IncomeFormDialog({
-  mode,
-  income,
-  isIcon,
+  open,
+  onClose,
   onSuccess,
-  categories,
+  income,
+  categories = [],
 }: Props) {
-  const isEdit = mode === "edit";
-  const incomeCategories = categories.filter((cat) => cat.type === "INCOME");
+  const isEdit = Boolean(income);
+  const incomeCategories = categories;
 
-  const [open, setOpen] = useState(false);
   const [datePickerOpen, setDatePickerOpen] = useState(false);
 
   const noteInputRef = useRef<HTMLTextAreaElement>(null);
@@ -137,9 +135,7 @@ export default function IncomeFormDialog({
 
       reset(getDefaultValues());
       setDatePickerOpen(false);
-      setOpen(false);
-
-      await onSuccess?.();
+      onSuccess();
     } catch (err: any) {
       toast.error(
         err?.message || `Failed to ${isEdit ? "update" : "create"} income`,
@@ -147,38 +143,19 @@ export default function IncomeFormDialog({
     }
   };
 
-  const handleCancel = () => {
+  const handleClose = () => {
     reset(getDefaultValues());
     setDatePickerOpen(false);
-    setOpen(false);
+    onClose();
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        {isIcon ? (
-          <Button
-            size="icon"
-            className="rounded-full h-14 w-14 shadow-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700"
-          >
-            <Plus className="h-7 w-7" />
-          </Button>
-        ) : isEdit ? (
-          <Button
-            variant="ghost"
-            size="icon"
-            className="text-blue-600 transition-colors hover:text-blue-700 hover:bg-blue-100"
-          >
-            <Pencil className="h-4 w-4" />
-          </Button>
-        ) : (
-          <Button className="gap-2 py-5 bg-gradient-to-r from-emerald-700 to-teal-600 hover:from-emerald-800 hover:to-teal-700">
-            <Plus className="h-4 w-4" />
-            Add Income
-          </Button>
-        )}
-      </DialogTrigger>
-
+    <Dialog
+      open={open}
+      onOpenChange={(isOpen) => {
+        if (!isOpen) handleClose();
+      }}
+    >
       <DialogContent className="max-w-[90%] md:max-w-xl rounded-2xl">
         <DialogHeader>
           <DialogTitle>{isEdit ? "Edit Income" : "Add New Income"}</DialogTitle>
@@ -324,7 +301,7 @@ export default function IncomeFormDialog({
             />
 
             <DialogFooter className="flex-col sm:flex-row gap-3 pt-4">
-              <Button type="button" variant="outline" onClick={handleCancel}>
+              <Button type="button" variant="outline" onClick={handleClose}>
                 Cancel
               </Button>
               <Button
