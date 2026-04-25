@@ -36,7 +36,7 @@ const IncomePage = async ({
       <Suspense fallback={<TableSkeleton columns={5} rows={10} />}>
         <IncomesTable
           incomes={incomesResult?.data.data || []}
-          categories={categories || []}
+          categories={allUsedCategories || []}
         />
       </Suspense>
     </div>
