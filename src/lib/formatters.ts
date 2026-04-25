@@ -1,4 +1,6 @@
 export function queryStringFormatter(searchParamsObj: { [key: string]: string | string[] | undefined }): string {
+    console.log("searchParamsObj", searchParamsObj);
+
     let queryString = "";
     // {searchTerm: "John", speciality: "Cardiology"}
     // after entries: [ ["searchTerm", "John"], ["speciality", "Cardiology"] ]

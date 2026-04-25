@@ -3,10 +3,11 @@
 import { queryStringFormatter } from "@/lib/formatters";
 import { getIncomes } from "@/services/Income";
 import { Suspense } from "react";
-import IncomeHeader from "./_components/IncomeHeader";
 import IncomesFilter from "./_components/IncomesFilter";
 import { TableSkeleton } from "@/components/shared/TableSkeleton";
 import IncomesTable from "./_components/IncomesTable";
+import IncomeHeader from "./_components/IncomeHeader";
+import { getCategories } from "@/services/Category";
 
 const IncomePage = async ({
   searchParams,
@@ -18,25 +19,24 @@ const IncomePage = async ({
 
   const incomesResult = await getIncomes(queryString);
 
-  console.log("incomesResult", incomesResult);
+  const queryStringCategories = queryStringFormatter({
+    type: "INCOME",
+  });
+  const categoriesResult = await getCategories(queryStringCategories);
 
-  // const totalPages = Math.ceil(
-  //   (incomesResult?.meta?.total || 1) / (incomesResult?.meta?.limit || 1),
-  // );
+  const categories = categoriesResult.data;
+  const allUsedCategories = incomesResult.data.allUsedCategories || [];
 
   return (
     <div className="space-y-6">
-      <IncomeHeader />
+      <div>
+        <IncomeHeader categories={categories || []} />
+      </div>
 
-      <IncomesFilter categories={incomesResult?.categories || []} />
+      <IncomesFilter categories={allUsedCategories || []} />
 
       <Suspense fallback={<TableSkeleton columns={5} rows={10} />}>
-        <IncomesTable incomes={incomesResult?.data || []} />
-
-        {/* <TablePagination
-          currentPage={incomesResult?.meta?.page || 1}
-          totalPages={totalPages || 1}
-        /> */}
+        <IncomesTable incomes={incomesResult?.data.data || []} />
       </Suspense>
     </div>
   );

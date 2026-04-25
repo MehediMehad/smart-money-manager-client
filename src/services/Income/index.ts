@@ -88,7 +88,6 @@ export async function getIncomes(queryString?: string) {
     }
 }
 
-
 export const getSingleIncome = async (
     id: string
 ): Promise<TApiResponse<any | null>> => {

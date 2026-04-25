@@ -54,7 +54,7 @@ export default function IncomeFormModal({
   categories,
 }: Props) {
   const isEdit = mode === "edit";
-  const incomeCategories = categories.filter((cat) => cat.type === "INCOME");
+  // const incomeCategories = categories.filter((cat) => cat.type === "INCOME");
 
   const [open, setOpen] = useState(false);
   const [datePickerOpen, setDatePickerOpen] = useState(false);
@@ -97,7 +97,7 @@ export default function IncomeFormModal({
   } = form;
 
   const selectedCategoryId = watch("categoryId");
-  const selectedCategory = incomeCategories.find(
+  const selectedCategory = categories.find(
     (cat) => cat.id === selectedCategoryId,
   );
 
@@ -241,13 +241,13 @@ export default function IncomeFormModal({
                 <FormItem>
                   <FormLabel>Category</FormLabel>
                   <div className="max-h-72 overflow-y-auto -mx-1 px-1">
-                    {incomeCategories.length === 0 ? (
+                    {categories.length === 0 ? (
                       <p className="text-center text-sm text-muted-foreground py-4">
                         No income categories available
                       </p>
                     ) : (
                       <div className="flex flex-wrap gap-2">
-                        {incomeCategories.map((cat) => (
+                        {categories.map((cat) => (
                           <button
                             key={cat.id}
                             type="button"

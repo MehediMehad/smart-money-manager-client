@@ -1,37 +1,23 @@
-"use client";
+import IncomeFormModal from "@/components/modules/dashboard/Income/IncomeFormModal";
+import { TCategory } from "@/types";
 
-import { Plus } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useTransition } from "react";
-import IncomeFormDialog from "./IncomeFormDialog";
-import DashboardPageHeader from "@/components/shared/DashboardPageHeader";
+type Props = {
+  categories: TCategory[];
+};
 
-const IncomeHeader = () => {
-  const router = useRouter();
-  const [, startTransition] = useTransition();
-
-  const handleSuccess = () => {
-    startTransition(() => {
-      router.refresh();
-    });
-  };
-
+const IncomeHeader = ({ categories }: Props = { categories: [] }) => {
   return (
-    <DashboardPageHeader
-      title="Income Management"
-      description="Manage your incomes"
-      action={{
-        label: "Add Income",
-        icon: Plus,
-        component: (
-          <IncomeFormDialog
-            mode="create"
-            onSuccess={handleSuccess}
-            categories={[]} // later API theke diba
-          />
-        ),
-      }}
-    />
+    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <div>
+        <h1 className="text-2xl font-bold flex items-center gap-2">
+          📈 Income
+        </h1>
+      </div>
+
+      <div className="hidden sm:block">
+        <IncomeFormModal mode="create" categories={categories || []} />
+      </div>
+    </div>
   );
 };
 

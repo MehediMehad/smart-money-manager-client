@@ -5,6 +5,8 @@ import config from "@/configs";
 import { cookies } from "next/headers";
 import { revalidateTag } from "next/cache";
 import { TApiResponse } from "@/types";
+import { getValidToken } from "../Auth/verifyToken";
+import { serverFetch } from "@/lib/utils/serverFetch";
 
 const TAG = "categories";
 
@@ -135,7 +137,7 @@ type TGetCategoriesParams = {
     searchTerm?: string;
 };
 
-export const getCategories = async (params?: TGetCategoriesParams) => {
+export const getCategories2 = async (params?: TGetCategoriesParams) => {
     try {
         const accessToken = (await cookies()).get("accessToken")?.value;
 
@@ -185,6 +187,29 @@ export const getCategories = async (params?: TGetCategoriesParams) => {
         };
     }
 };
+
+export async function getCategories(queryString?: string) {
+    try {
+        const accessToken = await getValidToken();
+        const response = await serverFetch.get(`/categories${queryString ? `?${queryString}` : ""}`, {
+            headers: {
+                Authorization: `Bearer ${accessToken}`,
+            },
+            next: {
+                tags: ["categories"],
+                revalidate: 180
+            }
+        });
+        const result = await response.json();
+        return result;
+    } catch (error: any) {
+        console.log(error);
+        return {
+            success: false,
+            message: `${process.env.NODE_ENV === 'development' ? error.message : 'Something went wrong'}`
+        };
+    }
+}
 
 export const deleteCategory = async (id: string): Promise<TApiResponse<null>> => {
     try {
