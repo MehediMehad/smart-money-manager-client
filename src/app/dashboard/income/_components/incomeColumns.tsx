@@ -8,7 +8,7 @@ export const incomeColumns: Column<TIncome>[] = [
   {
     header: "Date",
     accessor: (income) => <DateCell date={income.date} />,
-    // sortKey: "date",
+    sortKey: "date",
   },
   {
     header: "Note",
@@ -32,6 +32,6 @@ export const incomeColumns: Column<TIncome>[] = [
         ৳{income.amount?.toLocaleString()}
       </span>
     ),
-    // sortKey: "amount",
+    sortKey: "amount",
   },
 ];

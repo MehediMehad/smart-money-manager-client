@@ -4,6 +4,7 @@ import {
   ArrowUp,
   ArrowUpDown,
   Edit,
+  Edit2,
   Eye,
   Loader2,
   MoreHorizontal,
@@ -26,6 +27,7 @@ import {
   TableHeader,
   TableRow,
 } from "../ui/table";
+import { TIncome } from "@/types";
 
 export interface Column<T> {
   header: string;
@@ -40,6 +42,7 @@ interface ManagementTableProps<T> {
   onView?: (row: T) => void;
   onEdit?: (row: T) => void;
   onDelete?: (row: T) => void;
+  actionVariant?: "primary" | "secondary";
   getRowKey: (row: T) => string;
   emptyMessage?: string;
   isRefreshing?: boolean;
@@ -51,6 +54,7 @@ function ManagementTable<T>({
   onView,
   onEdit,
   onDelete,
+  actionVariant = "primary",
   getRowKey,
   emptyMessage = "No records found.",
   isRefreshing = false,
@@ -111,7 +115,7 @@ function ManagementTable<T>({
 
         <Table>
           <TableHeader>
-            <TableRow>
+            <TableRow className="border-b">
               {columns?.map((column, colIndex) => (
                 <TableHead key={colIndex} className={column.className}>
                   {column.sortKey ? (
@@ -153,39 +157,26 @@ function ManagementTable<T>({
                         : String(item[col.accessor])}
                     </TableCell>
                   ))}
-                  {hasActions && (
-                    <TableCell>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          {onView && (
-                            <DropdownMenuItem onClick={() => onView(item)}>
-                              <Eye className="mr-2 h-4 w-4" />
-                              View
-                            </DropdownMenuItem>
-                          )}
-                          {onEdit && (
-                            <DropdownMenuItem onClick={() => onEdit(item)}>
-                              <Edit className="mr-2 h-4 w-4" />
-                              Edit
-                            </DropdownMenuItem>
-                          )}
-                          {onDelete && (
-                            <DropdownMenuItem
-                              onClick={() => onDelete(item)}
-                              className="text-destructive"
-                            >
-                              <Trash className="mr-2 h-4 w-4" />
-                              Delete
-                            </DropdownMenuItem>
-                          )}
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
+                  {hasActions && actionVariant === "secondary" && (
+                    <ActionVariantSecondaryTableCell
+                      item={item as TIncome}
+                      onView={onView as ((item: TIncome) => void) | undefined}
+                      onEdit={onEdit as ((item: TIncome) => void) | undefined}
+                      onDelete={
+                        onDelete as ((item: TIncome) => void) | undefined
+                      }
+                    />
+                  )}
+
+                  {hasActions && actionVariant === "primary" && (
+                    <ActionVariantPrimaryTableCell
+                      item={item as TIncome}
+                      onView={onView as ((item: TIncome) => void) | undefined}
+                      onEdit={onEdit as ((item: TIncome) => void) | undefined}
+                      onDelete={
+                        onDelete as ((item: TIncome) => void) | undefined
+                      }
+                    />
                   )}
                 </TableRow>
               ))
@@ -198,3 +189,89 @@ function ManagementTable<T>({
 }
 
 export default ManagementTable;
+
+// Action Components
+type ActionVariantTableCellProps = {
+  item: TIncome;
+  onView?: (item: TIncome) => void;
+  onEdit?: (item: TIncome) => void;
+  onDelete?: (item: TIncome) => void;
+};
+
+const ActionVariantPrimaryTableCell = ({
+  item,
+  onView,
+  onEdit,
+  onDelete,
+}: ActionVariantTableCellProps) => {
+  return (
+    <TableCell>
+      <div className="flex items-center gap-2">
+        {onView && (
+          <Button variant="ghost" size="icon" onClick={() => onView(item)}>
+            <Eye className="h-4 w-4" />
+          </Button>
+        )}
+
+        {onEdit && (
+          <Button variant="ghost" size="icon" onClick={() => onEdit(item)}>
+            <Edit2 className="h-4 w-4" />
+          </Button>
+        )}
+
+        {onDelete && (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => onDelete(item)}
+            className="text-destructive"
+          >
+            <Trash className="h-4 w-4" />
+          </Button>
+        )}
+      </div>
+    </TableCell>
+  );
+};
+
+const ActionVariantSecondaryTableCell = ({
+  item,
+  onView,
+  onEdit,
+  onDelete,
+}: ActionVariantTableCellProps) => {
+  return (
+    <TableCell>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" size="icon">
+            <MoreHorizontal className="h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          {onView && (
+            <DropdownMenuItem onClick={() => onView(item)}>
+              <Eye className="mr-2 h-4 w-4" />
+              View
+            </DropdownMenuItem>
+          )}
+          {onEdit && (
+            <DropdownMenuItem onClick={() => onEdit(item)}>
+              <Edit className="mr-2 h-4 w-4" />
+              Edit
+            </DropdownMenuItem>
+          )}
+          {onDelete && (
+            <DropdownMenuItem
+              onClick={() => onDelete(item)}
+              className="text-destructive"
+            >
+              <Trash className="mr-2 h-4 w-4" />
+              Delete
+            </DropdownMenuItem>
+          )}
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </TableCell>
+  );
+};
