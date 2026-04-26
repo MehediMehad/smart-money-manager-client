@@ -8,8 +8,6 @@ import { TApiResponse, TUpdateExpenseForm, TCreateExpenseForm, TGetExpensesParam
 
 const TAG = "expenses";
 
-
-
 export const createExpense = async (
     data: TCreateExpenseForm
 ): Promise<TApiResponse<any>> => {

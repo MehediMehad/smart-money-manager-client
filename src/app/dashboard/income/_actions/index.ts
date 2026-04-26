@@ -1,4 +1,4 @@
-// src/services/Income/index.ts
+// src/app/dashboard/income/_actions/index.ts
 "use server";
 
 import { revalidateTag } from "next/cache";
