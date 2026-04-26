@@ -22,7 +22,7 @@ const IncomePage = async ({
   ]);
 
   const categories = categoriesResult.data;
-  const allUsedCategories = incomesResult.data.allUsedCategories || [];
+  const incomes = incomesResult.data;
 
   return (
     <div className="space-y-6">
@@ -31,10 +31,7 @@ const IncomePage = async ({
       </div>
 
       <Suspense fallback={<TableSkeleton columns={5} rows={10} />}>
-        <IncomesTable
-          incomes={incomesResult?.data.data || []}
-          categories={categories || []}
-        />
+        <IncomesTable incomes={incomes || []} categories={categories || []} />
       </Suspense>
     </div>
   );

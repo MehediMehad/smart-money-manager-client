@@ -168,7 +168,7 @@ export default function IncomeFormDialog({
               name="date"
               render={({ field }) => (
                 <FormItem className="flex flex-col">
-                  <FormLabel>Date</FormLabel>
+                  <FormLabel className="mb-2">Date</FormLabel>
                   <Popover
                     open={datePickerOpen}
                     onOpenChange={setDatePickerOpen}
@@ -311,10 +311,10 @@ export default function IncomeFormDialog({
               >
                 {isSubmitting
                   ? isEdit
-                    ? "Updating..."
+                    ? "Saving..."
                     : "Adding Income..."
                   : isEdit
-                    ? "Update Income"
+                    ? "Save Changes"
                     : "Add Income"}
               </Button>
             </DialogFooter>

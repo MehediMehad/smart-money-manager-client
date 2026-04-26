@@ -44,6 +44,7 @@ const IncomeHeader = ({ categories }: Props = { categories: [] }) => {
         onClick={handleOpenDialog}
         className="hidden sm:flex items-center gap-2 py-5 bg-gradient-to-r from-emerald-700 to-teal-600 hover:from-emerald-800 hover:to-teal-700"
       >
+        <Plus className="h-4 w-4" />
         Add Income
       </Button>
 
