@@ -27,7 +27,6 @@ import {
   TableHeader,
   TableRow,
 } from "../ui/table";
-import { TIncome } from "@/types";
 
 // export interface Column<T> {
 //   header: string;
@@ -168,23 +167,19 @@ function ManagementTable<T>({
                   ))}
                   {hasActions && actionVariant === "secondary" && (
                     <ActionVariantSecondaryTableCell
-                      item={item as TIncome}
-                      onView={onView as ((item: TIncome) => void) | undefined}
-                      onEdit={onEdit as ((item: TIncome) => void) | undefined}
-                      onDelete={
-                        onDelete as ((item: TIncome) => void) | undefined
-                      }
+                      item={item}
+                      onView={onView as ((item: T) => void) | undefined}
+                      onEdit={onEdit as ((item: T) => void) | undefined}
+                      onDelete={onDelete as ((item: T) => void) | undefined}
                     />
                   )}
 
                   {hasActions && actionVariant === "primary" && (
                     <ActionVariantPrimaryTableCell
-                      item={item as TIncome}
-                      onView={onView as ((item: TIncome) => void) | undefined}
-                      onEdit={onEdit as ((item: TIncome) => void) | undefined}
-                      onDelete={
-                        onDelete as ((item: TIncome) => void) | undefined
-                      }
+                      item={item}
+                      onView={onView as ((item: T) => void) | undefined}
+                      onEdit={onEdit as ((item: T) => void) | undefined}
+                      onDelete={onDelete as ((item: T) => void) | undefined}
                     />
                   )}
                 </TableRow>
@@ -201,10 +196,10 @@ export default ManagementTable;
 
 // Action Components
 type ActionVariantTableCellProps = {
-  item: TIncome;
-  onView?: (item: TIncome) => void;
-  onEdit?: (item: TIncome) => void;
-  onDelete?: (item: TIncome) => void;
+  item: any;
+  onView?: (item: any) => void;
+  onEdit?: (item: any) => void;
+  onDelete?: (item: any) => void;
 };
 
 const ActionVariantPrimaryTableCell = ({

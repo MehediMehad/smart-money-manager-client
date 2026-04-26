@@ -3,13 +3,10 @@
 
 import { revalidateTag } from "next/cache";
 import { serverFetch } from "@/lib/utils/serverFetch";
-import {
-  TApiResponse,
-  TUpdateExpenseForm,
-  TCreateExpenseForm,
-  TGetExpensesParams,
-} from "@/types";
+
 import { getValidToken } from "@/services/Auth/verifyToken";
+import { TApiResponse } from "@/types";
+import { TCreateExpenseForm } from "../_lib/types";
 
 const TAG = "expenses";
 
@@ -151,7 +148,7 @@ export const getSingleExpense = async (
 
 export const updateExpense = async (
   id: string,
-  data: TUpdateExpenseForm,
+  data: Partial<TCreateExpenseForm>,
 ): Promise<TApiResponse<any>> => {
   try {
     const accessToken = await getValidToken();
