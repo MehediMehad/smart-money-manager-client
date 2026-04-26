@@ -20,6 +20,7 @@ export const incomeColumns: Column<TIncome>[] = [
     accessor: (income) => (
       <span className="line-clamp-1">{income.note || "N/A"}</span>
     ),
+    className: "hidden md:table-cell",
   },
   {
     header: "Category",
@@ -29,6 +30,7 @@ export const incomeColumns: Column<TIncome>[] = [
         <span>{income.category?.name || "N/A"}</span>
       </div>
     ),
+    className: "hidden md:table-cell",
   },
   {
     header: "Amount",

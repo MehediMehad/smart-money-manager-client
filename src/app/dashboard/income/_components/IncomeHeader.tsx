@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import IncomeFormDialog from "./IncomeFormDialog";
 import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
 
 type Props = {
   categories: TCategory[];
@@ -41,7 +42,7 @@ const IncomeHeader = ({ categories }: Props = { categories: [] }) => {
 
       <Button
         onClick={handleOpenDialog}
-        className="gap-2 py-5 bg-gradient-to-r from-emerald-700 to-teal-600 hover:from-emerald-800 hover:to-teal-700"
+        className="hidden sm:flex items-center gap-2 py-5 bg-gradient-to-r from-emerald-700 to-teal-600 hover:from-emerald-800 hover:to-teal-700"
       >
         Add Income
       </Button>
@@ -53,6 +54,15 @@ const IncomeHeader = ({ categories }: Props = { categories: [] }) => {
         onClose={handleCloseDialog}
         onSuccess={handleSuccess}
       />
+
+      {/* Mobile Add Button */}
+      {/* Mobile Add Button */}
+      <Button
+        onClick={handleOpenDialog}
+        className="sm:hidden fixed bottom-6 right-6 h-14 w-14 rounded-full shadow-lg bg-gradient-to-r from-emerald-700 to-teal-600 hover:from-emerald-800 hover:to-teal-700 flex items-center justify-center"
+      >
+        <Plus className="h-6 w-6" />
+      </Button>
     </div>
   );
 };

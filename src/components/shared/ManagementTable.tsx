@@ -109,7 +109,7 @@ function ManagementTable<T>({
   };
   return (
     <>
-      <div className="rounded-lg border relative">
+      <div className="rounded-lg border relative overflow-auto ">
         {/* Refreshing Overlay */}
         {isRefreshing && (
           <div className="absolute inset-0 bg-background/50 backdrop-blur-[2px] flex items-center justify-center z-10 rounded-lg">
@@ -134,7 +134,7 @@ function ManagementTable<T>({
                       {getSortIcon(column.sortKey)}
                     </span>
                   ) : (
-                    <div className="flex items-center py-2 font-medium">
+                    <div className="flex items-center p-2 font-medium">
                       {column.header}
                     </div>
                   )}
@@ -215,7 +215,7 @@ const ActionVariantPrimaryTableCell = ({
 }: ActionVariantTableCellProps) => {
   return (
     <TableCell>
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-0 md:gap-2">
         {onView && (
           <Button variant="ghost" size="icon" onClick={() => onView(item)}>
             <Eye className="h-4 w-4" />

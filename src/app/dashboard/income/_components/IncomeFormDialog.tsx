@@ -156,7 +156,7 @@ export default function IncomeFormDialog({
         if (!isOpen) handleClose();
       }}
     >
-      <DialogContent className="max-w-[90%] md:max-w-xl rounded-2xl">
+      <DialogContent className="w-[95%] sm:w-full overflow-y-auto rounded-2xl">
         <DialogHeader>
           <DialogTitle>{isEdit ? "Edit Income" : "Add New Income"}</DialogTitle>
         </DialogHeader>

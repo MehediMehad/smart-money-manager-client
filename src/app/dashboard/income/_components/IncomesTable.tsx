@@ -8,6 +8,7 @@ import ManagementTable from "@/components/shared/ManagementTable";
 import { TCategory, TIncome } from "@/types";
 import { incomeColumns } from "./incomeColumns";
 import IncomeFormDialog from "./IncomeFormDialog";
+import IncomeViewDialog from "./IncomeViewDialog";
 
 const IncomesTable = ({
   incomes = [],
@@ -16,6 +17,7 @@ const IncomesTable = ({
   incomes: TIncome[];
   categories: TCategory[];
 }) => {
+  const [viewing, setViewing] = useState<TIncome | null>(null);
   const [deleting, setDeleting] = useState<any>(null);
   const [editing, setEditing] = useState<TIncome | null>(null);
 
@@ -36,14 +38,19 @@ const IncomesTable = ({
 
   return (
     <>
-      <ManagementTable
-        data={incomes}
-        columns={incomeColumns}
-        onEdit={handleEdit}
-        onDelete={(item) => setDeleting(item)}
-        getRowKey={(item) => item.id}
-        emptyMessage="No income found"
-      />
+      <div className="overflow-x-auto">
+        <ManagementTable
+          data={incomes}
+          columns={incomeColumns}
+          onView={(item) => setViewing(item)}
+          onEdit={handleEdit}
+          onDelete={(item) => setDeleting(item)}
+          getRowKey={(item) => item.id}
+          emptyMessage="No income found"
+        />
+      </div>
+
+      <IncomeViewDialog income={viewing} onClose={() => setViewing(null)} />
 
       {/* Edit */}
       <IncomeFormDialog

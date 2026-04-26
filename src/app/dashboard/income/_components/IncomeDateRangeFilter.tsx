@@ -13,6 +13,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
 
 interface IncomeDateRangeFilterProps {
   compact?: boolean;
@@ -203,12 +204,17 @@ const IncomeDateRangeFilter = ({
           type="button"
           variant={compact ? "link" : "default"}
           disabled={isPending}
-          className="justify-start text-left font-normal"
+          className={cn(
+            "justify-start text-left font-normal",
+            compact && "h-auto px-1 py-0",
+          )}
         >
           {!compact && <CalendarIcon className="mr-2 h-4 w-4" />}
           {compact ? (
             <div className="flex items-center h-8 gap-1.5 text-base font-medium text-slate-600 hover:text-slate-900">
-              <span className="text-slate-500 text-xs ">({label})</span>
+              <span className="hidden md:inline text-slate-500 text-xs ">
+                ({label})
+              </span>
               <CalendarIcon className="h-4 w-4 text-emerald-600" />
             </div>
           ) : (
