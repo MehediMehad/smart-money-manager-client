@@ -14,6 +14,10 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 
+interface IncomeDateRangeFilterProps {
+  compact?: boolean;
+}
+
 /**
  * IncomeDateRangeFilter
  *
@@ -23,7 +27,9 @@ import {
  * - Only current visible month date can be selected
  */
 
-const IncomeDateRangeFilter = () => {
+const IncomeDateRangeFilter = ({
+  compact = false,
+}: IncomeDateRangeFilterProps) => {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -171,13 +177,22 @@ const IncomeDateRangeFilter = () => {
   /**
    * Button label text
    */
+  //   const label = selectedRange?.from
+  //     ? selectedRange.to
+  //       ? `${format(selectedRange.from, "dd MMM yyyy")} - ${format(
+  //           selectedRange.to,
+  //           "dd MMM yyyy",
+  //         )}`
+  //       : format(selectedRange.from, "dd MMM yyyy")
+  //     : "Select date";
+
   const label = selectedRange?.from
     ? selectedRange.to
-      ? `${format(selectedRange.from, "dd MMM yyyy")} - ${format(
+      ? `${format(selectedRange.from, "MMM d")} - ${format(
           selectedRange.to,
-          "dd MMM yyyy",
+          "MMM d, yyyy",
         )}`
-      : format(selectedRange.from, "dd MMM yyyy")
+      : format(selectedRange.from, "MMM d, yyyy")
     : "Select date";
 
   return (
@@ -186,13 +201,43 @@ const IncomeDateRangeFilter = () => {
       <PopoverTrigger asChild>
         <Button
           type="button"
-          variant="outline"
+          variant={compact ? "link" : "default"}
           disabled={isPending}
-          className="w-full justify-start text-left font-normal"
+          className="justify-start text-left font-normal"
         >
-          <CalendarIcon className="mr-2 h-4 w-4" />
-          {label}
+          {!compact && <CalendarIcon className="mr-2 h-4 w-4" />}
+          {compact ? (
+            <div className="flex items-center h-8 gap-1.5 text-base font-medium text-slate-600 hover:text-slate-900">
+              <span className="text-slate-500 text-xs ">({label})</span>
+              <CalendarIcon className="h-4 w-4 text-emerald-600" />
+            </div>
+          ) : (
+            label
+          )}
         </Button>
+
+        {/* <Button
+          type="button"
+          variant="ghost"
+          disabled={isPending}
+          className={
+            compact
+              ? "h-8 gap-1.5 px-2 text-xs font-medium text-slate-600 hover:text-slate-900"
+              : "w-full justify-start text-left font-normal"
+          }
+        >
+          {!compact && <CalendarIcon className="mr-2 h-4 w-4" />}
+
+          {compact ? (
+            <Button>
+              <span className="text-slate-500">Date</span>
+              <span className="text-slate-400">({label})</span>
+              <CalendarIcon className="h-4 w-4 text-emerald-600" />
+            </Button>
+          ) : (
+            label
+          )}
+        </Button> */}
       </PopoverTrigger>
 
       {/* Calendar Popover */}

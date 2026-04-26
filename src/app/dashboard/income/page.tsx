@@ -3,11 +3,10 @@
 import { queryStringFormatter } from "@/lib/formatters";
 import { getIncomes } from "@/services/Income";
 import { Suspense } from "react";
-import IncomesFilter from "./_components/IncomesFilter";
 import { TableSkeleton } from "@/components/shared/TableSkeleton";
 import IncomesTable from "./_components/IncomesTable";
 import IncomeHeader from "./_components/IncomeHeader";
-import { getCategories } from "@/services/Category";
+import { getCategories2 } from "@/services/Category";
 
 const IncomePage = async ({
   searchParams,
@@ -19,7 +18,7 @@ const IncomePage = async ({
 
   const [incomesResult, categoriesResult] = await Promise.all([
     getIncomes(queryString),
-    getCategories(queryStringFormatter({ type: "INCOME" })),
+    getCategories2(queryStringFormatter({ type: "INCOME" })),
   ]);
 
   const categories = categoriesResult.data;
@@ -30,8 +29,6 @@ const IncomePage = async ({
       <div>
         <IncomeHeader categories={categories || []} />
       </div>
-
-      <IncomesFilter categories={allUsedCategories || []} />
 
       <Suspense fallback={<TableSkeleton columns={5} rows={10} />}>
         <IncomesTable

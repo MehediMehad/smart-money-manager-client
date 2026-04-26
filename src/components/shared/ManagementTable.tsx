@@ -29,8 +29,15 @@ import {
 } from "../ui/table";
 import { TIncome } from "@/types";
 
+// export interface Column<T> {
+//   header: string;
+//   accessor: keyof T | ((row: T) => React.ReactNode);
+//   className?: string;
+//   sortKey?: string;
+// }
+
 export interface Column<T> {
-  header: string;
+  header: string | React.ReactNode; // 👈 change
   accessor: keyof T | ((row: T) => React.ReactNode);
   className?: string;
   sortKey?: string;
@@ -121,13 +128,15 @@ function ManagementTable<T>({
                   {column.sortKey ? (
                     <span
                       onClick={() => handleSort(column.sortKey!)}
-                      className="flex items-center p-2 hover:text-foreground transition-colors font-medium cursor-pointer select-none"
+                      className="flex items-center gap-1 py-2 hover:text-foreground transition-colors font-medium cursor-pointer select-none"
                     >
                       {column.header}
                       {getSortIcon(column.sortKey)}
                     </span>
                   ) : (
-                    column.header
+                    <div className="flex items-center py-2 font-medium">
+                      {column.header}
+                    </div>
                   )}
                 </TableHead>
               ))}

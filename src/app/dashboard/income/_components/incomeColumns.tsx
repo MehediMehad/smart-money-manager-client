@@ -1,14 +1,19 @@
 "use client";
 
-import { DateCell } from "@/components/shared/cell/DateCell";
 import { Column } from "@/components/shared/ManagementTable";
 import { TIncome } from "@/types";
+import IncomeDateRangeFilter from "./IncomeDateRangeFilter";
+import { format } from "date-fns";
 
 export const incomeColumns: Column<TIncome>[] = [
   {
-    header: "Date",
-    accessor: (income) => <DateCell date={income.date} />,
-    sortKey: "date",
+    header: (
+      <div className="flex items-center">
+        <span>Date</span>
+        <IncomeDateRangeFilter compact />
+      </div>
+    ),
+    accessor: (row) => format(new Date(row.date), "dd MMM yyyy"),
   },
   {
     header: "Note",

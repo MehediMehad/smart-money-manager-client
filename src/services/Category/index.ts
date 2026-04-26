@@ -137,7 +137,7 @@ type TGetCategoriesParams = {
     searchTerm?: string;
 };
 
-export const getCategories2 = async (params?: TGetCategoriesParams) => {
+export const getCategories = async (params?: TGetCategoriesParams) => {
     try {
         const accessToken = (await cookies()).get("accessToken")?.value;
 
@@ -188,7 +188,7 @@ export const getCategories2 = async (params?: TGetCategoriesParams) => {
     }
 };
 
-export async function getCategories(queryString?: string) {
+export async function getCategories2(queryString?: string) {
     try {
         const accessToken = await getValidToken();
         const response = await serverFetch.get(`/categories${queryString ? `?${queryString}` : ""}`, {

@@ -7,8 +7,6 @@ import { Filter } from "lucide-react";
 import ClearFiltersButton from "@/components/shared/ClearFiltersButton";
 import SearchFilter from "@/components/shared/SearchFilter";
 import SelectFilter from "@/components/shared/SelectFilter";
-import YearCalendarFilter from "@/components/shared/YearCalendarFilter";
-import MonthCalendarFilter from "@/components/shared/MonthCalendarFilter";
 import { TCategory } from "@/types";
 import IncomeDateRangeFilter from "./IncomeDateRangeFilter";
 
