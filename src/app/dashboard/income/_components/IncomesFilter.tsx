@@ -7,7 +7,10 @@ import { Filter } from "lucide-react";
 import ClearFiltersButton from "@/components/shared/ClearFiltersButton";
 import SearchFilter from "@/components/shared/SearchFilter";
 import SelectFilter from "@/components/shared/SelectFilter";
+import YearCalendarFilter from "@/components/shared/YearCalendarFilter";
+import MonthCalendarFilter from "@/components/shared/MonthCalendarFilter";
 import { TCategory } from "@/types";
+import IncomeDateRangeFilter from "./IncomeDateRangeFilter";
 
 type Props = {
   categories: TCategory[];
@@ -44,22 +47,6 @@ const IncomesFilter = ({ categories = [] }: Props) => {
     }
   }, [searchParams, router, currentYear, currentMonth]);
 
-  const yearOptions = Array.from({ length: 5 }, (_, i) => {
-    const year = Number(currentYear) - i;
-
-    return {
-      label: String(year),
-      value: String(year),
-    };
-  });
-
-  const monthOptions = Array.from({ length: 12 }, (_, i) => ({
-    label: new Date(2000, i).toLocaleString("en-US", {
-      month: "long",
-    }),
-    value: String(i + 1).padStart(2, "0"),
-  }));
-
   return (
     <div className="rounded-2xl border bg-white p-6 shadow-sm">
       <div className="flex items-center gap-3">
@@ -73,25 +60,18 @@ const IncomesFilter = ({ categories = [] }: Props) => {
       </div>
 
       <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-5">
-        <div className="space-y-2">
+        {/* <div className="space-y-2">
           <label className="text-sm font-semibold text-slate-700">Year</label>
 
-          <SelectFilter
-            paramName="year"
-            placeholder="Year"
-            defaultValue={currentYear}
-            options={yearOptions}
-          />
+          <YearCalendarFilter defaultYear={currentYear} />
         </div>
 
         <div className="space-y-2">
           <label className="text-sm font-semibold text-slate-700">Month</label>
 
-          <SelectFilter
-            paramName="month"
-            placeholder="Month"
-            defaultValue={currentMonth}
-            options={monthOptions}
+          <MonthCalendarFilter
+            defaultYear={currentYear}
+            defaultMonth={currentMonth}
           />
         </div>
 
@@ -101,6 +81,14 @@ const IncomesFilter = ({ categories = [] }: Props) => {
           </label>
 
           <SearchFilter paramName="date_range" placeholder="Enter day (1-31)" />
+        </div> */}
+
+        <div className="space-y-2">
+          <label className="text-sm font-semibold text-slate-700">
+            Date Range
+          </label>
+
+          <IncomeDateRangeFilter />
         </div>
 
         <div className="space-y-2">
@@ -143,8 +131,9 @@ const IncomesFilter = ({ categories = [] }: Props) => {
           excludeFromCount={[
             "year",
             "month",
-            "page",
-            "limit",
+            "date_range",
+            // "page",
+            // "limit",
             "sortBy",
             "sortOrder",
           ]}
