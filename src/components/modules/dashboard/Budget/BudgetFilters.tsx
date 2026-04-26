@@ -64,7 +64,6 @@ export default function BudgetFilters({
           <Label className="text-sm">Budget Type</Label>
           <div className="flex gap-2">
             <Button
-              variant={budgetType === "DAILY" ? "default" : "outline"}
               size="sm"
               onClick={() =>
                 onUpdateQuery({
@@ -74,12 +73,16 @@ export default function BudgetFilters({
                   year: undefined,
                 })
               }
+              className={`${
+                budgetType === "DAILY"
+                  ? "bg-gradient-to-r from-emerald-700 to-teal-600 text-white"
+                  : "bg-gray-100 text-gray-700 hover:bg-gradient-to-r hover:from-emerald-100 hover:to-teal-100"
+              } border border-gray-200 transition-all duration-200`}
             >
               Daily
             </Button>
 
             <Button
-              variant={budgetType === "MONTHLY" ? "default" : "outline"}
               size="sm"
               onClick={() => {
                 const value = selectedMonth || defaultMonth;
@@ -92,6 +95,11 @@ export default function BudgetFilters({
                   date: undefined,
                 });
               }}
+              className={`${
+                budgetType === "MONTHLY"
+                  ? "bg-gradient-to-r from-emerald-700 to-teal-600 text-white"
+                  : "bg-gray-100 text-gray-700 hover:bg-gradient-to-r hover:from-emerald-100 hover:to-teal-100"
+              } border border-gray-200 transition-all duration-200`}
             >
               Monthly
             </Button>

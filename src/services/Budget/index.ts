@@ -28,7 +28,7 @@ export const createBudget = async (
                     message: "Date is required for daily budget",
                 };
             }
-            payload.date = data.date;
+            payload.date = `${data.date}T00:00:00.000Z`;
         }
 
         if (data.type === "MONTHLY") {
@@ -43,6 +43,8 @@ export const createBudget = async (
             payload.year = Number(year);
             payload.month = Number(month);
         }
+
+        console.log("payload data", payload);
 
         const response = await serverFetch.post("/budgets", {
             body: JSON.stringify(payload),
