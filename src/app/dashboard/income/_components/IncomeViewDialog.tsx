@@ -6,8 +6,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { TIncome } from "@/types";
 import { format } from "date-fns";
+import { TIncome } from "../_lib/types";
 
 const IncomeViewDialog = ({
   income,

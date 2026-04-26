@@ -1,14 +1,15 @@
 "use client";
 
-import { deleteIncome, updateIncome } from "@/services/Income";
 import { useState } from "react";
 import { toast } from "sonner";
 import DeleteConfirmationDialog from "@/components/shared/DeleteConfirmationDialog";
 import ManagementTable from "@/components/shared/ManagementTable";
-import { TCategory, TIncome } from "@/types";
 import { incomeColumns } from "./incomeColumns";
 import IncomeFormDialog from "./IncomeFormDialog";
 import IncomeViewDialog from "./IncomeViewDialog";
+import { deleteIncome } from "../_actions";
+import { TIncome } from "../_lib/types";
+import { TCategory } from "@/types";
 
 const IncomesTable = ({
   incomes = [],

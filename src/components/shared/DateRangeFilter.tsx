@@ -15,12 +15,12 @@ import {
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 
-interface IncomeDateRangeFilterProps {
+interface DateRangeFilterProps {
   compact?: boolean;
 }
 
 /**
- * IncomeDateRangeFilter
+ * DateRangeFilter
  *
  * Purpose:
  * - Handle year, month, date_range filter with single calendar
@@ -28,9 +28,7 @@ interface IncomeDateRangeFilterProps {
  * - Only current visible month date can be selected
  */
 
-const IncomeDateRangeFilter = ({
-  compact = false,
-}: IncomeDateRangeFilterProps) => {
+const DateRangeFilter = ({ compact = false }: DateRangeFilterProps) => {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -264,4 +262,4 @@ const IncomeDateRangeFilter = ({
   );
 };
 
-export default IncomeDateRangeFilter;
+export default DateRangeFilter;

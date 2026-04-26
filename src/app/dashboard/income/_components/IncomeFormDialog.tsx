@@ -34,8 +34,8 @@ import { Calendar } from "@/components/ui/calendar";
 
 import { cn } from "@/lib/utils";
 import { TCategory } from "@/types";
-import { createIncome, updateIncome } from "@/services/Income";
-import { IncomeFormValues, incomeSchema } from "@/validations/incomeValidation";
+import { IncomeFormValues, incomeSchema } from "../_lib/validations";
+import { createIncome, updateIncome } from "../_actions";
 
 type Props = {
   open: boolean;

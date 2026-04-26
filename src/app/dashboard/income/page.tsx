@@ -1,12 +1,11 @@
 // src/app/dashboard/income/page.tsx
-
 import { queryStringFormatter } from "@/lib/formatters";
-import { getIncomes } from "@/services/Income";
 import { Suspense } from "react";
 import { TableSkeleton } from "@/components/shared/TableSkeleton";
 import IncomesTable from "./_components/IncomesTable";
 import IncomeHeader from "./_components/IncomeHeader";
 import { getCategories2 } from "@/services/Category";
+import { getIncomes } from "./_actions";
 
 const IncomePage = async ({
   searchParams,
