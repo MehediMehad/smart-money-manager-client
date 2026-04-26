@@ -1,4 +1,5 @@
 "use client";
+
 import { useRouter, useSearchParams } from "next/navigation";
 import { useTransition } from "react";
 import {
@@ -25,8 +26,10 @@ const SelectFilter = ({
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
+
   const currentValue =
     searchParams.get(paramName) || defaultValue || options[0]?.value || "";
+
   const handleChange = (value: string) => {
     const params = new URLSearchParams(searchParams.toString());
 
@@ -36,8 +39,12 @@ const SelectFilter = ({
       params.set(paramName, value);
     }
 
+    params.delete("page");
+
     startTransition(() => {
-      router.push(`?${params.toString()}`);
+      router.replace(`?${params.toString()}`, {
+        scroll: false,
+      });
     });
   };
 
