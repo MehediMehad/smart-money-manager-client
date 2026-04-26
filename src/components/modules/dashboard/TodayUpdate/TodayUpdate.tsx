@@ -12,8 +12,6 @@ import { Button } from "@/components/ui/button";
 import {
   ArrowUpRight,
   ArrowDownRight,
-  Utensils,
-  Bus,
   DollarSign,
   PiggyBank,
   AlertTriangle,
@@ -25,7 +23,7 @@ import { cn } from "@/lib/utils";
 
 // Dummy data for today (2026-03-08)
 const todayData = {
-  date: "৮ মার্চ ২০২৬",
+  date: "March 8, 2026",
   income: 2500,
   expense: 1200,
   budgetRemaining: 800,
@@ -37,58 +35,54 @@ const todayData = {
 
 const todayTransactions = [
   {
-    time: "১০:৩০ AM",
+    time: "10:30 AM",
     type: "income",
-    category: "ফ্রিল্যান্স",
+    category: "Freelance",
     amount: 1500,
     note: "Upwork",
   },
   {
-    time: "০১:০০ PM",
+    time: "01:00 PM",
     type: "expense",
-    category: "খাবার",
+    category: "Food",
     amount: 200,
-    note: "দুপুরের খাবার",
+    note: "Lunch",
   },
   {
-    time: "০৪:০০ PM",
+    time: "04:00 PM",
     type: "expense",
-    category: "যাতায়াত",
-    note: "উবার",
+    category: "Transport",
+    note: "Uber",
     amount: 100,
   },
   {
-    time: "০৪:০০ PM",
+    time: "04:00 PM",
     type: "expense",
-    category: "যাতায়াত",
+    category: "Transport",
     amount: 100,
-    note: "উবার",
+    note: "Uber",
   },
   {
-    time: "০৭:৩০ PM",
+    time: "07:30 PM",
     type: "savings",
-    category: "সঞ্চয়",
-    note: "সঞ্চয়ে ৳৩০০ যোগ করা",
+    category: "Savings",
+    note: "Added ৳300 to savings",
     amount: 300,
   },
 ];
 
 const quickActions = [
-  { label: "আয় যোগ করুন", icon: ArrowUpRight, color: "emerald" },
-  { label: "ব্যয় যোগ করুন", icon: ArrowDownRight, color: "rose" },
-  { label: "সঞ্চয় যোগ করুন", icon: PiggyBank, color: "blue" },
-  { label: "ধার/দেনা যোগ করুন", icon: CalendarClock, color: "amber" },
+  { label: "Add Income", icon: ArrowUpRight, color: "emerald" },
+  { label: "Add Expense", icon: ArrowDownRight, color: "rose" },
+  { label: "Add Savings", icon: PiggyBank, color: "blue" },
+  { label: "Add Loan/Debt", icon: CalendarClock, color: "amber" },
 ];
 
 const reminders = [
-  { text: "আজ সঞ্চয়ে ৳৩০০ যোগ করার পরিকল্পনা", type: "reminder" },
-  { text: "আগামীকাল ধার পরিশোধ: ৳১০০০", type: "alert" },
-  { text: "মাসিক বাজেট চেক করুন", type: "info" },
+  { text: "Plan to add ৳300 to savings today", type: "reminder" },
+  { text: "Debt repayment tomorrow: ৳1000", type: "alert" },
+  { text: "Check monthly budget", type: "info" },
 ];
-
-function formatBDT(amount: number) {
-  return "৳" + amount.toLocaleString("bn-BD");
-}
 
 export default function TodayUpdate() {
   return (
@@ -96,13 +90,15 @@ export default function TodayUpdate() {
       {/* Page Header */}
       <div className="text-center sm:text-left">
         <h1 className="text-3xl font-bold tracking-tight">
-          আজকের আর্থিক আপডেট
+          Today's Financial Update
         </h1>
       </div>
 
       {/* Today's Financial Status */}
       <Card
-        className={`rounded-2xl shadow-sm border-2 ${(todayData.status === "good") === true ? "border-emerald-500" : ""}`} //border-emerald-500
+        className={`rounded-2xl shadow-sm border-2 ${
+          todayData.status === "good" ? "border-emerald-500" : ""
+        }`}
       >
         <CardContent className="pt-6">
           <div className="flex items-center gap-3">
@@ -113,19 +109,20 @@ export default function TodayUpdate() {
             )}
             <div>
               <h3 className="font-semibold text-lg">
-                আজকের আর্থিক অবস্থা:{" "}
-                {todayData.status === "good" ? "ভালো 👍" : "সতর্কতা দরকার ⚠"}
+                Today's Financial Status:{" "}
+                {todayData.status === "good" ? "Good 👍" : "Needs Attention ⚠"}
               </h3>
               <p className="text-sm text-muted-foreground">
                 {todayData.budgetRemaining >= 0
-                  ? "আপনি বাজেটের মধ্যে আছেন।"
-                  : "আজ বাজেট অতিক্রম হয়েছে।"}
+                  ? "You are within budget."
+                  : "Budget exceeded today."}
               </p>
             </div>
           </div>
         </CardContent>
       </Card>
-      {/* 4. Quick Actions */}
+
+      {/* Quick Actions */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {quickActions.map((action, i) => (
           <Button
@@ -145,46 +142,18 @@ export default function TodayUpdate() {
         ))}
       </div>
 
-      {/* 1. Today Summary Cards */}
-      {/* <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <TodayCard
-          title="আজকের মোট আয়"
-          value={todayData.income}
-          icon={ArrowUpRight}
-          color="emerald"
-        />
-        <TodayCard
-          title="আজকের মোট ব্যয়"
-          value={todayData.expense}
-          icon={ArrowDownRight}
-          color="rose"
-        />
-        <TodayCard
-          title="আজকের বাজেট অবশিষ্ট"
-          value={todayData.budgetRemaining}
-          icon={DollarSign}
-          color={todayData.budgetRemaining >= 0 ? "blue" : "destructive"}
-        />
-        <TodayCard
-          title="আজকের সঞ্চয় যোগ"
-          value={todayData.savingsAdded}
-          icon={PiggyBank}
-          color="teal"
-        />
-      </div> */}
-
-      {/* 3. Daily Budget Progress */}
+      {/* Daily Budget */}
       <Card className="rounded-2xl shadow-sm">
         <CardHeader>
-          <CardTitle>আজকের বাজেট</CardTitle>
+          <CardTitle>Today's Budget</CardTitle>
           <CardDescription>
-            দৈনিক বাজেট: {formatBDT(todayData.dailyBudget)}
+            Daily Budget: {todayData.dailyBudget}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
             <div className="flex justify-between text-sm">
-              <span>ব্যয় হয়েছে: {formatBDT(todayData.expense)}</span>
+              <span>Spent: {todayData.expense}</span>
               <span>{todayData.dailySpentPercent}%</span>
             </div>
             <div
@@ -215,18 +184,18 @@ export default function TodayUpdate() {
             <div className="flex items-center gap-2 text-sm text-amber-700 bg-amber-50 p-3 rounded-lg">
               <AlertTriangle className="h-4 w-4" />
               <p>
-                বাজেটের {todayData.dailySpentPercent}% ইতিমধ্যে ব্যয় হয়েছে।
-                সতর্ক থাকুন।
+                {todayData.dailySpentPercent}% of your budget is already spent.
+                Stay cautious.
               </p>
             </div>
           )}
         </CardContent>
       </Card>
 
-      {/* 2. Today Transactions */}
+      {/* Transactions */}
       <Card className="rounded-2xl shadow-sm">
         <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle>আজকের লেনদেন</CardTitle>
+          <CardTitle>Today's Transactions</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
@@ -257,7 +226,7 @@ export default function TodayUpdate() {
                   <div>
                     <p className="font-medium">{tx.category}</p>
                     <p className="text-xs text-muted-foreground">
-                      {tx.time} • {tx.note}{" "}
+                      {tx.time} • {tx.note}
                     </p>
                   </div>
                 </div>
@@ -276,7 +245,7 @@ export default function TodayUpdate() {
                     : tx.type === "expense"
                       ? "-"
                       : "+"}
-                  {formatBDT(tx.amount)}
+                  {tx.amount}
                 </p>
               </div>
             ))}
@@ -284,10 +253,10 @@ export default function TodayUpdate() {
         </CardContent>
       </Card>
 
-      {/* 5. Upcoming Reminders */}
+      {/* Reminders */}
       <Card className="rounded-2xl shadow-sm">
         <CardHeader>
-          <CardTitle>আজকের গুরুত্বপূর্ণ স্মরণিকা</CardTitle>
+          <CardTitle>Important Reminders</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           {reminders.map((rem, i) => (
@@ -310,43 +279,5 @@ export default function TodayUpdate() {
         </CardContent>
       </Card>
     </div>
-  );
-}
-
-function TodayCard({
-  title,
-  value,
-  icon: Icon,
-  color = "foreground",
-}: {
-  title: string;
-  value: number;
-  icon: any;
-  color?: string;
-}) {
-  return (
-    <Card className="rounded-2xl shadow-sm">
-      <CardContent className="pt-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm text-muted-foreground">{title}</p>
-            <p className="text-2xl font-bold mt-1">{formatBDT(value)}</p>
-          </div>
-          <div
-            className={cn(
-              "p-3 rounded-full",
-              color === "emerald" && "bg-emerald-100 text-emerald-700",
-              color === "rose" && "bg-rose-100 text-rose-700",
-              color === "blue" && "bg-blue-100 text-blue-700",
-              color === "teal" && "bg-teal-100 text-teal-700",
-              color === "destructive" && "bg-red-100 text-red-700",
-              color === "purple" && "bg-purple-100 text-purple-700",
-            )}
-          >
-            <Icon className="h-6 w-6" />
-          </div>
-        </div>
-      </CardContent>
-    </Card>
   );
 }
