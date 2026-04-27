@@ -3,7 +3,19 @@ import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import DailySpendingProgress from "./DailySpendingProgress";
 
-const MainStatusCard = ({ isGood, todayData }: any) => {
+export interface TodayData {
+  date: string;
+  income: number;
+  expense: number;
+  budgetRemaining: number;
+  savingsAdded: number;
+  todayBudget: number;
+  todaySpentPercent: number;
+  status: "good" | "warning" | "danger";
+}
+
+const MainStatusCard = ({ todayData }: { todayData: TodayData }) => {
+  const isGood = todayData.status === "good";
   return (
     <Card
       className={cn(

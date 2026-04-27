@@ -6,8 +6,13 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import ReminderItem from "./ReminderItem";
+import { Reminder } from "@/types";
 
-const RemindersCard = ({ reminders }: any) => {
+interface Props {
+  reminders: Reminder[];
+}
+
+const RemindersCard = ({ reminders }: Props) => {
   return (
     <Card className="rounded-2xl shadow-sm">
       <CardHeader>
@@ -18,7 +23,7 @@ const RemindersCard = ({ reminders }: any) => {
       </CardHeader>
 
       <CardContent className="space-y-3">
-        {reminders.map((rem: any, i: number) => (
+        {reminders?.map((rem: any, i: number) => (
           <ReminderItem key={i} rem={rem} />
         ))}
       </CardContent>

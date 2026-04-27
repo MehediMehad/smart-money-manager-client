@@ -1,5 +1,11 @@
 import { Button } from "@/components/ui/button";
 import {
+  ArrowDownRight,
+  ArrowUpRight,
+  CalendarClock,
+  PiggyBank,
+} from "lucide-react";
+import {
   Card,
   CardContent,
   CardDescription,
@@ -7,7 +13,13 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-const QuickActionsCard = ({ quickActions }: any) => {
+const QuickActionsCard = () => {
+  const quickActions = [
+    { label: "Add Income", icon: ArrowUpRight, color: "emerald" },
+    { label: "Add Expense", icon: ArrowDownRight, color: "rose" },
+    { label: "Add Savings", icon: PiggyBank, color: "blue" },
+    { label: "Add Debt", icon: CalendarClock, color: "amber" },
+  ];
   return (
     <Card className="rounded-2xl shadow-sm">
       <CardHeader>

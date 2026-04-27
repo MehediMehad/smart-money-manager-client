@@ -7,8 +7,13 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import TransactionItem from "./TransactionItem";
+import { Transaction } from "@/types";
 
-const TransactionsCard = ({ todayTransactions }: any) => {
+type Props = {
+  todayTransactions: Transaction[];
+};
+
+const TransactionsCard = ({ todayTransactions }: Props) => {
   return (
     <Card className="rounded-2xl shadow-sm">
       <CardHeader className="flex flex-row items-center justify-between">
@@ -26,7 +31,7 @@ const TransactionsCard = ({ todayTransactions }: any) => {
 
       <CardContent>
         <div className="space-y-3">
-          {todayTransactions.map((tx: any, i: number) => (
+          {todayTransactions?.map((tx: any, i: number) => (
             <TransactionItem key={i} tx={tx} />
           ))}
         </div>
