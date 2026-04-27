@@ -1,7 +1,17 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
-const SummaryCard = ({ title, value, icon: Icon, color }: any) => {
+const SummaryCard = ({
+  title,
+  value,
+  icon: Icon,
+  color,
+}: {
+  title: string;
+  value: string | number;
+  icon: any;
+  color: "emerald" | "rose" | "blue" | "teal";
+}) => {
   return (
     <Card className="rounded-2xl shadow-sm">
       <CardContent className="p-5">

@@ -9,7 +9,7 @@ export interface TodayData {
     todaySpentPercent: number;
     status: "good" | "warning" | "danger";
     transactions: Transaction[];
-    reminders: Reminder[];
+    reminders: TReminder[];
 }
 
 export interface Transaction {
@@ -21,7 +21,7 @@ export interface Transaction {
     note: string;
 }
 
-export interface Reminder {
+export interface TReminder {
     text: string;
     type: "alert" | "reminder" | "info";
 }

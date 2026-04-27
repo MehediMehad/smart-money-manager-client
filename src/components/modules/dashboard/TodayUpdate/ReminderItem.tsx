@@ -1,6 +1,7 @@
+import { TReminder } from "@/types";
 import { AlertTriangle, CalendarClock, TrendingUp } from "lucide-react";
 
-const ReminderItem = ({ rem }: any) => {
+const ReminderItem = ({ rem }: { rem: TReminder }) => {
   return (
     <div className="flex gap-3 rounded-2xl border bg-background p-4">
       {rem.type === "alert" && (

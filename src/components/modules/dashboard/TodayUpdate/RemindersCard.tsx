@@ -6,10 +6,10 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import ReminderItem from "./ReminderItem";
-import { Reminder } from "@/types";
+import { TReminder } from "@/types";
 
 interface Props {
-  reminders: Reminder[];
+  reminders: TReminder[];
 }
 
 const RemindersCard = ({ reminders }: Props) => {

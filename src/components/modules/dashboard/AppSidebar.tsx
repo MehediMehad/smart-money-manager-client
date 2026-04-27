@@ -4,11 +4,9 @@ import {
   ArrowUpCircle,
   PiggyBank,
   HandCoins,
-  BarChart3,
   Settings,
   Bell,
   Clock,
-  PieChart,
   Receipt,
 } from "lucide-react";
 import {
@@ -36,17 +34,9 @@ const menuItems = [
   },
   { title: "Income", url: "/dashboard/income", icon: ArrowDownCircle },
   { title: "Expense", url: "/dashboard/expense", icon: ArrowUpCircle },
-
   { title: "Budget", url: "/dashboard/budget", icon: Receipt },
-  { title: "Monthly Budget", url: "/dashboard/monthly-budget", icon: PieChart },
-
   { title: "Savings", url: "/dashboard/savings", icon: PiggyBank },
   { title: "Debts", url: "/dashboard/debts", icon: HandCoins },
-  {
-    title: "Monthly Reports",
-    url: "/dashboard/monthly-reports",
-    icon: BarChart3,
-  },
   {
     title: "Categories",
     url: "/dashboard/categories",
@@ -72,7 +62,10 @@ const AppSidebar = () => {
             <SidebarMenu>
               {menuItems.map((item) => {
                 const isActive =
-                  pathname === item.url || pathname.startsWith(item.url + "/");
+                  item.url === "/dashboard"
+                    ? pathname === item.url
+                    : pathname === item.url ||
+                      pathname.startsWith(item.url + "/");
 
                 return (
                   <SidebarMenuItem key={item.title}>
@@ -80,13 +73,14 @@ const AppSidebar = () => {
                       <Link
                         href={item.url}
                         className={clsx(
-                          "flex items-center rounded-md px-3 py-2 text-base transition-colors",
-                          "hover:bg-accent/60",
-                          isActive && "bg-accent text-primary font-semibold",
+                          "flex items-center hover:font-bold rounded-lg px-4 py-3 text-[15px] transition-all",
+                          "hover:bg-accent/70",
+                          isActive &&
+                            "bg-accent text-accent-foreground font-semibold shadow-sm",
                         )}
                       >
                         <item.icon
-                          className={clsx("h-5 w-5", !collapsed && "mr-2")}
+                          className={clsx("h-6 w-6", !collapsed && "mr-3")}
                         />
                         {!collapsed && <span>{item.title}</span>}
                       </Link>

@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -20,13 +19,13 @@ const TransactionsCard = ({ todayTransactions }: Props) => {
         <div>
           <CardTitle>Today’s Transactions</CardTitle>
           <CardDescription>
-            Latest income, expenses, and savings.
+            Today’s income, expenses, and savings.
           </CardDescription>
         </div>
 
-        <Button variant="ghost" size="sm">
+        {/* <Button variant="ghost" size="sm">
           See All
-        </Button>
+        </Button> */}
       </CardHeader>
 
       <CardContent>
