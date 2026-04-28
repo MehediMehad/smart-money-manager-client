@@ -1,54 +1,66 @@
-import { Badge } from "@/components/ui/badge";
+import { HandCoins } from "lucide-react";
 
-const given = [
-  { name: "রহিম", amount: "৳৫,০০০", date: "১৫ মার্চ ২০২৬", status: "বাকি" },
-  {
-    name: "করিম",
-    amount: "৳৩,০০০",
-    date: "১০ ফেব্রু ২০২৬",
-    status: "পরিশোধিত",
-  },
-];
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
-const received = [
-  { name: "সালমা", amount: "৳১০,০০০", date: "২০ মার্চ ২০২৬", status: "বাকি" },
-  { name: "জামিল", amount: "৳২,০০০", date: "০৫ জানু ২০২৬", status: "পরিশোধিত" },
-];
+import IconBox from "./IconBox";
+import { formatDate } from "@/lib/format";
 
-const DebtTable = ({ title, data }: { title: string; data: typeof given }) => (
-  <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
-    <h3 className="mb-4 text-lg font-semibold text-foreground">{title}</h3>
-    <div className="space-y-3">
-      {data.map((item, i) => (
-        <div
-          key={i}
-          className="flex items-center justify-between rounded-lg bg-muted/50 px-4 py-3"
-        >
-          <div>
-            <p className="font-medium text-foreground">{item.name}</p>
-            <p className="text-sm text-muted-foreground">{item.date}</p>
-          </div>
-          <div className="flex items-center gap-3">
-            <span className="font-semibold text-foreground">{item.amount}</span>
-            <Badge
-              variant={item.status === "পরিশোধিত" ? "secondary" : "destructive"}
-            >
-              {item.status}
-            </Badge>
-          </div>
-        </div>
-      ))}
-    </div>
-  </div>
-);
-
-const DebtList = () => {
+function DebtList({
+  title,
+  items,
+  color,
+}: {
+  title: string;
+  items: { id: string; name: string; amount: number; dueDate: string }[];
+  color: "green" | "red";
+}) {
   return (
-    <div className="grid gap-6 lg:grid-cols-2">
-      <DebtTable title="আপনি যাদের টাকা দিয়েছেন" data={given} />
-      <DebtTable title="আপনি যাদের কাছে টাকা পেয়েছেন" data={received} />
+    <div>
+      <div className="mb-3 flex items-center justify-between">
+        <h3 className="text-sm font-semibold">{title}</h3>
+        <Button variant="ghost" size="sm" className="h-7 text-xs">
+          View All
+        </Button>
+      </div>
+
+      <div className="space-y-3">
+        {items.length ? (
+          items.map((item) => (
+            <div
+              key={item.id}
+              className="flex items-center justify-between rounded-xl border bg-slate-50/50 p-3"
+            >
+              <div className="flex items-center gap-3">
+                <IconBox
+                  icon={HandCoins}
+                  color={color === "green" ? "green" : "red"}
+                  small
+                />
+                <div>
+                  <p className="font-semibold">{item.name}</p>
+                  <p className="text-xs text-slate-500">
+                    {formatDate(item.dueDate)}
+                  </p>
+                </div>
+              </div>
+
+              <p
+                className={cn(
+                  "font-bold",
+                  color === "green" ? "text-emerald-600" : "text-red-500",
+                )}
+              >
+                {item.amount}
+              </p>
+            </div>
+          ))
+        ) : (
+          <p className="text-sm text-slate-500">No debts found.</p>
+        )}
+      </div>
     </div>
   );
-};
+}
 
 export default DebtList;

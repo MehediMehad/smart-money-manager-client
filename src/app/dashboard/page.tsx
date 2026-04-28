@@ -1,24 +1,68 @@
-import ChartSection from "@/components/modules/dashboard/Home/ChartSection";
-import DebtList from "@/components/modules/dashboard/Home/DebtList";
+import { getDashboardOverview } from "@/services/Dashboard";
+import OverviewChart from "@/components/modules/dashboard/Home/OverviewChart";
+import BudgetOverview from "@/components/modules/dashboard/Home/BudgetOverview";
+import DashboardStats from "@/components/modules/dashboard/Home/DashboardStats";
+import RecentTransactions from "@/components/modules/dashboard/Home/RecentTransactions";
 import SavingsGoals from "@/components/modules/dashboard/Home/SavingsGoals";
-import SummarySection from "@/components/modules/dashboard/Home/SummarySection";
+import DebtsOverview from "@/components/modules/dashboard/Home/DebtsOverview";
 
-const DashboardHome = () => {
+const DashboardPage = async () => {
+  const overview = await getDashboardOverview();
+
+  const stats = overview?.stats || [];
+  const transactions = overview?.transactions || [];
+  const debts = overview?.debts || { receive: [], pay: [] };
+  const goals = overview?.goals || [];
+
+  const totalReceive = debts.receive.reduce(
+    (sum: number, item: any) => sum + item.amount,
+    0,
+  );
+
+  const totalPay = debts.pay.reduce(
+    (sum: number, item: any) => sum + item.amount,
+    0,
+  );
+
   return (
-    <>
-      <h2 className="mb-6 text-2xl font-bold text-foreground">
-        আর্থিক সারসংক্ষেপ
-      </h2>
-      <SummarySection />
-      <div className="mb-8">
-        <ChartSection />
+    <div className="min-h-screen">
+      <div className="mx-auto space-y-4">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">
+              Good morning, Mehedi! 👋
+            </h1>
+            <p className="mt-1 text-muted-foreground">
+              Here’s what’s happening with your finances today.
+            </p>
+          </div>
+        </div>
+
+        <DashboardStats stats={stats} />
+
+        <div className="grid gap-4 xl:grid-cols-[1.45fr_0.8fr]">
+          <div className="space-y-4">
+            <OverviewChart />
+
+            <div className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
+              <RecentTransactions transactions={transactions} />
+              <SavingsGoals goals={goals} />
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <BudgetOverview />
+
+            <DebtsOverview
+              debts={debts}
+              totalReceive={totalReceive}
+              totalPay={totalPay}
+            />
+          </div>
+        </div>
       </div>
-      <div className="mb-8">
-        <SavingsGoals />
-      </div>
-      <DebtList />
-    </>
+    </div>
   );
 };
 
-export default DashboardHome;
+export default DashboardPage;
