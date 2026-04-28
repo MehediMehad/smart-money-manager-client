@@ -3,7 +3,7 @@ import { AlertTriangle, CalendarClock, TrendingUp } from "lucide-react";
 
 const ReminderItem = ({ rem }: { rem: TReminder }) => {
   return (
-    <div className="flex gap-3 rounded-2xl border bg-background p-4">
+    <div className="flex gap-3 rounded-2xl border bg-white p-4">
       {rem.type === "alert" && (
         <AlertTriangle className="mt-0.5 h-5 w-5 text-amber-600" />
       )}

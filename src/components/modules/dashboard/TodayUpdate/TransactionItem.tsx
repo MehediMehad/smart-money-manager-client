@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 
 const TransactionItem = ({ tx }: any) => {
   return (
-    <div className="flex items-center justify-between rounded-2xl border bg-background p-4">
+    <div className="flex items-center justify-between rounded-2xl border bg-white p-4">
       <div className="flex items-center gap-3">
         <div
           className={cn(
