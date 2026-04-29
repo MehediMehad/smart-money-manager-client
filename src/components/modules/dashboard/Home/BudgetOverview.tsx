@@ -4,26 +4,16 @@ import { cn } from "@/lib/utils";
 
 import { CalendarDays } from "lucide-react";
 
-const budgets = [
-  {
-    title: "Today's Budget",
-    budget: 500,
-    spent: 40,
-    percent: 8,
-    left: 460,
-    color: "green",
-  },
-  {
-    title: "Monthly Budget",
-    budget: 55000,
-    spent: 42300,
-    percent: 76,
-    left: 12700,
-    color: "purple",
-  },
-];
+type TBudget = {
+  title: string;
+  budget: number;
+  spent: number;
+  percent: number;
+  left: number;
+  color: "green" | "purple";
+};
 
-function BudgetOverview() {
+function BudgetOverview({ budgets }: { budgets: TBudget[] }) {
   return (
     <Card className="rounded-2xl border-slate-200 bg-white shadow-sm">
       <CardHeader>

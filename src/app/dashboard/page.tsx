@@ -13,6 +13,7 @@ const DashboardPage = async () => {
   const transactions = overview?.transactions || [];
   const debts = overview?.debts || { receive: [], pay: [] };
   const goals = overview?.goals || [];
+  const budgets = overview?.budgets || [];
 
   const totalReceive = debts.receive.reduce(
     (sum: number, item: any) => sum + item.amount,
@@ -51,7 +52,7 @@ const DashboardPage = async () => {
           </div>
 
           <div className="space-y-4">
-            <BudgetOverview />
+            <BudgetOverview budgets={budgets} />
 
             <DebtsOverview
               debts={debts}

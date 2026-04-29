@@ -7,7 +7,7 @@ export const getDashboardOverview = async () => {
     try {
         const accessToken = await getValidToken();
 
-        const res = await fetch(`${config.base_api}/dashboard`, {
+        const res = await fetch(`${config.base_api}/dashboard/overview`, {
             method: "GET",
             headers: {
                 Authorization: `Bearer ${accessToken}`,
