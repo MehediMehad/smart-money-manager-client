@@ -14,6 +14,7 @@ const DashboardPage = async () => {
   const debts = overview?.debts || { receive: [], pay: [] };
   const goals = overview?.goals || [];
   const budgets = overview?.budgets || [];
+  const chartData = overview?.chartData || [];
 
   const totalReceive = debts.receive.reduce(
     (sum: number, item: any) => sum + item.amount,
@@ -43,7 +44,7 @@ const DashboardPage = async () => {
 
         <div className="grid gap-4 xl:grid-cols-[1.45fr_0.8fr]">
           <div className="space-y-4">
-            <OverviewChart />
+            <OverviewChart chartData={chartData} />
 
             <div className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
               <RecentTransactions transactions={transactions} />

@@ -1,7 +1,5 @@
 "use client";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ChevronRight } from "lucide-react";
 import {
   LineChart,
   Line,
@@ -12,33 +10,19 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-const data = Array.from({ length: 31 }, (_, i) => {
-  const day = i + 1;
+type Props = {
+  chartData: {
+    date: string;
+    income: number;
+    expense: number;
+  }[];
+};
 
-  return {
-    date: `May ${day}`,
-    income:
-      42000 +
-      day * 850 +
-      Math.sin(day / 1.7) * 7000 +
-      (day % 5 === 0 ? 9000 : 0),
-    expense:
-      24000 +
-      day * 520 +
-      Math.sin(day / 1.4) * 3500 +
-      (day % 6 === 0 ? 4500 : 0),
-  };
-});
-
-const OverviewChart = () => {
+const OverviewChart = ({ chartData }: Props) => {
   return (
     <Card className="rounded-2xl border-slate-200 bg-white shadow-sm">
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle>Overview</CardTitle>
-        <Button variant="outline" className="rounded-xl">
-          This Month
-          <ChevronRight className="ml-2 h-4 w-4 rotate-90" />
-        </Button>
       </CardHeader>
 
       <CardContent>
@@ -56,7 +40,7 @@ const OverviewChart = () => {
         <div className="h-[260px]">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart
-              data={data}
+              data={chartData}
               margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
             >
               <CartesianGrid vertical={false} stroke="#EEF2F7" />
