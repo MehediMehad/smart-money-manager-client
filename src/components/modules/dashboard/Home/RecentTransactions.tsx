@@ -56,7 +56,19 @@ function RecentTransactions({ transactions }: { transactions: any[] }) {
             );
           })
         ) : (
-          <p className="text-sm text-slate-500">No transactions found.</p>
+          <div className="flex min-h-[300px] flex-col items-center justify-center text-center">
+            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-slate-100">
+              <Wallet className="h-7 w-7 text-slate-500" />
+            </div>
+
+            <h4 className="mt-4 text-sm font-semibold text-slate-700">
+              No transactions yet
+            </h4>
+
+            <p className="mt-1 text-xs text-slate-500">
+              Your recent transactions will appear here.
+            </p>
+          </div>
         )}
       </CardContent>
     </Card>

@@ -1,64 +1,97 @@
-import { HandCoins } from "lucide-react";
-
+import { CalendarDays, WalletCards } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-
-import IconBox from "./IconBox";
 import { formatDate } from "@/lib/format";
+
+type Debt = {
+  id: string;
+  name: string;
+  amount: number;
+  dueDate: string;
+};
+
+type DebtListProps = {
+  title: string;
+  totalLabel: string;
+  total: number;
+  items: Debt[];
+  color: "green" | "red";
+  emptyTitle: string;
+  emptyText: string;
+};
 
 function DebtList({
   title,
+  totalLabel,
+  total,
   items,
   color,
-}: {
-  title: string;
-  items: { id: string; name: string; amount: number; dueDate: string }[];
-  color: "green" | "red";
-}) {
+  emptyTitle,
+  emptyText,
+}: DebtListProps) {
+  const isGreen = color === "green";
+
   return (
-    <div>
-      <div className="mb-3 flex items-center justify-between">
-        <h3 className="text-sm font-semibold">{title}</h3>
-        <Button variant="ghost" size="sm" className="h-7 text-xs">
-          View All
-        </Button>
+    <div className="overflow-hidden  rounded-2xl border border-slate-200 bg-white">
+      <div className="border-b p-4">
+        <div className="flex items-center justify-between">
+          <h3 className="text-sm font-semibold">{title}</h3>
+        </div>
+
+        <p
+          className={cn(
+            "mt-2 text-lg font-semibold",
+            isGreen ? "text-emerald-600" : "text-red-500",
+          )}
+        >
+          {totalLabel} {total}
+        </p>
       </div>
 
-      <div className="space-y-3">
-        {items.length ? (
-          items.map((item) => (
+      {items.length ? (
+        <div className="divide-y min-h-[250px]">
+          {items.map((item) => (
             <div
               key={item.id}
-              className="flex items-center justify-between rounded-xl border bg-slate-50/50 p-3"
+              className="flex items-start justify-between px-4 py-4"
             >
-              <div className="flex items-center gap-3">
-                <IconBox
-                  icon={HandCoins}
-                  color={color === "green" ? "green" : "red"}
-                  small
-                />
-                <div>
-                  <p className="font-semibold">{item.name}</p>
-                  <p className="text-xs text-slate-500">
-                    {formatDate(item.dueDate)}
-                  </p>
+              <div>
+                <p className="font-semibold">{item.name}</p>
+
+                <div className="mt-2 flex items-center gap-1.5 text-xs text-slate-500">
+                  <CalendarDays className="h-3.5 w-3.5" />
+                  <span>{formatDate(item.dueDate)}</span>
                 </div>
               </div>
 
               <p
                 className={cn(
                   "font-bold",
-                  color === "green" ? "text-emerald-600" : "text-red-500",
+                  isGreen ? "text-emerald-600" : "text-red-500",
                 )}
               >
                 {item.amount}
               </p>
             </div>
-          ))
-        ) : (
-          <p className="text-sm text-slate-500">No debts found.</p>
-        )}
-      </div>
+          ))}
+        </div>
+      ) : (
+        <div className="flex min-h-[250px] flex-col items-center justify-center px-6 text-center">
+          <div
+            className={cn(
+              "flex h-16 w-16 items-center justify-center rounded-full",
+              isGreen
+                ? "bg-emerald-50 text-emerald-600"
+                : "bg-red-100 text-red-500",
+            )}
+          >
+            <WalletCards className="h-7 w-7" />
+          </div>
+
+          <h4 className="mt-4 font-bold">{emptyTitle}</h4>
+          <p className="mt-1 text-sm text-slate-500">{emptyText}</p>
+        </div>
+      )}
     </div>
   );
 }
