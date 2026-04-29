@@ -1,16 +1,18 @@
+
+
 export * from "./dashboard"; import {
-    ArrowDown,
-    ArrowUp,
-    CreditCard,
-    Wallet,
+    ArrowDownRight,
+    ArrowUpRight,
     HandCoins,
+    PiggyBank,
+    Wallet,
 } from "lucide-react";
 
 export const statIconMap: Record<string, any> = {
     "Total Balance": Wallet,
-    "Total Income": ArrowDown,
-    "Total Expense": ArrowUp,
-    "Total Savings": CreditCard,
+    "Total Income": ArrowDownRight,
+    "Total Expense": ArrowUpRight,
+    "Total Savings": PiggyBank,
 };
 
 export const statColorMap: Record<string, string> = {
@@ -22,8 +24,8 @@ export const statColorMap: Record<string, string> = {
 
 export const transactionIconMap: Record<string, any> = {
     income: Wallet,
-    expense: CreditCard,
-    savings: CreditCard,
+    expense: ArrowUpRight,
+    savings: PiggyBank,
     debts: HandCoins,
 };
 
