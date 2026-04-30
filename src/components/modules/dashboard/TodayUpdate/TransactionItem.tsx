@@ -2,31 +2,34 @@ import { ArrowDownRight, ArrowUpRight, DollarSign } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const TransactionItem = ({ tx }: any) => {
+  const isIncome = tx.type === "income";
+  const isExpense = tx.type === "expense";
+
   return (
-    <div className="flex items-center justify-between rounded-2xl border bg-white p-4">
+    <div className="flex items-center justify-between rounded-2xl border border-slate-200 bg-white p-4">
       <div className="flex items-center gap-3">
         <div
           className={cn(
-            "flex h-10 w-10 items-center justify-center rounded-full",
-            tx.type === "income"
-              ? "bg-emerald-100 text-emerald-700"
-              : tx.type === "expense"
-                ? "bg-rose-100 text-rose-700"
-                : "bg-teal-100 text-teal-700",
+            "flex h-11 w-11 items-center justify-center rounded-2xl",
+            isIncome
+              ? "bg-emerald-100 text-emerald-600"
+              : isExpense
+                ? "bg-rose-100 text-rose-600"
+                : "bg-teal-100 text-teal-600",
           )}
         >
-          {tx.type === "income" ? (
-            <ArrowUpRight className="h-4 w-4" />
-          ) : tx.type === "expense" ? (
-            <ArrowDownRight className="h-4 w-4" />
+          {isIncome ? (
+            <ArrowUpRight />
+          ) : isExpense ? (
+            <ArrowDownRight />
           ) : (
-            <DollarSign className="h-4 w-4" />
+            <DollarSign />
           )}
         </div>
 
         <div>
-          <p className="font-medium">{tx.category}</p>
-          <p className="text-xs text-muted-foreground">
+          <p className="font-semibold text-slate-950">{tx.category}</p>
+          <p className="text-xs text-slate-500">
             {tx.time} • {tx.note}
           </p>
         </div>
@@ -34,16 +37,15 @@ const TransactionItem = ({ tx }: any) => {
 
       <p
         className={cn(
-          "font-semibold",
-          tx.type === "income"
+          "font-bold",
+          isIncome
             ? "text-emerald-600"
-            : tx.type === "expense"
+            : isExpense
               ? "text-rose-600"
               : "text-teal-600",
         )}
       >
-        {tx.type === "expense" ? "-" : "+"}
-        {tx.amount}
+        {isExpense ? "-" : "+"}৳{Number(tx.amount || 0).toLocaleString()}
       </p>
     </div>
   );

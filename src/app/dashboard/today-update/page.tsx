@@ -10,31 +10,18 @@ import { TodayData } from "@/types";
 const TodayUpdatePage = async () => {
   const todayData: TodayData = await getTodayUpdate();
 
-  const metaData = {
-    date: todayData.date,
-    income: todayData.income,
-    expense: todayData.expense,
-    budgetRemaining: todayData.budgetRemaining,
-    savingsAdded: todayData.savingsAdded,
-    todayBudget: todayData.todayBudget,
-    todaySpentPercent: todayData.todaySpentPercent,
-    status: todayData.status,
-  };
-
-  const transactions = todayData.transactions;
-  const reminders = todayData.reminders;
-
   return (
-    <div className="min-h-screen">
-      <div className="mx-auto space-y-6">
+    <div className="min-h-screen bg-[#F8FAFC]">
+      <div className="mx-auto space-y-6 py-6">
         <TodayHeader />
-        <MainStatusCard todayData={metaData} />
+
+        <MainStatusCard todayData={todayData} />
         <SummaryCards todayData={todayData} />
         <QuickActionsCard />
 
-        <div className="grid gap-6 lg:grid-cols-[1.4fr_1fr]">
-          <TransactionsCard todayTransactions={transactions} />
-          <RemindersCard reminders={reminders} />
+        <div className="grid gap-6 lg:grid-cols-[1.05fr_1fr]">
+          <TransactionsCard todayTransactions={todayData.transactions} />
+          <RemindersCard reminders={todayData.reminders} />
         </div>
       </div>
     </div>

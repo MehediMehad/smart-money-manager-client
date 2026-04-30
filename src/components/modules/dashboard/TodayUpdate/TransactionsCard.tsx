@@ -13,27 +13,38 @@ type Props = {
 };
 
 const TransactionsCard = ({ todayTransactions }: Props) => {
-  return (
-    <Card className="rounded-2xl shadow-sm">
-      <CardHeader className="flex flex-row items-center justify-between">
-        <div>
-          <CardTitle>Today’s Transactions</CardTitle>
-          <CardDescription>
-            Today’s income, expenses, and savings.
-          </CardDescription>
-        </div>
+  const hasTransactions = todayTransactions?.length > 0;
 
-        {/* <Button variant="ghost" size="sm">
-          See All
-        </Button> */}
+  return (
+    <Card className="rounded-2xl border border-slate-200 bg-white shadow-sm">
+      <CardHeader>
+        <CardTitle className="text-xl font-bold text-slate-950">
+          Today’s Transactions
+        </CardTitle>
+        <CardDescription>
+          Today’s income, expenses, and savings.
+        </CardDescription>
       </CardHeader>
 
       <CardContent>
-        <div className="space-y-3">
-          {todayTransactions?.map((tx: any, i: number) => (
-            <TransactionItem key={i} tx={tx} />
-          ))}
-        </div>
+        {hasTransactions ? (
+          <div className="space-y-3">
+            {todayTransactions.map((tx, i) => (
+              <TransactionItem key={i} tx={tx} />
+            ))}
+          </div>
+        ) : (
+          <div className="flex min-h-[260px] flex-col items-center justify-center text-center">
+            <div className="mb-5 text-6xl">🗂️🔍</div>
+
+            <h3 className="text-lg font-bold text-slate-950">
+              No transactions yet
+            </h3>
+            <p className="mt-1 text-sm text-slate-500">
+              Add your first income or expense to get started.
+            </p>
+          </div>
+        )}
       </CardContent>
     </Card>
   );

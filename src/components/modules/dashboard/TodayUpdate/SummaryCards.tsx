@@ -1,31 +1,33 @@
-import { ArrowDownRight, ArrowUpRight, PiggyBank, Wallet } from "lucide-react";
+import {
+  ArrowDownRight,
+  ArrowUpRight,
+  CalendarDays,
+  PiggyBank,
+} from "lucide-react";
 import SummaryCard from "./SummaryCard";
 import { TodayData } from "@/types";
 
 const SummaryCards = ({ todayData }: { todayData: TodayData }) => {
   return (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+    <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
       <SummaryCard
         title="Income"
         value={todayData.income}
         icon={ArrowUpRight}
         color="emerald"
       />
-
       <SummaryCard
         title="Expense"
         value={todayData.expense}
         icon={ArrowDownRight}
         color="rose"
       />
-
       <SummaryCard
         title="Budget Remaining"
         value={todayData.budgetRemaining}
-        icon={Wallet}
+        icon={CalendarDays}
         color="blue"
       />
-
       <SummaryCard
         title="Savings Added"
         value={todayData.savingsAdded}

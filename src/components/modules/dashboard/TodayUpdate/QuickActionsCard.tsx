@@ -13,67 +13,56 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-const QuickActionsCard = () => {
-  const quickActions = [
-    {
-      label: "Add Income",
-      icon: ArrowUpRight,
-      bg: "bg-emerald-100",
-      text: "text-emerald-600",
-      hover: "hover:border-emerald-200 hover:bg-emerald-50",
-    },
-    {
-      label: "Add Expense",
-      icon: ArrowDownRight,
-      bg: "bg-rose-100",
-      text: "text-rose-600",
-      hover: "hover:border-rose-200 hover:bg-rose-50",
-    },
-    {
-      label: "Add Savings",
-      icon: PiggyBank,
-      bg: "bg-purple-100",
-      text: "text-purple-600",
-      hover: "hover:border-purple-200 hover:bg-purple-50",
-    },
-    {
-      label: "Add Debt",
-      icon: CalendarClock,
-      bg: "bg-orange-100",
-      text: "text-orange-600",
-      hover: "hover:border-orange-200 hover:bg-orange-50",
-    },
-  ];
+const quickActions = [
+  {
+    label: "Add Income",
+    icon: ArrowUpRight,
+    style: "bg-emerald-50 border-emerald-100 text-emerald-600",
+  },
+  {
+    label: "Add Expense",
+    icon: ArrowDownRight,
+    style: "bg-rose-50 border-rose-100 text-rose-600",
+  },
+  {
+    label: "Add Savings",
+    icon: PiggyBank,
+    style: "bg-purple-50 border-purple-100 text-purple-600",
+  },
+  {
+    label: "Add Debt",
+    icon: CalendarClock,
+    style: "bg-orange-50 border-orange-100 text-orange-600",
+  },
+];
 
+const QuickActionsCard = () => {
   return (
     <Card className="rounded-2xl border border-slate-200 bg-white shadow-sm">
-      <CardHeader className="pb-4">
-        <CardTitle className="text-xl font-semibold text-slate-950">
-          Quick Actions
-        </CardTitle>
-        <CardDescription className="text-sm text-slate-500">
-          Add your most common financial activity quickly.
-        </CardDescription>
-      </CardHeader>
+      <CardContent className="grid gap-5 p-5 lg:grid-cols-[260px_1fr] lg:items-center">
+        <div>
+          <CardTitle className="text-xl font-bold text-slate-950">
+            Quick Actions
+          </CardTitle>
+          <CardDescription className="mt-1 text-sm text-slate-500">
+            Add your most common financial activity quickly.
+          </CardDescription>
+        </div>
 
-      <CardContent>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {quickActions.map((action, i) => {
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          {quickActions.map((action) => {
             const Icon = action.icon;
 
             return (
               <Button
-                key={i}
+                key={action.label}
                 variant="outline"
-                className={`h-20 justify-center gap-3 rounded-2xl border-slate-200 bg-white text-slate-900 shadow-none transition-all ${action.hover}`}
+                className={`h-16 rounded-xl border font-semibold shadow-none transition hover:scale-[1.01] ${action.style}`}
               >
-                <span
-                  className={`flex h-10 w-10 items-center justify-center rounded-xl ${action.bg}`}
-                >
-                  <Icon className={`h-5 w-5 ${action.text}`} />
+                <span className="mr-2 flex h-9 w-9 items-center justify-center rounded-xl bg-white/70">
+                  <Icon className="h-5 w-5" />
                 </span>
-
-                <span className="text-sm font-semibold">{action.label}</span>
+                {action.label}
               </Button>
             );
           })}
