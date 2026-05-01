@@ -22,13 +22,14 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Eye, EyeOff } from "lucide-react";
 import Image from "next/image";
 
+const demoUser = {
+  email: "mehedi@lnovic.com",
+  password: "Mehedi1!",
+};
+
 export default function LoginForm() {
   const form = useForm({
     resolver: zodResolver(loginSchema),
-    defaultValues: {
-      email: "mehedi@lnovic.com",
-      password: "Mehedi1!",
-    },
   });
 
   const { setIsLoading } = useUser();
@@ -44,6 +45,12 @@ export default function LoginForm() {
     reset,
   } = form;
 
+  const handleDemoLogin = () => {
+    form.setValue("email", demoUser.email);
+    form.setValue("password", demoUser.password);
+
+    form.handleSubmit(onSubmit)();
+  };
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
     try {
       const res = await loginUser(data);
@@ -142,11 +149,21 @@ export default function LoginForm() {
             </div>
 
             <Button
-              disabled={isSubmitting ? true : false}
+              disabled={isSubmitting}
               type="submit"
               className="mt-4 py-6 w-full bg-gradient-to-r from-emerald-700 to-teal-600 hover:from-emerald-800 hover:to-teal-700"
             >
               {isSubmitting ? "Logging...." : "Login"}
+            </Button>
+
+            <Button
+              disabled={isSubmitting}
+              type="button"
+              variant="outline"
+              onClick={handleDemoLogin}
+              className="mt-3 py-6 w-full border-emerald-700 text-emerald-700 hover:bg-emerald-50"
+            >
+              Demo User Login
             </Button>
           </form>
         </Form>
