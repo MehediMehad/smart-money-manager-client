@@ -14,7 +14,7 @@ const HeroSection = () => {
           style={{ animationDelay: "0.15s" }}
         >
           Track your income and expenses, grow your savings, and manage debts
-          easily — all in one place.
+          easily all in one place.
         </p>
         <div
           className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16 animate-fade-in"
@@ -22,13 +22,13 @@ const HeroSection = () => {
         >
           <Link
             href="/dashboard"
-            className="inline-flex items-center justify-center rounded-lg bg-primary px-8 py-3 text-base font-semibold text-primary-foreground shadow-lg hover:opacity-90 transition-all duration-200 hover:shadow-xl"
+            className="inline-flex items-center justify-center rounded-lg bg-primary px-8 py-3 text-base font-semibold text-primary-foreground shadow-lg hover:opacity-90 transition-all duration-200 hover:shadow-xl bg-gradient-to-r from-emerald-700 to-teal-600 hover:from-emerald-800 hover:to-teal-700"
           >
             Get Started
           </Link>
           <Link
             href="/dashboard"
-            className="inline-flex items-center justify-center rounded-lg border border-border bg-card px-8 py-3 text-base font-semibold text-foreground hover:bg-accent transition-all duration-200"
+            className="inline-flex items-center justify-center rounded-lg border border-border bg-card px-8 py-3 text-base font-semibold text-gray-600 hover:bg-accent transition-all duration-200"
           >
             View Dashboard
           </Link>

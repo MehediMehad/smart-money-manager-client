@@ -58,8 +58,12 @@ export default function RegisterForm() {
         reset();
 
         setTimeout(() => {
-          router.replace(`/verify-otp?email=${data?.email}&type=VERIFY_EMAIL`);
+          router.replace(`/login`);
         }, 300);
+
+        // setTimeout(() => {
+        //   router.replace(`/verify-otp?email=${data?.email}&type=VERIFY_EMAIL`);
+        // }, 300);
       } else {
         toast.error(res?.message);
       }
@@ -165,7 +169,7 @@ export default function RegisterForm() {
                     </FormItem>
                   )}
                 />
-                <FormField
+                {/* <FormField
                   control={form.control}
                   name="passwordConfirm"
                   render={({ field }) => (
@@ -197,14 +201,14 @@ export default function RegisterForm() {
                       )}
                     </FormItem>
                   )}
-                />
+                /> */}
               </div>
             </div>
 
             <Button
               disabled={passwordConfirm && password !== passwordConfirm}
               type="submit"
-              className="mt-5 w-full"
+              className="mt-4 py-6 w-full bg-gradient-to-r from-emerald-700 to-teal-600 hover:from-emerald-800 hover:to-teal-700"
             >
               {isSubmitting ? "Registering...." : "Register"}
             </Button>

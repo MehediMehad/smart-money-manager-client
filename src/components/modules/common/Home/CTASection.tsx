@@ -9,7 +9,7 @@ const CTASection = () => {
         </h2>
         <Link
           href="/dashboard"
-          className="inline-flex items-center justify-center rounded-lg bg-primary px-8 py-3 text-base font-semibold text-primary-foreground shadow-lg hover:opacity-90 transition-all duration-200 hover:shadow-xl"
+          className="inline-flex items-center justify-center rounded-lg bg-primary px-8 py-3 text-white font-semibold text-primary-foreground shadow-lg hover:opacity-90 transition-all duration-200 hover:shadow-xl bg-gradient-to-r from-emerald-700 to-teal-600 hover:from-emerald-800 hover:to-teal-700"
         >
           Go to Dashboard
         </Link>

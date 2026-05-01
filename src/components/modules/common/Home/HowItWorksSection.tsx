@@ -14,7 +14,7 @@ const HowItWorksSection = () => {
         <div className="grid gap-8 md:grid-cols-3">
           {steps.map((step, i) => (
             <div key={i} className="flex flex-col items-center text-center">
-              <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-primary text-2xl font-bold text-primary-foreground shadow-md">
+              <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-r from-emerald-700 to-teal-600 hover:from-emerald-800 hover:to-teal-700 text-2xl font-bold text-primary-foreground shadow-md">
                 {step.number}
               </div>
               <h3 className="text-lg font-semibold text-foreground">

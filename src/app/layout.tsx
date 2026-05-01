@@ -1,14 +1,8 @@
 import "./globals.css";
 import { Metadata } from "next";
 import { Toaster } from "sonner";
-import { Noto_Sans_Bengali } from "next/font/google";
 import { Roboto } from "next/font/google";
 import UserProvider from "@/context/UserContext";
-
-const notoSansBengali = Noto_Sans_Bengali({
-  subsets: ["bengali", "latin"],
-  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
-});
 
 const roboto = Roboto({
   subsets: ["latin"],
@@ -16,8 +10,9 @@ const roboto = Roboto({
 });
 
 export const metadata: Metadata = {
-  title: "স্মার্ট মানি ম্যানেজার",
-  description: "তোমার টাকা-পয়সার হিসাব রাখো সহজে",
+  title: "Smart Money Manager",
+  description:
+    "Track your income and expenses, grow your savings, and manage debts easily all in one place.",
 };
 
 export default function RootLayout({
@@ -30,7 +25,7 @@ export default function RootLayout({
       <body className={`${roboto.className} antialiased`}>
         <UserProvider>
           {children}
-          <Toaster richColors position="top-center" />
+          <Toaster richColors position="top-right" />
         </UserProvider>
       </body>
     </html>

@@ -135,7 +135,7 @@ export default function LoginForm() {
             <div className="flex justify-end mt-1">
               <Link
                 href="/forgot-password"
-                className="text-sm font-medium text-primary hover:underline"
+                className="text-sm font-medium text-emerald-700 hover:underline"
               >
                 Forgot password?
               </Link>
@@ -144,7 +144,7 @@ export default function LoginForm() {
             <Button
               disabled={isSubmitting ? true : false}
               type="submit"
-              className="mt-4 w-full"
+              className="mt-4 py-6 w-full bg-gradient-to-r from-emerald-700 to-teal-600 hover:from-emerald-800 hover:to-teal-700"
             >
               {isSubmitting ? "Logging...." : "Login"}
             </Button>
@@ -152,7 +152,7 @@ export default function LoginForm() {
         </Form>
         <p className="text-sm text-gray-600 text-center my-3">
           Do not have any account ?
-          <Link href="/register" className="text-primary">
+          <Link href="/register" className="text-emerald-700 font-medium">
             {" "}
             Register
           </Link>
