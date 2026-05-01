@@ -7,8 +7,7 @@ import BudgetFilters from "./BudgetFilters";
 import BudgetAlerts from "./BudgetAlerts";
 import BudgetGrid from "./BudgetGrid";
 import BudgetFormModal from "./BudgetFormModal";
-import { TBudget } from "@/constants";
-import { TCategory } from "@/types";
+import { TBudget, TCategory } from "@/types";
 import BudgetEmptyState from "./BudgetEmptyState";
 import { getAlertBudgets, getBudgetStatus } from "./budget.utils";
 

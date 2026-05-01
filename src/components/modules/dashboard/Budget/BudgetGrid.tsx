@@ -1,4 +1,4 @@
-import { TBudget } from "@/constants";
+import { TBudget } from "@/types";
 import BudgetCard from "./BudgetCard";
 
 interface Props {

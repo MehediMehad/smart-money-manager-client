@@ -1,4 +1,4 @@
-import { TBudget } from "@/constants";
+import { TBudget } from "@/types";
 
 export const getBudgetStatus = (
     budget: TBudget,

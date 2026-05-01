@@ -1,6 +1,21 @@
 
+import type { TCategory } from "./category";
 
 export type BudgetType = "DAILY" | "MONTHLY";
+
+export type TBudget = {
+    id: string;
+    categoryId?: string;
+    amount: number;
+    spent?: number;
+    type: BudgetType;
+    date?: string | null;
+    month?: string | number | null;
+    year?: string | number | null;
+    category?: TCategory | null;
+    createdAt?: string;
+    updatedAt?: string;
+};
 
 export type TCreateBudgetForm = {
     categoryId: string;

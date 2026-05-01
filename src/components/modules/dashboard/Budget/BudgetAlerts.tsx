@@ -1,5 +1,5 @@
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { TBudget } from "@/constants";
+import { TBudget } from "@/types";
 import { AlertTriangle } from "lucide-react";
 
 export default function BudgetAlerts({ budgets }: { budgets: TBudget[] }) {

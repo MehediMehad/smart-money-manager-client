@@ -1,6 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { AlertTriangle } from "lucide-react";
-import { TBudget } from "@/constants";
+import { TBudget } from "@/types";
 import { cn } from "@/lib/utils";
 
 interface Props {
