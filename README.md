@@ -1,181 +1,228 @@
-# Event Planner & Participation System
+# Smart Money Manager
 
-![Event Planner Banner](https://placeholder.svg?height=300&width=800)
+Smart Money Manager is a personal finance dashboard for tracking income, expenses, budgets, savings goals, debts, and daily financial activity. The app is built with a Next.js client and an Express API backed by MongoDB through Prisma.
 
-A secure web platform built with Next.js , Node.js , and PostgreSQL that allows users to create, manage, and participate in events both public and private — with optional registration fees and payment integration.
+## Features
 
-## 🌟 Features
+- User registration, login, OTP verification, password reset, and cookie-based authentication
+- Dashboard overview for financial summaries
+- Income and expense tracking with categories
+- Daily and monthly budget management
+- Savings goals with contribution tracking
+- Debt tracking for money given or taken, including pending, paid, and overdue states
+- Today update page for quick financial activity review
+- Category management with default seeded categories
 
-### For Event Creators
-- Create, edit, and delete events
-- Set events as Public (open to all) or Private (host approval required)
-- Optionally charge registration fees
-- Approve or reject join requests
-- Ban participants
-- Send direct invitations
+## Tech Stack
 
-### For Event Participants
-- Browse upcoming events via homepage slider or detailed listings
-- Join free public events instantly
-- Request access to private events
-- Complete payment for paid events
-- Receive invitations with payment prompts when applicable
+### Client
 
-### For Admins
-- Monitor all events and user activity
-- Delete inappropriate events or accounts
-- Maintain a safe, well-moderated community
+- Next.js App Router
+- React
+- TypeScript
+- Tailwind CSS
+- shadcn/ui and Radix UI
+- React Hook Form
+- Zod
+- TanStack Table
+- Recharts
+- Axios
 
-## 🚀 Technology Stack
+### Server
 
-- **Frontend**: Next.js, Tailwind CSS, shadcn/ui
-- **Backend**: Node.js with Express.js
-- **Database**: PostgreSQL with Prisma ORM
-- **Authentication**: JWT
-- **Payment Integration**: Straip
-- **Deployment**: Vercel/Render/Railway
+- Node.js
+- Express
+- TypeScript
+- Prisma ORM
+- MongoDB
+- JWT authentication
+- Bcrypt
+- Nodemailer
+- Firebase Admin
+- Zod validation
 
-## 📋 Prerequisites
+## Repository Structure
 
-- Node.js (v18 or higher)
-- PostgreSQL
-- npm or yarn
+```txt
+project/
+├── smart-money-manager-client/   # Next.js frontend
+│   ├── src/app/                  # App Router pages and layouts
+│   ├── src/components/           # Shared and module components
+│   ├── src/services/             # API service functions
+│   ├── src/types/                # Frontend TypeScript types
+│   ├── src/validations/          # Zod validation schemas
+│   └── src/proxy.ts              # Route protection proxy
+└── smart-money-manager-server/   # Express backend
+    ├── prisma/schema.prisma      # Prisma MongoDB schema
+    ├── src/app/modules/          # Feature modules
+    ├── src/routes/               # API route registration
+    ├── src/configs/              # Environment config
+    └── src/server.ts             # Server entry point
+```
 
-## 🔧 Installation & Setup
+## Prerequisites
 
-1. **Clone the repository**
-   \`\`\`bash
-   git clone https://github.com/MehediMehad/Event-Fusion-Client.git
-   cd event-planner
-   \`\`\`
+- Node.js 20 or later
+- npm
+- MongoDB database URL
+- SMTP credentials for email/OTP flows
+- Firebase service credentials if push notification features are enabled
 
-2. **Install dependencies**
-   \`\`\`bash
-   npm install
-   # or
-   yarn install
-   \`\`\`
+## Environment Variables
 
-3. **Set up environment variables**
-   Create a `.env.local` file in the root directory with the following variables:
-   \`\`\`
-   # Database
-   DATABASE_URL="postgresql://username:password@localhost:5432/eventplanner"
-   
-   # Authentication
-   JWT_SECRET="your-jwt-secret"
-   
-   # Payment Gateway (if applicable)
-   PAYMENT_GATEWAY_API_KEY="your-payment-gateway-api-key"
-   PAYMENT_GATEWAY_SECRET="your-payment-gateway-secret"
-   
-   # Next.js
-   NEXT_PUBLIC_API_URL="http://localhost:3000/api"
-   \`\`\`
+Create a `.env.local` file inside `smart-money-manager-client`:
 
-4. **Set up the database**
-   \`\`\`bash
-   npx prisma migrate dev --name init
-   \`\`\`
+```env
+NEXT_PUBLIC_BASE_API=http://localhost:5000/api/v1
+```
 
-5. **Run the development server**
-   \`\`\`bash
-   npm run dev
-   # or
-   yarn dev
-   \`\`\`
+Create a `.env` file inside `smart-money-manager-server`:
 
-6. **Open your browser**
-   Navigate to [http://localhost:3000](http://localhost:3000)
+```env
+APP_NAME=Smart Money Manager
+NODE_ENV=development
+PORT=5000
+DATABASE_URL=mongodb+srv://USER:PASSWORD@HOST/DATABASE
 
-## 🏗️ Project Structure
+CLIENT_ORIGIN=http://localhost:3000
+CORS_ORIGINS=http://localhost:3000
 
-\`\`\`
-event-planner/
-├── app/                  # Next.js App Router
-│   ├── about/            # About page
-│   ├── contact/          # Contact page
-│   ├── dashboard/        # User dashboard
-│   ├── events/           # Events pages
-│   ├── api/              # API routes
-│   ├── layout.tsx        # Root layout
-│   └── page.tsx          # Homepage
-├── components/           # Reusable components
-│   ├── ui/               # UI components (shadcn/ui)
-│   └── ...               # Other components
-├── lib/                  # Utility functions
-├── prisma/               # Prisma schema and migrations
-├── public/               # Static assets
-└── ...                   # Config files
-\`\`\`
+SUPPER_ADMIN_EMAIL=admin@example.com
+ADMIN_PASSWORD=change-this-password
 
-## 🖥️ Usage
+JWT_ACCESS_SECRET=change-this-access-secret
+JWT_ACCESS_EXPIRES_IN=7d
+JWT_REFRESH_SECRET=change-this-refresh-secret
+JWT_REFRESH_EXPIRES_IN=30d
+JWT_RESET_PASS_SECRET=change-this-reset-secret
+JWT_RESET_PASS_EXPIRES_IN=10m
+BCRYPT_SALT_ROUNDS=12
+access_cookie_max_age=7
+REFRESH_COOKIE_MAX_AGE=30
 
-### Creating an Event
+```
 
-1. Log in to your account
-2. Navigate to the Dashboard
-3. Click "Create Event"
-4. Fill in the event details:
-   - Title, date, time, location
-   - Description
-   - Public/Private setting
-   - Registration fee (if applicable)
-5. Click "Create" to publish your event
+## Installation
 
-### Joining an Event
+Install client dependencies:
 
-1. Browse events on the homepage or Events page
-2. Click on an event to view details
-3. For free public events: Click "Join" to instantly join
-4. For paid events: Click "Pay & Join" to complete payment
-5. For private events: Click "Request to Join" to send a request
+```bash
+cd smart-money-manager-client
+npm install
+```
 
-### Managing Participants (for event creators)
+Install server dependencies:
 
-1. Navigate to your event in the Dashboard
-2. Click "Manage Participants"
-3. Approve or reject pending requests
-4. Ban participants if necessary
-5. Send invitations to other users
+```bash
+cd ../smart-money-manager-server
+npm install
+```
 
-## 📸 Screenshots
+Generate the Prisma client:
 
-![Homepage](https://placeholder.svg?height=400&width=800)
-*Homepage with featured events slider*
+```bash
+npm run prisma:generate
+```
 
-![Event Details](https://placeholder.svg?height=400&width=800)
-*Event details page with join options*
+## Run Locally
 
-![Dashboard](https://placeholder.svg?height=400&width=800)
-*User dashboard for managing events*
+Start the API server:
 
-## 🔄 API Endpoints
+```bash
+cd smart-money-manager-server
+npm run dev
+```
 
-### Authentication
-- `POST /api/auth/register` - Register a new user
-- `POST /api/auth/login` - Log in a user
-- `GET /api/auth/me` - Get current user
+Start the Next.js client in another terminal:
 
-### Events
-- `GET /api/events` - Get all events
-- `GET /api/events/:id` - Get a specific event
-- `POST /api/events` - Create a new event
-- `PUT /api/events/:id` - Update an event
-- `DELETE /api/events/:id` - Delete an event
+```bash
+cd smart-money-manager-client
+npm run dev
+```
 
-### Participation
-- `POST /api/events/:id/join` - Join or request to join an event
-- `GET /api/events/:id/participants` - Get event participants
-- `PUT /api/events/:id/participants/:userId` - Approve/reject a participant
-- `DELETE /api/events/:id/participants/:userId` - Remove a participant
+Open the app at:
 
-## 🤝 Contributing
+```txt
+http://localhost:3000
+```
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+The API health check is available at:
 
+```txt
+http://localhost:5000
+```
 
+## Available Scripts
+
+Client scripts:
+
+```bash
+npm run dev
+npm run build
+npm run start
+npm run lint
+npm run lint:fix
+```
+
+Server scripts:
+
+```bash
+npm run dev
+npm run build
+npm run start
+npm run worker
+npm run worker:start
+npm run prisma:generate
+npm run prisma:studio
+npm run lint
+npm run lint:fix
+npm run format
+npm run check-format
+```
+
+## Main API Routes
+
+All server routes are prefixed with `/api/v1`.
+
+- `/auth` - register, login, OTP verification, password reset, refresh token, profile, change password
+- `/dashboard` - dashboard summary data
+- `/today` - today's financial activity
+- `/categories` - category management
+- `/incomes` - income records
+- `/expenses` - expense records
+- `/budgets` - budget records
+- `/savings-goals` - savings goals and savings transactions
+- `/debts` - debt records
+
+## Dashboard Modules
+
+- `dashboard` - financial overview
+- `income` - add, edit, view, and filter income
+- `expense` - add, edit, view, and filter expenses
+- `budget` - manage budgets
+- `savings` - create goals and add saved amounts
+- `debts` - manage given and taken debts
+- `categories` - manage income and expense categories
+- `today-update` - daily snapshot and updates
+
+## Build
+
+Build the server:
+
+```bash
+cd smart-money-manager-server
+npm run build
+```
+
+Build the client:
+
+```bash
+cd smart-money-manager-client
+npm run build
+```
+
+## Notes
+
+- The server seeds a super admin and default categories when it starts.
+- The backend uses MongoDB, so Prisma migrations are not used in the same way as SQL databases. Use `npm run prisma:generate` after schema changes.
+- Keep `NEXT_PUBLIC_BASE_API` aligned with the server `PORT` and `/api/v1` prefix.
