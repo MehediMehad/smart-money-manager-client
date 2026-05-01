@@ -3,11 +3,16 @@ import { getCurrentUser } from "./services/Auth";
 
 type Role = keyof typeof roleBasedPrivateRoutes;
 
-const authRoutes = ["/login", "/register", "/verify-otp", '/forgot-password'];
+const authRoutes = [
+  "/login",
+  "/register",
+  "/verify-otp",
+  "/forgot-password",
+  "/reset-password",
+];
 
 const roleBasedPrivateRoutes = {
-  user: [/^\/user/, /^\/create-shop/],
-  admin: [/^\/admin/],
+  user: [/^\/dashboard/],
 };
 
 export const proxy = async (request: NextRequest) => {
@@ -15,24 +20,29 @@ export const proxy = async (request: NextRequest) => {
 
   const userInfo = await getCurrentUser();
 
-  const normalizedRole = userInfo?.role.toLowerCase() as Role;
+  const normalizedRole = userInfo?.role?.toLowerCase() as Role | undefined;
 
+  // Not logged in
   if (!userInfo) {
     if (authRoutes.includes(pathname)) {
       return NextResponse.next();
-    } else {
-      return NextResponse.redirect(
-        new URL(
-          `http://localhost:3000/login?redirectPath=${pathname}`,
-          request.url
-        )
-      );
     }
+
+    return NextResponse.redirect(
+      new URL(`/login?redirectPath=${pathname}`, request.url)
+    );
   }
 
+  // Logged in user should not go to auth pages
+  if (authRoutes.includes(pathname)) {
+    return NextResponse.redirect(new URL("/dashboard", request.url));
+  }
+
+  // Role based private route access
   if (normalizedRole && roleBasedPrivateRoutes[normalizedRole]) {
-    const routes = roleBasedPrivateRoutes[normalizedRole];
-    if (routes.some((route) => pathname.match(route))) {
+    const allowedRoutes = roleBasedPrivateRoutes[normalizedRole];
+
+    if (allowedRoutes.some((route) => pathname.match(route))) {
       return NextResponse.next();
     }
   }
@@ -43,11 +53,11 @@ export const proxy = async (request: NextRequest) => {
 export const config = {
   matcher: [
     "/login",
-    "/create-shop",
-    "/admin",
-    "/admin/:page",
-    "/user",
-    "/user/create-event",
-    "/user/:page",
+    "/register",
+    "/verify-otp",
+    "/forgot-password",
+    "/reset-password",
+    "/dashboard",
+    "/dashboard/:path*",
   ],
 };
