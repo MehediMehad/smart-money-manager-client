@@ -73,7 +73,7 @@ const AppSidebar = () => {
                       <Link
                         href={item.url}
                         className={clsx(
-                          "flex items-center hover:font-bold rounded-lg px-4 py-3 text-[15px] transition-all",
+                          "flex items-center hover:font-bold rounded-lg px-4 py-6 text-[15px] transition-all",
                           "hover:bg-accent/70",
                           isActive &&
                             "bg-accent text-accent-foreground font-semibold shadow-sm",
