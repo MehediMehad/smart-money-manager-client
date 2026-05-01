@@ -3,18 +3,18 @@ import { TrendingUp, Target, HandCoins } from "lucide-react";
 const features = [
   {
     icon: TrendingUp,
-    title: "আয় ও ব্যয় ট্র্যাকিং",
-    description: "প্রতিদিনের আয়-ব্যয়ের হিসাব সহজভাবে সংরক্ষণ করুন।",
+    title: "Income & Expense Tracking",
+    description: "Easily keep records of your daily income and expenses.",
   },
   {
     icon: Target,
-    title: "সঞ্চয় লক্ষ্য নির্ধারণ",
-    description: "নির্দিষ্ট লক্ষ্য ঠিক করুন এবং অগ্রগতি দেখুন।",
+    title: "Set Savings Goals",
+    description: "Set specific goals and track your progress.",
   },
   {
     icon: HandCoins,
-    title: "ধার-দেনা ব্যবস্থাপনা",
-    description: "কে কত টাকা নিয়েছে বা দিয়েছে তা ভুলবেন না আর কখনও।",
+    title: "Debt Management",
+    description: "Never forget who borrowed or paid how much money again.",
   },
 ];
 
@@ -23,7 +23,7 @@ const FeaturesSection = () => {
     <section className="py-20 bg-muted/40">
       <div className="container mx-auto px-4">
         <h2 className="mb-12 text-center text-3xl font-bold text-foreground md:text-4xl">
-          আপনার অর্থ ব্যবস্থাপনার জন্য প্রয়োজনীয় সবকিছু
+          Everything You Need to Manage Your Money
         </h2>
         <div className="grid gap-8 md:grid-cols-3">
           {features.map((feature, i) => (

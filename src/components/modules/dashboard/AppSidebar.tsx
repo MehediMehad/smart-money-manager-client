@@ -4,8 +4,6 @@ import {
   ArrowUpCircle,
   PiggyBank,
   HandCoins,
-  Settings,
-  Bell,
   Clock,
   Receipt,
 } from "lucide-react";
@@ -42,8 +40,8 @@ const menuItems = [
     url: "/dashboard/categories",
     icon: MdOutlineCategory,
   },
-  { title: "Notifications", url: "/dashboard/notifications", icon: Bell },
-  { title: "Settings", url: "/dashboard/settings", icon: Settings },
+  // { title: "Notifications", url: "/dashboard/notifications", icon: Bell },
+  // { title: "Settings", url: "/dashboard/settings", icon: Settings },
 ];
 
 const AppSidebar = () => {

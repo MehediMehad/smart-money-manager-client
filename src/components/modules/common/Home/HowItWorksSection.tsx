@@ -1,7 +1,7 @@
 const steps = [
-  { number: "১", title: "আয় ও ব্যয় যোগ করুন" },
-  { number: "২", title: "সঞ্চয়ের লক্ষ্য নির্ধারণ করুন" },
-  { number: "৩", title: "রিপোর্ট দেখে বিশ্লেষণ করুন" },
+  { number: "1", title: "Add Income & Expenses" },
+  { number: "2", title: "Set Savings Goals" },
+  { number: "3", title: "Analyze Reports" },
 ];
 
 const HowItWorksSection = () => {
@@ -9,7 +9,7 @@ const HowItWorksSection = () => {
     <section className="py-20">
       <div className="container mx-auto px-4">
         <h2 className="mb-14 text-center text-3xl font-bold text-foreground md:text-4xl">
-          কিভাবে কাজ করে
+          How It Works
         </h2>
         <div className="grid gap-8 md:grid-cols-3">
           {steps.map((step, i) => (
