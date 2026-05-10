@@ -22,6 +22,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import clsx from "clsx";
 import { MdOutlineCategory } from "react-icons/md";
+import Image from "next/image";
+import logo from "@/assets/logo.png";
 
 const menuItems = [
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
@@ -52,10 +54,26 @@ const AppSidebar = () => {
   return (
     <Sidebar collapsible="icon">
       <SidebarContent>
+        {/* Logo Text */}
+        <div className="flex items-center justify-center">
+          <Link href="/dashboard" className="flex items-center justify-center">
+            <Image
+              src={logo}
+              alt="Smart Money Manager"
+              width={70}
+              height={20}
+              priority
+              className={clsx(
+                "object-contain transition-all duration-300",
+                collapsed ? "w-16 h-16" : "w-auto h-auto",
+              )}
+            />
+          </Link>
+        </div>
         <SidebarGroup>
-          <SidebarGroupLabel className="text-base font-bold px-4 py-3 mb-4">
+          {/* <SidebarGroupLabel className="text-base font-bold px-4 py-3 mb-4">
             {!collapsed && ""}
-          </SidebarGroupLabel>
+          </SidebarGroupLabel> */}
           <SidebarGroupContent>
             <SidebarMenu>
               {menuItems.map((item) => {
