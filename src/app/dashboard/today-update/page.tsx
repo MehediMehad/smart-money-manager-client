@@ -10,7 +10,11 @@ import { TodayData } from "@/types";
 
 const TodayUpdatePage = async () => {
   const todayData: TodayData = await getTodayUpdate();
-  const categories = await getCategories();
+  const categoriesResponse = await getCategories();
+
+  const categories = Array.isArray(categoriesResponse)
+    ? categoriesResponse
+    : (categoriesResponse?.data ?? []);
 
   return (
     <div className="min-h-screen bg-[#F8FAFC]">
