@@ -43,6 +43,7 @@ const DebtHeader = () => {
         </div>
 
         <Button
+          size="lg"
           onClick={handleOpenDialog}
           className="hidden sm:flex items-center gap-2 py-5 bg-gradient-to-r from-emerald-700 to-teal-600 hover:from-emerald-800 hover:to-teal-700"
         >

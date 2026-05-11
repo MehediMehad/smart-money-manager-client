@@ -44,7 +44,10 @@ export function CreateGoalDialog() {
     <>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
-          <Button className="gap-2 bg-gradient-to-r from-emerald-700 to-teal-600">
+          <Button
+            size="lg"
+            className="gap-2 bg-gradient-to-r from-emerald-700 to-teal-600"
+          >
             <Plus className="h-4 w-4" />
             New Goal
           </Button>

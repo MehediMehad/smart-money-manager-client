@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { getDashboardOverview } from "@/services/Dashboard";
 import OverviewChart from "./OverviewChart";
+import Link from "next/link";
 // import OverviewChart from "@/components/modules/dashboard/Home/OverviewChart";
 
 const debts = {
@@ -233,9 +234,12 @@ const DashboardPage = async () => {
               <Card className="rounded-2xl border-slate-200 bg-white shadow-sm">
                 <CardHeader className="flex flex-row items-center justify-between">
                   <CardTitle>Savings Goals</CardTitle>
-                  <Button variant="ghost" size="sm" className="text-xs">
+                  <Link
+                    href={"/dashboard/savings"}
+                    className="text-xs text-emerald-600"
+                  >
                     View All
-                  </Button>
+                  </Link>
                 </CardHeader>
 
                 <CardContent className="space-y-4">

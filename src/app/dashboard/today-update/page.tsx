@@ -4,11 +4,13 @@ import RemindersCard from "@/components/modules/dashboard/TodayUpdate/RemindersC
 import SummaryCards from "@/components/modules/dashboard/TodayUpdate/SummaryCards";
 import TodayHeader from "@/components/modules/dashboard/TodayUpdate/TodayHeader";
 import TransactionsCard from "@/components/modules/dashboard/TodayUpdate/TransactionsCard";
+import { getCategories } from "@/services/Category";
 import { getTodayUpdate } from "@/services/ToDayUpdate";
 import { TodayData } from "@/types";
 
 const TodayUpdatePage = async () => {
   const todayData: TodayData = await getTodayUpdate();
+  const categories = await getCategories();
 
   return (
     <div className="min-h-screen bg-[#F8FAFC]">
@@ -17,7 +19,7 @@ const TodayUpdatePage = async () => {
 
         <MainStatusCard todayData={todayData} />
         <SummaryCards todayData={todayData} />
-        <QuickActionsCard />
+        <QuickActionsCard categories={categories} />
 
         <div className="grid gap-6 lg:grid-cols-[1.05fr_1fr]">
           <TransactionsCard todayTransactions={todayData.transactions} />

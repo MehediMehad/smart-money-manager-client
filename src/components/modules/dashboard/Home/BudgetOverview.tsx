@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
 import { CalendarDays } from "lucide-react";
+import Link from "next/link";
 
 type TBudget = {
   title: string;
@@ -25,9 +26,8 @@ function BudgetOverview({ budgets }: { budgets: TBudget[] }) {
           <div key={item.title}>
             <div className="mb-3 flex items-center justify-between">
               <h3 className="font-semibold">{item.title}</h3>
-              <Button
-                variant="ghost"
-                size="sm"
+              <Link
+                href={`/dashboard/budget`}
                 className={cn(
                   "h-7 text-xs",
                   item.color === "green" && "text-emerald-600",
@@ -35,7 +35,7 @@ function BudgetOverview({ budgets }: { budgets: TBudget[] }) {
                 )}
               >
                 View Details
-              </Button>
+              </Link>
             </div>
 
             <div className="rounded-2xl border p-4">

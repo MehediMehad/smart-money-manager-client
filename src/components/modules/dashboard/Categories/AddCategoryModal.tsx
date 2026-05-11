@@ -84,8 +84,8 @@ export default function AddCategoryModal({
           </Button>
         ) : (
           <Button
-            size="sm"
-            className="gap-1.5 hidden sm:flex shadow-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white transition-all duration-200 ease-in-out py-2 px-4 rounded-lg"
+            size="lg"
+            className="hidden sm:flex items-center gap-2 py-5 bg-gradient-to-r from-emerald-700 to-teal-600 hover:from-emerald-800 hover:to-teal-700"
           >
             <Plus className="h-4 w-4" />
             Add Category
